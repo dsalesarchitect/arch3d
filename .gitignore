@@ -7,6 +7,7 @@
 .vscode
 *.log
 *.tmp
+.github/
 tools/
 *.tar.gz
 find_params.ps1

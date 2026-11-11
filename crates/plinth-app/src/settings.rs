@@ -506,9 +506,9 @@ impl Default for DiagnosticsSettings {
             detailed_telemetry: true,
             log_messages: vec![
                 "[Arch3D Core] System initialized cleanly.".into(),
-                "[plinth-geom] Vector engine running with hardware SSE/AVX acceleration.".into(),
-                "[plinth-ifc] IFC4 ISO 10303-21 parser ready.".into(),
-                "[plinth-views] Interactive 3D Painter engine loaded.".into(),
+                "[Arch3D Geom] Vector engine running with hardware SSE/AVX acceleration.".into(),
+                "[Arch3D IFC] IFC4 ISO 10303-21 parser ready.".into(),
+                "[Arch3D Views] Interactive 3D Painter engine loaded.".into(),
             ],
         }
     }

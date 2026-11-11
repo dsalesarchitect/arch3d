@@ -244,10 +244,10 @@ pub fn export_ifc4(doc: &Document) -> String {
     let unit_assign = b.add_line(&format!("IFCUNITASSIGNMENT((#{unit_len},#{unit_ang},#{unit_area}))"));
 
     // Owner history & Context
-    let person = b.add_line("IFCPERSON($,'Plinth Architect',$,$,$,$,$,$)");
-    let org = b.add_line("IFCORGANIZATION($,'Plinth BIM',$,$,$)");
+    let person = b.add_line("IFCPERSON($,'Arch3D Architect',$,$,$,$,$,$)");
+    let org = b.add_line("IFCORGANIZATION($,'Arch3D',$,$,$)");
     let person_org = b.add_line(&format!("IFCPERSONANDORGANIZATION(#{person},#{org},$)"));
-    let app = b.add_line(&format!("IFCAPPLICATION(#{org},'1.0','Plinth BIM','Plinth')"));
+    let app = b.add_line(&format!("IFCAPPLICATION(#{org},'1.0','Arch3D','Arch3D')"));
     let owner_hist = b.add_line(&format!(
         "IFCOWNERHISTORY(#{person_org},#{app},.READWRITE.,.ADDED.,1730300000,#{person_org},#{app},1730300000)"
     ));

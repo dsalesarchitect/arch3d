@@ -5,7 +5,7 @@
 **A cleanroom, modern BIM authoring application powered by a high-performance pure Rust engine.**
 
 [![Rust 1.81+](https://img.shields.io/badge/rust-1.81%2B-orange.svg)](https://www.rust-lang.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT OR GPL-3.0](https://img.shields.io/badge/License-MIT%20%7C%20GPL--3.0-blue.svg)](LICENSE)
 [![Schema: IFC4](https://img.shields.io/badge/IFC-4_ISO_10303--21-brightgreen.svg)](https://technical.buildingsmart.org/standards/ifc/)
 [![Web Studio](https://img.shields.io/badge/Web_Studio-Live_on_GitHub_Pages-cyan.svg)](https://dsalesarchitect.github.io/arch3d/)
 
@@ -32,7 +32,7 @@ Arch3D offers a streamlined, developer-friendly architectural and structural mod
 ## 🏛 Workspace Architecture
 
 ```text
-plinth-bim/
+arch3d/
 ├── crates/
 │   ├── plinth-geom/     # Geometry kernel: 2D/3D vectors, AABBs, affine transforms,
 │   │                    # ear-clipping polygon triangulation, prism solids, clipping.
@@ -125,7 +125,7 @@ Test live in your browser without installation: [https://dsalesarchitect.github.
 
 ## 📐 Single Source of Truth Projection Engine
 
-In Plinth, every building element is stored once in 3D world space at standard 1:1 scale (mm):
+In Arch3D, every building element is stored once in 3D world space at standard 1:1 scale (mm):
 $$\mathbf{X}_{world} = (x, y, z) \in \mathbb{R}^3$$
 
 When viewing the model:
@@ -139,5 +139,8 @@ When viewing the model:
 
 ## 📄 License
 
-Plinth BIM is open-source software licensed under the [MIT License](LICENSE).
+Arch3D is open-source software dual-licensed under your choice of either:
+- **MIT License** ([LICENSE-MIT](LICENSE-MIT) or [LICENSE](LICENSE))
+- **GNU General Public License v3.0** ([LICENSE-GPL](LICENSE-GPL))
+
 All contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).

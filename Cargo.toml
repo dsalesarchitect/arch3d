@@ -12,10 +12,10 @@ default-members = ["crates/plinth-app"]
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
-repository = "https://github.com/your-org/plinth-bim"
+license = "MIT OR GPL-3.0-or-later"
+repository = "https://github.com/dsalesarchitect/arch3d"
 rust-version = "1.81"
-authors = ["Plinth BIM contributors"]
+authors = ["David Sales <dsalesarchitect@gmail.com>", "Arch3D Contributors"]
 
 [workspace.dependencies]
 # Internal crates

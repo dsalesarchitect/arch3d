@@ -218,7 +218,7 @@ pub fn render_ribbon(
                 if btn(ui, "New", IconKind::NewProject, false).on_hover_text("Create New BIM Project (Ctrl+N)").clicked() {
                     action.new_project = true;
                 }
-                if btn(ui, "Open", IconKind::OpenProject, false).on_hover_text("Open Arch3D Project (.arch3d, .plinth) or CAD/BIM File (Ctrl+O)").clicked() {
+                if btn(ui, "Open", IconKind::OpenProject, false).on_hover_text("Open Arch3D Project (.arch3d) or CAD/BIM File (Ctrl+O)").clicked() {
                     action.open_project = true;
                 }
                 if btn(ui, "Save", IconKind::Save, false).on_hover_text("Save Current Project (Ctrl+S)").clicked() {

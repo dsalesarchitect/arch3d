@@ -1,12 +1,12 @@
-# Contributing to Plinth BIM
+# Contributing to Arch3D
 
-Thank you for your interest in contributing to **Plinth BIM**! Plinth is an open-source, cleanroom BIM (Building Information Modeling) engine and application inspired by Revit with a simplified, high-performance approach written in Rust.
+Thank you for your interest in contributing to **Arch3D**! Arch3D is an open-source, cleanroom BIM (Building Information Modeling) engine and authoring application powered by a high-performance pure Rust engine.
 
 ---
 
 ## 🏛 Cleanroom Architecture Policy
 
-Plinth is strictly authored from scratch under a **cleanroom engineering policy**:
+Arch3D is strictly authored from scratch under a **cleanroom engineering policy**:
 - **No decompiled, proprietary, or reverse-engineered code**: Do not copy or reference proprietary CAD/BIM source code.
 - **Open Standards**: All data exchange uses the open ISO 10303-21 standard (buildingSMART IFC4 schema).
 - **Original Implementations**: All geometric algorithms, projection routines, and UI panels are original implementations designed for simplicity, readability, and speed.
@@ -15,7 +15,7 @@ Plinth is strictly authored from scratch under a **cleanroom engineering policy*
 
 ## 📦 Workspace Crates
 
-Plinth is modularized into 5 focused crates:
+Arch3D is modularized into 5 focused crates:
 
 | Crate | Description |
 |---|---|
@@ -36,17 +36,17 @@ Plinth is modularized into 5 focused crates:
 ### Building and Testing
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/plinth-bim.git
-cd plinth-bim
+git clone https://github.com/dsalesarchitect/arch3d.git
+cd arch3d
 
 # Check all crates
 cargo check --workspace
 
 # Run all unit and integration tests
-cargo test --lib --workspace
+cargo test --workspace
 
 # Run the desktop application
-cargo run --bin plinth
+cargo run --bin arch3d
 ```
 
 ---

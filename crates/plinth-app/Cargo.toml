@@ -1,6 +1,6 @@
 [package]
 name = "plinth-app"
-description = "Desktop BIM application inspired by Revit with simplified approach, ribbon UI, 1:1 single-source-of-truth views"
+description = "Arch3D: Fast, lightweight BIM authoring platform powered by pure Rust and OpenGL"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

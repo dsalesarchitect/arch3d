@@ -938,7 +938,7 @@ impl eframe::App for PlinthApp {
             #[cfg(not(target_arch = "wasm32"))]
             if action.save_as_project || trigger_save_as {
                 if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("Arch3D Project (*.arch3d, *.plinth, *.json)", &["arch3d", "plinth", "json"])
+                    .add_filter("Arch3D Project (*.arch3d, *.json)", &["arch3d", "plinth", "json"])
                     .add_filter("IFC4 BIM Model (*.ifc)", &["ifc"])
                     .set_file_name("project.arch3d")
                     .save_file()
@@ -951,7 +951,7 @@ impl eframe::App for PlinthApp {
             if action.open_project || action.import_file || action.import_ifc || trigger_open {
                 pick_file_web(
                     self.pending_file_loads.clone(),
-                    "All Supported Files (*.arch3d, *.plinth, *.ifc, *.skp, *.dwg, *.dxf, *.step, *.json)",
+                    "All Supported Files (*.arch3d, *.ifc, *.skp, *.dwg, *.dxf, *.step, *.json)",
                     &["arch3d", "plinth", "ifc", "skp", "dwg", "dxf", "step", "json"],
                 );
             }
@@ -960,10 +960,10 @@ impl eframe::App for PlinthApp {
             if action.open_project || action.import_file || action.import_ifc || trigger_open {
                 if let Some(path) = rfd::FileDialog::new()
                     .add_filter(
-                        "All Supported Files (*.arch3d, *.plinth, *.ifc, *.skp, *.dwg, *.dxf, *.step, *.json)",
+                        "All Supported Files (*.arch3d, *.ifc, *.skp, *.dwg, *.dxf, *.step, *.json)",
                         &["arch3d", "plinth", "ifc", "skp", "dwg", "dxf", "step", "json"],
                     )
-                    .add_filter("Arch3D Project (*.arch3d, *.plinth, *.json)", &["arch3d", "plinth", "json"])
+                    .add_filter("Arch3D Project (*.arch3d, *.json)", &["arch3d", "plinth", "json"])
                     .add_filter("AutoCAD Drawing (*.dwg, *.dxf)", &["dwg", "dxf"])
                     .add_filter("SketchUp Model (*.skp)", &["skp"])
                     .add_filter("IFC BIM Model (*.ifc, *.step)", &["ifc", "step"])
@@ -1026,7 +1026,7 @@ impl eframe::App for PlinthApp {
             if action.export_file || action.export_ifc || trigger_export {
                 if let Some(path) = rfd::FileDialog::new()
                     .add_filter("IFC4 BIM Model (*.ifc)", &["ifc"])
-                    .add_filter("Arch3D Project JSON (*.arch3d, *.plinth, *.json)", &["arch3d", "plinth", "json"])
+                    .add_filter("Arch3D Project JSON (*.arch3d, *.json)", &["arch3d", "plinth", "json"])
                     .set_file_name("model.ifc")
                     .save_file()
                 {
