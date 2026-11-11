@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn test_wall_miter_corners_and_seamless_openings() {
-        let doc = Document::create_sample_building();
+        let doc = Document::create_test_box_building();
         let all_walls: Vec<&plinth_model::Wall> = doc
             .elements
             .values()
@@ -507,8 +507,15 @@ mod tests {
     #[test]
     fn test_curtain_wall_auto_hosting_and_wall_hole_cut() {
         use plinth_geom::vec2;
-        let mut doc = Document::create_sample_building();
-        let lvl = doc.active_level_id;
+        let mut doc = Document::new_empty();
+        let lvl_obj = plinth_model::Level::new("Level 1", 0.0, 3000.0);
+        let lvl = lvl_obj.id;
+        doc.levels.insert(lvl, lvl_obj);
+        doc.active_level_id = lvl;
+        let v3d_obj = plinth_model::ViewDef::new_3d("3D View");
+        doc.views.insert(v3d_obj.id, v3d_obj);
+        let v_plan_obj = plinth_model::ViewDef::new_floor_plan("Level 1", lvl);
+        doc.views.insert(v_plan_obj.id, v_plan_obj);
 
         // 1. Create a 10m long host wall
         let mut wall = plinth_model::Wall::new(vec2(0.0, 0.0), vec2(10000.0, 0.0), lvl);

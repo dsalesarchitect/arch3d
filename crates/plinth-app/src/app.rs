@@ -2602,7 +2602,11 @@ mod tests {
     #[test]
     fn test_curtain_wall_app_workflow_and_level_replication() {
         let mut app = PlinthApp::default();
-        let lvl1 = app.doc.active_level_id;
+        app.doc = plinth_model::Document::new_empty();
+        let lvl1 = plinth_model::Level::new("Level 1", 0.0, 3000.0);
+        let lvl1_id = lvl1.id;
+        app.doc.levels.insert(lvl1_id, lvl1);
+        app.doc.active_level_id = lvl1_id;
 
         // Verify curtain wall tool is available
         app.active_tool = Tool::DrawCurtainWall { start: None };
@@ -2615,13 +2619,13 @@ mod tests {
         // 1. Add host wall
         use plinth_geom::vec2;
         use plinth_model::{CurtainWall, Element, Wall};
-        let mut wall = Wall::new(vec2(0.0, 0.0), vec2(8000.0, 0.0), lvl1);
+        let mut wall = Wall::new(vec2(0.0, 0.0), vec2(8000.0, 0.0), lvl1_id);
         wall.unconnected_height = 3200.0;
         let wall_id = wall.id;
         app.doc.elements.insert(wall_id, Element::Wall(wall));
 
         // 2. Add hosted curtain wall embedded inside the wall
-        let mut cw = CurtainWall::new(vec2(1500.0, 0.0), vec2(5500.0, 0.0), lvl1);
+        let mut cw = CurtainWall::new(vec2(1500.0, 0.0), vec2(5500.0, 0.0), lvl1_id);
         cw.host_wall = Some(wall_id);
         cw.automatically_embed = true;
         app.tool_studio.configure_new_curtain_wall(&app.doc, &mut cw);
@@ -2637,7 +2641,7 @@ mod tests {
         let filter = crate::level_copy::EntityCategoryFilter::default();
         let clipboard = crate::level_copy::copy_level_entities(
             &app.doc,
-            lvl1,
+            lvl1_id,
             &filter,
             false,
         );
@@ -2706,7 +2710,8 @@ mod tests {
 
     #[test]
     fn test_wall_corners_visible_in_3d_and_opening_clean_cut_and_picking() {
-        let app = PlinthApp::default();
+        let mut app = PlinthApp::default();
+        app.doc = plinth_model::Document::create_test_box_building();
         let doc = &app.doc;
 
         // 1. Verify GPU Scene generation uses exact B-Rep faces
@@ -2920,7 +2925,7 @@ mod tests {
 
     #[test]
     fn test_diagnose_3d_picking_issue() {
-        let doc = plinth_model::Document::create_sample_building();
+        let doc = plinth_model::Document::create_test_box_building();
         let cam = plinth_model::Camera3D::default();
         let target = plinth_geom::Vec3::new(cam.target_x, cam.target_y, cam.target_z);
         let center = egui::Pos2::new(500.0, 400.0);

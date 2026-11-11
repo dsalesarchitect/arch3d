@@ -548,7 +548,7 @@ mod tests {
 
     #[test]
     fn test_export_single_sheet_pdf() {
-        let doc = Document::create_sample_building();
+        let doc = Document::create_test_box_building();
         let sheet_id = doc.sheets.keys().next().copied().unwrap();
 
         let pdf_bytes = export_sheet_pdf(&doc, sheet_id, VisualStyle::ConsistentColors).unwrap();
@@ -562,7 +562,7 @@ mod tests {
 
     #[test]
     fn test_export_all_sheets_multi_page_pdf() {
-        let mut doc = Document::create_sample_building();
+        let mut doc = Document::create_test_box_building();
         let s2 = Sheet::new("A102", "ELEVATIONS & SECTIONS", PaperSize::A1);
         doc.sheets.insert(s2.id, s2);
 
