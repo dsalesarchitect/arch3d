@@ -1,0 +1,47 @@
+[package]
+name = "plinth-app"
+description = "Desktop BIM application inspired by Revit with simplified approach, ribbon UI, 1:1 single-source-of-truth views"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[lib]
+name = "plinth_app"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "arch3d"
+path = "src/main.rs"
+
+[[bin]]
+name = "plinth"
+path = "src/bin/plinth.rs"
+
+[dependencies]
+plinth-geom.workspace = true
+plinth-model.workspace = true
+plinth-views.workspace = true
+plinth-ifc.workspace = true
+
+eframe.workspace = true
+egui.workspace = true
+egui_glow = "0.31"
+glow = "0.16"
+rfd.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+log.workspace = true
+env_logger.workspace = true
+web-time = "1.1"
+flate2 = "1.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["Window", "Document", "HtmlCanvasElement", "HtmlAnchorElement", "Blob", "BlobPropertyBag", "Url"] }
+console_error_panic_hook = "0.1"

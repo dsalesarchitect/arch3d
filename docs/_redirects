@@ -1,0 +1,9 @@
+# Cloudflare Pages Redirects & Clean Routing for Arch3D
+
+# Clean URL aliases
+/home          /                  301
+/download      /#download         302
+/features      /#features         302
+/specs         /#specifications   302
+/docs          /#documentation    302
+/github        https://github.com/redwood-ph/arch3d 302

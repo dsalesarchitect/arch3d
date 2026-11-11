@@ -1,0 +1,17 @@
+/target
+**/*.rs.bk
+*.pdb
+*.orig
+.cargo/*.temp*
+.idea
+.vscode
+*.log
+*.tmp
+tools/
+*.tar.gz
+find_params.ps1
+test_icon.ps1
+trace.ps1
+rendered_test.png
+blender_ascii.txt
+blender_logo.svg

@@ -1,0 +1,37 @@
+1. 100% Rust Programming Language
+
+Every line of application code, business logic, file parsing, and rendering across the entire workspace is written in standard Rust (edition = "2021"):
+
+Workspace Crate	Purpose	Language & Dependencies
+plinth-geom	Computational geometry kernel	Pure Rust (zero external dependencies except serde)
+plinth-model	Single-source-of-truth BIM document & elements	Pure Rust (serde, uuid, pure-Rust parsers)
+plinth-views	Plans, elevations, sections, 3D projections	Pure Rust
+plinth-ifc	ISO 10303-21 STEP / IFC4 reader & writer	Pure Rust (custom lexer & serializer)
+plinth-app	Desktop GUI, multi-pane canvas & GPU viewport	Pure Rust (eframe, egui, glow, egui_glow)
+No C/C++ runtimes or wrapper DLLs: Compiles directly to a single native Windows executable (arch3d.exe) using standard Cargo (cargo build --bin arch3d).
+No proprietary binary blobs: Zero foreign function interfaces (FFI) to proprietary libraries.
+2. 100% Clean-Room Architecture
+
+Arch3D was developed entirely from scratch using first-principles mathematics, open ISO standards, and documented file specifications:
+
+Geometry Kernel (plinth-geom):
+
+All 2D and 3D algorithms (Newell normal computation, Sutherland-Hodgman polygon clipping, ear-clipping triangulation, B-Rep boundary generation, ray-plane picking) are original implementations derived from foundational mathematics.
+Zero reliance on commercial proprietary modeling kernels (no ACIS, no Parasolid, no Autodesk ShapeManager).
+
+Open International Standards Compliance (plinth-ifc):
+
+Parsed and serialized directly against the open ISO 10303-21 (STEP) and buildingSMART IFC4 public standards.
+
+CAD & 3D Model Importers (plinth-model):
+
+AutoCAD DWG/DXF: Uses acadrust (0.6.8), a pure-Rust parser written from open specification reverse engineering—completely free from Autodesk ObjectARX or RealDWG SDKs.
+SketchUp SKP: Uses openskp (0.5.0), a clean-room Rust parser reading standard ZIP containers and documented MFC CArchive streams—zero Trimble SketchUp C++ SDK (SlApi.dll) dependencies.
+
+100% Vector Procedural UI (icons.rs):
+
+All ribbon and toolbar icons are mathematical vector paths rendered on the fly via egui::Painter. There are zero copyrighted raster/PNG icons or third-party image assets.
+
+No Proprietary Code or Reverse-Engineered Binaries:
+
+The codebase does not decompile, copy, or link to any proprietary binaries from Revit, ArchiCAD, SketchUp, or AutoCAD.

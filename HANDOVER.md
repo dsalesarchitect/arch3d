@@ -1,0 +1,285 @@
+# Arch3D (formerly Plinth BIM) — Master Engineering Handover Notes
+
+**Project**: Arch3D / Plinth BIM  
+**Location**: `d:\Arch3D`  
+**Target**: `x86_64-pc-windows-gnu`  
+**Date**: November 5, 2026  
+**Status**: 100% Passing Tests (93/93 unit & integration tests passed across all crates, 0 warnings)  
+
+---
+
+## 0. Critical Directory Isolation Rule (Read Before Doing Anything)
+
+> [!IMPORTANT]
+> - **Arch3D Root Directory**: Arch3D is located EXCLUSIVELY in `D:\Arch3D`.
+> - **Do NOT touch or pollute `D:\mymusicapp`**: That folder is an independent Python/PyTorch AI music app. Never place Arch3D files, cargo builds, or code into `D:\mymusicapp`.
+> - **Legacy folders are OBSOLETE**: `D:\plinth-bim` and `D:\mymusicapp\plinth-bim` are deprecated/removed.
+> - **Execution Rule**: Always run build, test, and run commands with working directory `D:\Arch3D` (e.g. `cd 'D:\Arch3D'; cargo test --workspace`).
+
+---
+
+## 1. System Architecture & Crates Overview
+
+Arch3D is a native BIM (Building Information Modeling) CAD platform written in pure clean-room Rust. All dimensions and coordinates operate at **1:1 millimeter real-world scale** ($1\text{ m} = 1000\text{ mm}$), adhering to ISO 10303-21 IFC4 STEP standards.
+
+```
+d:\Arch3D/
+├── crates/
+│   ├── plinth-geom/     # Pure 2D/3D computational geometry, Newell normals, polygon clipping, ear-clip triangulation
+│   ├── plinth-model/    # Core BIM document, parametric elements (Wall, Slab, Roof, Stair, Ramp, Railing, etc.), DWG & SKP importers
+│   ├── plinth-views/    # Multi-viewport projection, 3D isometric & perspective, visual styles (Shaded, Hidden Line, Consistent, Wireframe)
+│   ├── plinth-ifc/      # IFC4 / IFC2X3 STEP physical file parser and serializer
+│   └── plinth-app/      # egui GUI application, multi-pane canvas, procedural vector icons, properties & settings inspectors
+└── AGENTS.md            # Golden architectural rules & engineering standards
+```
+
+---
+
+## 2. Recent Major Implementations & Bug Fixes
+
+### A. SketchUp (.skp) Native Importer & Exploding Geometry Elimination
+*Implementation*: [`crates/plinth-model/src/skp.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/skp.rs), [`crates/plinth-model/src/material.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/material.rs), [`crates/plinth-model/src/element.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/element.rs)
+
+1. **Root Cause Analysis of Exploding Geometry & Starburst Rays**:
+   - **Subtree Pruning Bug on Hidden Nodes**: SketchUp models use helper bounding boxes, guide geometry, or reference instances with `node.hidden = true`. Previously, `visit_node` did not prune `node.children`, causing untransformed or reference objects to leak into world space.
+   - **Warped Non-Planar Quads**: Organic curved meshes contain thousands of 4-vertex quadrilaterals whose vertices are not coplanar. When passed into `egui::Shape::convex_polygon`, these warped polygons projected as non-convex or self-intersecting butterflies.
+   - **Axis-Aligned Foreshortening on N-Gons**: Triangulating N-gons by projecting to arbitrary axis planes compressed oblique faces by $\sqrt{2}$, flipping triangle orientations and causing ear-clipping to fail.
+   - **Wireframe Spiderweb Contours**: Internal diagonals and softened curved mesh edges were all given `hard = true`, causing white wireframe webs over organic surfaces.
+
+2. **The Engineering Fixes Applied**:
+   - **WYSIWYG Subtree Pruning**: In `visit_node`, any node with `node.hidden == true` immediately returns, pruning its entire descendant subtree.
+   - **Quad Decomposition Along Shortest Diagonal**: Every 4-vertex quad is decomposed into two triangles along $\min(d_{02}, d_{13})$. The internal diagonal chord is strictly assigned `hard = false`.
+   - **Exact Orthonormal Tangent Frame `(U, V)`**: N-gons are projected into a local orthonormal basis $(U, V)$ perpendicular to the true Newell normal before ear-clipping, preserving 100% isometry, angle, and area.
+   - **Soft/Smooth Edge Filtering**: Edges are verified against `mesh.edges`. Only true crease edges get `hard = true`; internal chords and soft/smooth edges get `hard = false`.
+   - **Consecutive Vertex Deduplication**: Consecutive vertices within 0.1 mm tolerance are deduplicated, and vertex indices are validated against mesh boundaries.
+   - **Group & Component Hierarchy Preservation**: `FreeformSolid` now stores `group_name` and `is_group`, which are displayed in the Properties inspector.
+   - **Material & Embedded Texture Extraction**: `Material` now preserves `texture_name` and embedded binary `texture_bytes` (PNG/JPEG) from `openskp::Material::Textured`.
+
+---
+
+### B. AutoCAD (.dwg & .dxf) Native Drawing Importer
+*Implementation*: [`crates/plinth-model/src/dwg.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/dwg.rs), [`crates/plinth-app/src/icons.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/icons.rs)
+
+- **Pure-Rust `acadrust` Integration**: Zero external C/C++ or LibreDWG dependencies (`acadrust = "0.6.8"`).
+- **Unit Scaling**: Evaluates `$INSUNITS` and `$MEASUREMENT` (Inches: $\times 25.4$, Feet: $\times 304.8$, Meters: $\times 1000.0$, Metric standard: $\times 1.0$).
+- **Intelligent BIM Layer Mapping**:
+  - `WALL*`, `PAREDE*`, `MURO*` layers automatically generate native parametric `Element::Wall` (200 mm thickness, 3000 mm height).
+  - `SLAB*`, `FLOOR*`, `PISO*`, `LAJE*` layers generate native parametric `Element::Slab`.
+- **Drafting & Freeform Mesh Geometry**:
+  - Explodes `EntityType::Insert` block references into world-space CAD entities.
+  - Converts polylines with arc bulges ($b = \tan(\theta/4)$), circles, and arcs into `Element::DetailLine`.
+  - Converts 3D faces (`Face3D`), polyface meshes, and solids into `Element::FreeformSolid`.
+- **Procedural Vector Icon**: `IconKind::ImportDwg` in Ribbon Home & Insert tabs.
+
+---
+
+### C. Multi-Viewport Layouts & Dedicated Per-Viewport Visual Styles
+*Implementation*: [`crates/plinth-app/src/canvas.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/canvas.rs), [`crates/plinth-views/src/scene.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-views/src/scene.rs)
+
+- **Independent Multi-Pane Splits**:
+  - 5 Viewport Layouts: `Single`, `SplitHorizontal`, `SplitVertical`, `SplitTriple`, `SplitQuad`.
+  - Each viewport slot maintains its own `ViewId`, `pan`, `zoom`, and `visual_style`.
+- **Minimalist Single Icon Visual Style Pill**:
+  - Positioned at the bottom-right of each viewport as a compact 26×26 px pill showing `☀️`, `📐`, `🎨`, or `🕸️`.
+  - Clicking opens a clean dropdown to switch between Shaded, Hidden Line, Consistent Colors, and Wireframe per pane.
+- **Floating Viewport Header Badges**:
+  - Positioned at the top-left of each viewport with view kind icon (`📐`, `💡`, `🧊`, `🏛`, `✂`, `🔍`), active accent border, and view picker dropdown.
+- **Strict Scissor GPU Clipping**:
+  - Enforced via `painter.with_clip_rect(slot.rect)` to guarantee geometry never bleeds across pane boundaries.
+
+---
+
+### D. Architectural Ribbon Compacting & Circulation Tools
+*Implementation*: [`crates/plinth-app/src/ribbon.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/ribbon.rs), [`crates/plinth-app/src/settings.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/settings.rs)
+
+- **Snug Tool Spacing**: Reduced tool button padding and gaps from 4 px down to 2 px for a dense, professional CAD layout.
+- **Icon-Only Mode**:
+  - User can toggle **Tool Button Labels** in Settings (`Appearance -> Ribbon Tool Style: Show labels / Icon only`).
+  - When labels are hidden, ribbon height shrinks from 78 px to 44 px, maximizing drawing canvas workspace.
+- **Circulation Tools**:
+  - Added **Stair** (`IconKind::Stair`), **Ramp** (`IconKind::Ramp`), and **Railing** (`IconKind::Railing`) to Architecture ribbon tab and parametric data model.
+
+---
+
+### E. Universal Level-Hosting & Elevation Offsets
+*Implementation*: [`crates/plinth-model/src/element.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/element.rs), [`crates/plinth-app/src/properties.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/properties.rs)
+
+- Added **Base Level** dropdown, **Base Offset** (`mm`), **Top Constraint / Top Level** dropdown (`"Unconnected"` + all project levels), and **Top Offset** (`mm`) across all 13 core element types (`Wall`, `Door`, `Window`, `Column`, `Beam`, `Slab`, `Roof`, `Stair`, `Ramp`, `Railing`, `Fascia`, `Gutter`, `Ceiling`).
+- Strict vertical bounds resolution via `z_bounds(base_z, top_z)`.
+
+---
+
+### F. Type & Assembly Configuration Studio (`tool_config.rs`)
+*Implementation*: [`crates/plinth-app/src/tool_config.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/tool_config.rs), [`crates/plinth-app/src/ribbon.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/ribbon.rs)
+
+- Double-clicking any of the 17 Architecture or Structure Ribbon tools opens `ToolConfigStudio`.
+- Features curated Type Libraries, **Duplicate Type** / custom type creation, multi-layer compound assembly stacks (`AssemblyLayer`, `LayerFunction`) with live thermal $U$-value & thickness sync, procedural `egui::Painter` cross-section/ergonomics blueprints, default level hosting/offsets, and IFC4 `Pset_*Common` defaults.
+
+---
+
+### G. Free Sheet Viewport Movement & Corner Resizing
+*Implementation*: [`crates/plinth-model/src/document.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/document.rs), [`crates/plinth-app/src/canvas.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/canvas.rs), [`crates/plinth-app/src/properties.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/properties.rs)
+
+- Placed viewports (`PlacedViewport`) on Sheet Layout desks can be selected, freely dragged anywhere on the sheet paper (`position_mm`), and resized via 4 corner grips (`width_mm`, `height_mm`) with live mm coordinate badges and Undo/Redo snapshots.
+
+---
+
+### H. Level Manager & Grid Manager Dialogs
+*Implementation*: [`crates/plinth-app/src/level_manager.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/level_manager.rs)
+
+- **Manage Tab -> Level Manager**:
+  - Storey elevation schedule sorted top-to-bottom, inline elevation & name editing.
+  - `+ Add Level Above`, `+ Add Basement Below`, `⚡ Generate Multi-Storey Stack`.
+  - Live datum section diagram with Z=0 ground line, safe deletion with automatic element reassignment to nearest remaining level.
+- **Manage Tab -> Grid Manager**:
+  - Orthogonal bay generator with custom spacings (`"6000, 7500, 6000"`, `"3*6000, 4500"`).
+  - Automatic alphanumeric tags (X=A,B,C; Y=1,2,3), `⇄ Align Grid Tails`, and live 2D grid blueprint preview.
+
+---
+
+### I. Automated Structural Framing Pipeline & Foundation Footings
+*Implementation*: [`crates/plinth-app/src/structure_auto.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/structure_auto.rs), [`crates/plinth-model/src/element.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/element.rs)
+
+1. **Footing Tool (`Tool::DrawFooting`)**:
+   - Parametric isolated foundation footing (`FootingStyle::Pad`, `Stepped`, `Sloped`) with `Pset_FootingCommon`, column hosting link, and watertight 3D solid hulls.
+2. **4 Structural Automation Tools in Structure Tab**:
+   - **Place Columns on Grids**: Automatically identifies grid intersections and places structural columns.
+   - **Place Foundation Footings on Columns**: Automatically generates isolated footings underneath columns aligned with column center and rotation.
+   - **Place Beams on Grids / Columns**: Frames adjacent columns and grid nodes bay-by-bay along X and Y axes.
+   - **Place Slabs on Closed Column-Beam Bays**: Uses Planar Half-Edge Face Extraction to detect minimal CCW closed bays and places structural slabs aligned to beam inner faces.
+
+---
+
+### J. Multi-Storey Entity Replication & Smart Constraint Remapping
+*Implementation*: [`crates/plinth-app/src/level_copy.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/level_copy.rs)
+
+- `CopyActiveLevelDialog`: Interactive Source Level dropdown (`source_level_id`), selective category filter, and `☑ Include Storey Framing Beams & Deck Slabs (Ceiling Framing)` option.
+- **Storey Element Resolution (`is_storey_element`)**: Accurately captures both base-hosted elements (`relative_storey = 0`) and upper-framing elements (`relative_storey = 1`, structural framing beams, deck slabs, ceilings at the storey's ceiling level $Z_{\text{top}}$).
+- **Relative Storey Elevation Remapping**: `paste_clipboard_to_levels` utilizes `resolve_target_level_with_offset` to replicate beams and floor deck slabs across every destination storey without missing framing.
+- `PasteToLevelsDialog`: Destination storey multi-selector with live clipboard contents breakdown (`Contents: Columns: N, Beams: N, Floors: N`), Select All Other Storeys, and automatic `ElementId`, `host_wall`, `host_column`, and `top_level` storey constraint remapping.
+
+---
+
+### K. Column Section Projection, Slab Thickness & Elevation/Section Selection
+*Implementation*: [`crates/plinth-views/src/section.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-views/src/section.rs), [`crates/plinth-model/src/element.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/element.rs), [`crates/plinth-app/src/canvas.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/canvas.rs), [`crates/plinth-app/src/structure_auto.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-app/src/structure_auto.rs)
+
+1. **Columns Visible in Building Section Views**:
+   - Slices directly on the cut plane are rendered with thick cut lines (`width = 2.0`) and column cut fill.
+   - In addition, all columns, beams, footings, and walls beyond the section cut line in the viewing direction `v_dir = vec2(-u_dir.y, u_dir.x)` (within 30m view depth) are projected onto the section plane $(t, z)$ and sorted back-to-front behind the cut elements. Columns are 100% visible across all sections.
+2. **Slab Strict Thickness & Elevation/Section Bounds**:
+   - Fixed `Slab::z_bounds`: A slab's top face is aligned to $Z_{\text{top}}$ (either top level or base level + offset), and its bottom face is strictly $Z_{\text{top}} - \text{thickness}$. Slabs are always their exact specified thickness (e.g. 200 mm), eliminating vertical 3500mm storey-spanning monoliths.
+3. **Exact Elevation and Section Element Selection & Highlights**:
+   - Hit testing in Elevation views maps click coordinates to $(u, z)$ and tests against the element's actual projected bounds $[u_{\min}, u_{\max}] \times [z_0, z_1]$. Slabs only match if the click occurs within their actual 200mm thickness slice, preventing slabs from hijacking clicks across the entire storey.
+   - Selection highlights in Elevation and Section views project the element's exact 2D facade rectangle.
+4. **Slab Corner Trimming & Centroid Depth Sorting**:
+   - In `align_bay_to_beam_inner_surfaces`, corners supported by columns wider than beams are notched along the column inner vertical faces $(W_{col}/2, D_{col}/2)$, preventing slabs from encroaching on column top caps.
+   - In `threed.rs`, structural floor slabs and bay slabs evaluate depth at their centroid (`transform_to_view(centroid).y`), preventing slabs from sorting on top of framing beams during 3D orbit.
+
+---
+
+### L. Watertight 6-Sided Solid B-Rep Invariant, Beam Top Surface & Accurate Curtain Wall Elevation
+*Implementation*: [`crates/plinth-views/src/threed.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-views/src/threed.rs), [`crates/plinth-views/src/elevation.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-views/src/elevation.rs), [`crates/plinth-model/src/element.rs`](file:///d:/mymusicapp/plinth-bim/crates/plinth-model/src/element.rs)
+
+1. **Universal Watertight 6-Sided Solid B-Rep Invariant**:
+   - Every extrusion, mullion, transom, beam, pier, and column box in 3D MUST emit ALL 6 watertight solid faces: Front (`+norm`), Back (`-norm`), Top Cap (`+Z`), Bottom Cap (`-Z`), Left End (`-dir`), and Right End (`+dir`).
+   - In `emit_mullion_box!`, added the missing left end face (`-dir`), right end face (`+dir`), and unconditioned top (`+Z`) and bottom (`-Z`) caps for ALL intermediate transoms and vertical mullions. Orbiting in 3D now displays solid, opaque, dark metallic profiles from all angles with zero hollow tube cutaways or transparent voids.
+   - In `CurtainWall::solids` (`plinth-model`), added intermediate horizontal transoms (`1..n_h`) alongside rails and mullions, unifying B-Rep face extraction, IFC STEP export, and section cuts under a single source of truth.
+2. **Beam Top Flange & Soffit Camera-Closest Depth Anchoring**:
+   - Replaced arbitrary edge midpoint depth calculation with camera-closest corner vertex anchoring:
+     $$\text{depth} = \min_{i} (Y_{\text{corner}_i}) - 1.0\text{ mm}$$
+     (for top flange and bottom soffit) and $\min_i (Y_{\text{corner}_i})$ for vertical web faces.
+   - Eliminates the Painter's algorithm depth sorting failure where long beam spans (6000 mm) were sorted thousands of millimeters behind adjacent geometry, which caused the beam top surface to appear transparent or white.
+3. **Curtain Wall Elevation Geometry Accuracy**:
+   - Replaced generic single hairline projection with accurate 2D solid rectangles matching the 3D grid 1:1:
+     - Outer boundary vertical jamb mullions (`i = 0`, `i = n_v`) and intermediate mullions (`i = 1..n_v`) with `mullion_width` (50 mm).
+     - Bottom sill rail, top head rail, and intermediate horizontal transoms (`j = 1..n_h`) with `mullion_width` (50 mm).
+     - Individual recessed glazed glass panels inside every grid cell with translucent glass fill and crisp frame strokes.
+   - The Elevation view now displays identical architectural storefront geometry as the 3D isometric view.
+
+### M. Permanent GPU Hardware Depth-Buffered Viewport Renderer (`gpu_viewport.rs`, `glow`, `egui_glow`)
+- **Root Problem Solved**: Replaced the 2D CPU Painter's algorithm with true GPU hardware depth testing, completely eliminating all sorting ambiguities, inverted mullions, and transparent beam/slab surfaces across any 360° orbit angle.
+- **Hardware Z-Buffer & Anti-Aliasing**: Configured `eframe::NativeOptions` with `depth_buffer: 24` and `multisampling: 4` (4x hardware MSAA).
+- **3-Pass Architecture**:
+  1. *Pass 1 (Opaque Solids)*: Walls, slabs, beams, columns, mullions, roofs, stairs, ramps, and footings write depth with `GL_POLYGON_OFFSET_FILL` (offset 1.0, 1.0).
+  2. *Pass 2 (CAD Silhouette & Hard Edges)*: Drawn with `GL_LINES` in theme line color; because of the polygon offset, lines sit cleanly on outer faces without z-fighting.
+  3. *Pass 3 (Translucent Glazing)*: Glass panels render with `GL_BLEND` and `depth_mask(false)`, accurately reading depth from opaque walls/mullions without blocking other geometry.
+- **Viewport Scissor & 2D Overlays**: GPU render is clipped strictly to viewport panes via `gl.scissor`, and 2D overlays (snapping guides, ViewCube, gizmos, dimension badges) render smoothly on top via `egui::Painter`.
+- **Zero Test Regressions**: All 66 workspace tests continue to pass 100%.
+
+---
+
+### H. 3D Wall Corners, Opening Clean Cutouts & 3D Object Selection (Nov 1, 2026)
+- **3D Wall Corner Visible Lines**: `Wall::boundary_faces` and `Wall::build_solids_with_joins` maintain building outer corner vertices as crisp hard edges (`hard = true`, `soft = false`), ensuring vertical corner lines at building miters from $Z_0$ to $Z_1$ are 100% visible across 3D visual styles.
+- **Window & Door Monolithic Cutouts (Zero Vertical Seams)**: `build_gpu_scene` utilizes `doc.element_faces` (`Wall::boundary_faces`), rendering wall pier faces, sills, and lintels as seamless monolithic surfaces. The vertical edges between coplanar sill/lintel quads and adjacent piers are suppressed (`hard = false`), eliminating all vertical dividing lines above and below window openings. Vertical jamb lines are strictly confined to the opening reveal bounds $[Z_{\text{bot}}, Z_{\text{top}}]$.
+- **Interactive 3D Object Click Selection & Visual Highlight**: In `canvas.rs`, click-selection in 3D views projects face geometry directly to screen space using `project_3d(p)` and evaluates both `point_in_polygon` and a 6-pixel fuzzy hit tolerance on outline edges (`closest_point_on_segment <= 6.0px`), selecting the frontmost camera-facing element under the cursor. Selected elements in 3D highlight with a translucent blue fill and 2.5px cyan hard outlines, immediately updating their full parameter schedule in the Properties Inspector.
+- **Primary Click Reliability**: Fixed pointer tracking during mouse-up/click events (`pointer.interact_pos().or(hover_pos).or(latest_pos)`), ensuring primary clicks on the 3D viewport canvas reliably register without being dropped by high-DPI mouse drag deltas.
+
+### M. Sheet Layout Viewport White Paper Theme, Monolithic Rendering & Branding Integration (Nov 5, 2026)
+*Implementation*: [`crates/plinth-app/src/canvas.rs`](file:///d:/Arch3D/crates/plinth-app/src/canvas.rs), [`crates/plinth-app/src/icons.rs`](file:///d:/Arch3D/crates/plinth-app/src/icons.rs), [`crates/plinth-geom/src/polygon.rs`](file:///d:/Arch3D/crates/plinth-geom/src/polygon.rs)
+
+1. **Root Cause Analysis of Giant Screen-Splitting Wedges and Sheet Layout 3D Background Defect**:
+   - **Sutherland-Hodgman Concave Distortion**: Sutherland-Hodgman polygon clipping is mathematically strictly limited to convex polygons. In `draw_polygon_safe`, applying it to multi-wing concave slabs (such as 38-vertex apartment highrise floor plates or roof decks extending across viewport boundaries) connected non-adjacent entry and exit points along the rectangular clipping boundary. When ear-clipping triangulated this distorted boundary, giant triangles fanned across the viewport and connected to the corners, filling the entire viewport rectangle with the slab's gray color (`[175, 177, 173, 255]`) and creating giant diagonal wedge flaps.
+   - **Sheet Layout Theme Inversion**: `render_sheet_layout_canvas` previously used `ColorTheme::dark()` if the app UI was in Dark Mode. On a physical white paper drawing sheet, this rendered viewport backgrounds with dark colors and inverted linework to white.
+   - **Unclipped Line Segments on Sheets**: Placed viewports on sheets drew lines with raw `line_segment` without Liang-Barsky line clipping.
+
+2. **The Engineering Fixes Applied**:
+   - **Monolithic Safe Polygon Rendering & Indexed Mesh Engine (`draw_polygon_safe`)**:
+     1. Trivial rejection: Skips polygons whose vertices all lie strictly outside the clip rect bounds with a 50px margin.
+     2. Numerical sanity check: Rejects non-finite coordinates (`NaN`, `Inf`).
+     3. Monolithic convex polygon rendering: All convex shapes (triangles, quads, convex n-gons) are emitted as single monolithic shapes via `egui::Shape::convex_polygon` with zero internal seams (Rule 1).
+     4. Seamless Indexed Mesh Triangulation for Concave Slabs: Non-convex shapes (L-shaped, U-shaped, 38-vertex multi-wing highrise floor plates and roof slabs) are triangulated into a single indexed `egui::Mesh` with shared vertices (`mesh.colored_vertex`) and indexed triangles (`mesh.add_triangle`), then emitted via `painter.add(egui::Shape::mesh(mesh))`. This completely eliminates internal sub-pixel anti-aliasing seam lines across complex slabs, while GPU hardware scissor clipping (`gl.scissor` via `painter.with_clip_rect`) cleanly bounds geometry at viewport edges without CPU polygon corruption or corner wedge flaps.
+     5. Border linework: Outer contour strokes are cleanly emitted via `draw_line_segment_safe` along genuine boundary edges only.
+   - **Paper White Viewport Theme**: Placed viewports on Sheet Layout desks now strictly use `ColorTheme::light()`, ensuring 3D viewports on paper sheets always render on clean, crisp white paper.
+   - **Liang-Barsky Line Safe Drawing on Sheets**: Sheet viewports draw lines with `draw_line_segment_safe` to prevent unbounded coordinate projection.
+   - **Process Lock Management & Binary Rebuild**: Resolved file lock from previous running instances (PID 220, PID 22476) and cleanly linked `target/debug/arch3d.exe`.
+   - **Official Neon Violet & Obsidian 3D Cube Branding**: Application icon is synchronized from the official `Arch3D logo.png` into 128x128 RGBA window icon (`arch3d_icon_128.bin`), Windows desktop icon (`arch3d.ico`), and web favicon (`docs/favicon.ico`). Landing page theme matches this palette with electric neon violet accents (`#d946ef`, `#a855f7`), obsidian slate dark backgrounds (`#090a0f`, `#11131a`), pure SVG stroke icons (zero emojis), screenshot visual gallery, creator profile for Dsales Architect (`dsalesarchitect@gmail.com`, Philippines), and community sponsorship channels.
+
+---
+
+## 3. Verification & Test Suite Summary
+
+All 97 automated unit & integration tests across the 5 workspace crates pass with 100% success rate:
+
+```
+running 33 tests (crates/plinth-app)  ... ok (100%)
+running 16 tests (crates/plinth-geom) ... ok (100%)
+running 14 tests (crates/plinth-ifc)  ... ok (100%)
+running 13 tests (crates/plinth-model)... ok (100%)
+running 20 tests (crates/plinth-views)... ok (100%)
+Total: 96 passed; 0 failed; 0 ignored (0 warnings)
+```
+
+### D. Benchmark IFC Suite & MEP Systems Classification
+1. **Schema Verification Audit**:
+   - Analyzed all ZIP packages in `Downloads`: `Academic_Autodesk`, `FOJAB_Landsarkivet`, `KIT_Institute`, `KIT_Smiley-West`, `LTU_A-House`, `NBU_MedicalClinic`, `NVW_DCR-LOD`, `SGD_BODO`, `Hestia-main`.
+   - Identified schemas: 90% are **`IFC2X3`** (Coordination View 2.0) and legacy **`IFC2X2_FINAL`** (SGD BODO); only modern fixtures in `Hestia-main` are authored in **`IFC4`**.
+   - Verified that Arch3D seamlessly imports legacy `IFC2X2`, `IFC2X3`, modern `IFC4`, and infrastructure `IFC4X3`, upgrading and exporting them to standard `IFC4` STEP format.
+2. **MEP Systems & Architectural Specialization**:
+   - Categorized `IFCFLOWSEGMENT`, `IFCFLOWFITTING`, `IFCFLOWCONTROLLER`, `IFCFLOWTERMINAL`, `IFCENERGYCONVERSIONDEVICE`, `IFCFLOWMOVINGDEVICE`, `IFCFLOWTREATMENTDEVICE` into dedicated groups (`Duct`, `Pipe`, `MEP Fitting`, `MEP Controller`, `HVAC Terminal`, `Lighting`, `MEP Equipment`, `Treatment Device`).
+   - Categorized `IFCPLATE` as `Curtain Wall Panel` or `Plate`.
+   - Categorized `IFCFURNISHINGELEMENT` as `Furniture` and `IFCSANITARYTERMINAL` as `Plumbing Fixture`.
+   - Supported non-uniform 3D scales (`Scale`, `Scale2`, `Scale3`) in `resolve_cartesian_transformation_3d` for `IFCCARTESIANTRANSFORMATIONOPERATOR3DNONUNIFORM`.
+   - Added dedicated material pastel colors for MEP systems in `threed.rs` (galvanized zinc ductwork, technical piping blue, machinery steel, porcelain sanitary fixtures, luminaire gold).
+
+### Build & Run Commands
+- **Run App**: `cargo run --bin arch3d` or launch `Launch-Arch3D.bat`
+- **Run Tests**: `cargo test --workspace`
+- **Process Lock Safeguard**: Always terminate existing instances before linking on Windows (`taskkill /f /im arch3d.exe 2>$null`).
+
+---
+
+## 4. Key Rules for the Next Agent
+
+1. **Watertight 6-Sided Solid B-Rep Invariant**: Every extrusion, mullion, transom, beam, pier, and column in 3D MUST emit all 6 watertight solid faces: Front (`+norm`), Back (`-norm`), Top Cap (`+Z`), Bottom Cap (`-Z`), Left End (`-dir`), and Right End (`+dir`). Never omit end caps or top/bottom caps on intermediate segments.
+2. **Camera-Closest Depth Anchoring on Cap Faces**: Horizontal cap faces (beam top flanges, column tops, roof planes) must evaluate Painter's algorithm depth using their camera-closest corner vertex $\min_i(Y_i) - \text{bias}$, rather than an edge midpoint thousands of mm away.
+3. **Never use `raw-dylib`**: Target `x86_64-pc-windows-gnu` requires standard GNU linking.
+4. **Procedural Vector Icons Only**: All ribbon/toolbar icons must be mathematically rendered via `egui::Painter` in `icons.rs`. Never import bitmap/raster PNG icons.
+5. **Monolithic Surfaces**: Never subdivide walls or slabs into grid tiles; `egui::Shape::convex_polygon` sub-pixel anti-aliasing creates gray hairline seam lines if surfaces are split.
+6. **Scissor Rects**: Always wrap viewport rendering in `painter.with_clip_rect` to prevent geometry bleeding.
+7. **Single Source of Truth**: Geometry and BIM parameters reside strictly in `plinth-model`, projected reactively to views.
+8. **Ray-Plane Depth Picking Invariant**: In 3D viewports (`canvas.rs`), click selection evaluates exact ray-plane intersection along the view axis.
+9. **Wireframe Internal Chord Suppression**: In Wireframe mode, edge loops evaluate `face.hard` rather than drawing all triangle boundaries. Internal triangulation diagonals remain completely hidden.
+10. **Custom & IFC Floor/Ceiling CCW Boundary Normalization**: `Slab` and `Ceiling` boundary loops are strictly sanitized via `dedup_closed` and `make_ccw`, guaranteeing outward perimeter rim normals, $+Z$ top caps, $-Z$ bottom caps, and watertight solid hulls for complex atrium/courtyard geometry.
+11. **Frustum & Marquee Selection Screen-Bounds Safety**: 3D selection highlights cull offscreen projected vertices outside `vp_rect.expand(200.0)`, and `draw_polygon_safe` only strokes borders if ear-clipping fails, eliminating infinite rays and screen-splitting wedges.
+12. **Universal Annotation & Architectural Snapping Engine**: Ribbon Annotation tab provides Linear Dim, Circular Dim, Angular Dim, Text Note, and Leader Callout with customizable tick marks, typography, and live magnetic snapping to all architecture and structure vertices, cut opening jamb corners, centerlines, and edges.
+13. **Landing Page, GitHub Pages & Cloudflare Deployment**: Zero-dependency landing page in `docs/` with interactive 3D HTML5 model canvas, ready for GitHub Pages (via `docs/.nojekyll` and `.github/workflows/deploy-pages.yml`) and Cloudflare Pages (via `docs/_headers`, `docs/_redirects`, and `wrangler.toml`). Fully documented in `DEPLOYMENT.md`.

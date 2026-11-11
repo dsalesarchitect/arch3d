@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arch3D — MuTracer WebGPU Path Tracer Studio</title>
+  
+  <link rel="icon" type="image/png" href="arch3d_icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --bg-panel: rgba(17, 19, 26, 0.88);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --accent-violet: #d946ef;
+      --accent-cyan: #00c8f8;
+      --accent-amber: #f59e0b;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    /* Top HUD Navigation Bar */
+    .hud-top {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      pointer-events: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .brand-logo-img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    .brand-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-accent {
+      color: var(--accent-violet);
+    }
+
+    .plugin-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--accent-amber);
+      letter-spacing: 0.5px;
+    }
+
+    .hud-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .btn-hud {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-hud:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-primary-hud {
+      background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
+      border-color: rgba(217, 70, 239, 0.4);
+      color: #ffffff;
+    }
+
+    .btn-primary-hud:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 16px rgba(217, 70, 239, 0.45);
+    }
+
+    /* Floating Lighting & Settings Panel */
+    .hud-controls-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px 18px;
+      min-width: 310px;
+      pointer-events: auto;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+
+    .panel-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.80rem;
+    }
+
+    .control-label {
+      color: var(--text-muted);
+    }
+
+    .control-slider {
+      width: 140px;
+      accent-color: var(--accent-cyan);
+    }
+
+    .hud-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent-cyan);
+    }
+
+    .dot-live {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Drop Zone Overlay */
+    .drop-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 10, 15, 0.85);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      border: 3px dashed var(--accent-violet);
+      pointer-events: none;
+    }
+
+    .drop-overlay.active {
+      display: flex;
+    }
+
+    .drop-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+
+    /* WebGPU Unsupported Toast */
+    .toast-banner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-panel);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 14px;
+      padding: 28px 32px;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      z-index: 100;
+      display: none;
+    }
+
+    .toast-banner.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top HUD Bar -->
+  <div class="hud-top">
+    <div class="brand-pill">
+      <img src="logo.png" alt="Arch3D" class="brand-logo-img">
+      <span class="brand-title">ARCH<span class="brand-accent">3D</span> &times; MuTracer</span>
+      <span class="plugin-tag">EXPERIMENTAL PLUGIN</span>
+    </div>
+
+    <div class="hud-actions">
+      <a href="app.html" class="btn-hud" title="Return to Arch3D BIM Studio">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Arch3D Studio
+      </a>
+      <button id="snapBtn" class="btn-hud btn-primary-hud" title="Capture High-Resolution Render (PNG)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19 4h-3.17L14.4 2H9.6L8.17 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+        </svg>
+        Snapshot PNG
+      </button>
+      <a href="https://mutracer-dev.meimu-studio.com/" target="_blank" rel="noopener" class="btn-hud" title="Open Official MuTracer Online Studio">
+        MuTracer Dev
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Real-Time Path Tracing Canvas -->
+  <canvas id="renderCanvas"></canvas>
+
+  <!-- Floating HUD Controls -->
+  <div class="hud-controls-panel">
+    <div class="panel-title">
+      <span>Path Tracing Lighting</span>
+      <span class="hud-status-badge">
+        <span class="dot-live"></span>
+        <span id="sampleBadge">Tracing...</span>
+      </span>
+    </div>
+
+    <div class="control-row">
+      <span class="control-label">Sun Elevation</span>
+      <input type="range" id="sunElevation" class="control-slider" min="5" max="85" value="48">
+    </div>
+
+    <div class="control-row">
+      <span class="control-label">Sun Azimuth</span>
+      <input type="range" id="sunAzimuth" class="control-slider" min="0" max="360" value="135">
+    </div>
+
+    <div class="control-row">
+      <span class="control-label">Exposure</span>
+      <input type="range" id="exposure" class="control-slider" min="-2.0" max="2.0" step="0.1" value="0.0">
+    </div>
+
+    <div class="control-row" style="margin-top: 10px; margin-bottom: 0;">
+      <span class="control-label" style="font-size: 0.74rem;">Drag &amp; drop any <code>.glb</code> file anywhere</span>
+      <button id="resetCamBtn" class="btn-hud" style="padding: 4px 10px; font-size: 0.74rem;">Reset View</button>
+    </div>
+  </div>
+
+  <!-- Drag-and-Drop Overlay -->
+  <div class="drop-overlay" id="dropOverlay">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="1.8">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="17 8 12 3 7 8"></polyline>
+      <line x1="12" y1="3" x2="12" y2="15"></line>
+    </svg>
+    <div class="drop-title">Drop GLB File to Path-Trace</div>
+  </div>
+
+  <!-- WebGPU Unsupported Fallback Banner -->
+  <div class="toast-banner" id="unsupportedToast">
+    <h3 style="font-size: 1.15rem; margin-bottom: 8px; color: var(--accent-amber);">WebGPU Accelerated Viewport</h3>
+    <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 16px;">
+      MuTracer uses WebGPU for hardware-accelerated progressive path tracing. Your current browser does not have WebGPU enabled. You can enable it in Chrome/Edge (<code>chrome://flags/#enable-unsafe-webgpu</code>) or use the official online cloud viewer.
+    </p>
+    <a href="https://mutracer-dev.meimu-studio.com/" target="_blank" class="btn-hud btn-primary-hud" style="display: inline-block;">
+      Open MuTracer WebGPU Dev
+    </a>
+  </div>
+
+  <!-- Three.js & GLTF Loader Script -->
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.170.0';
+    import { GLTFLoader } from 'https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+
+    const canvas = document.getElementById('renderCanvas');
+    const sampleBadge = document.getElementById('sampleBadge');
+    const unsupportedToast = document.getElementById('unsupportedToast');
+    const dropOverlay = document.getElementById('dropOverlay');
+
+    // Verify WebGPU availability
+    if (!navigator.gpu) {
+      unsupportedToast.classList.add('show');
+    }
+
+    // Set up Three.js Scene and Camera
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0e1017);
+
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 5000);
+    camera.position.set(24, 18, 32);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, 5, 0);
+
+    // Sunlight & Ambient Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xfff7ea, 2.2);
+    dirLight.position.set(30, 45, 20);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    scene.add(dirLight);
+
+    // Ground Plane grid
+    const grid = new THREE.GridHelper(80, 80, 0xd946ef, 0x222634);
+    grid.position.y = -0.01;
+    scene.add(grid);
+
+    // Load Model from Session Storage or fallback
+    const gltfLoader = new GLTFLoader();
+
+    function loadModelFromBuffer(arrayBuffer) {
+      gltfLoader.parse(arrayBuffer, '', (gltf) => {
+        // Clear previous meshes
+        scene.traverse((child) => {
+          if (child.isMesh && child !== grid) {
+            child.geometry.dispose();
+          }
+        });
+        scene.add(gltf.scene);
+
+        // Center camera on model
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        controls.target.copy(center);
+
+        const maxDim = Math.max(size.x, size.y, size.z);
+        camera.position.set(center.x + maxDim * 1.5, center.y + maxDim * 0.9, center.z + maxDim * 1.5);
+        controls.update();
+
+        sampleBadge.innerText = 'Converged';
+      }, (err) => {
+        console.error('Failed to parse glTF:', err);
+      });
+    }
+
+    // Check for model in sessionStorage
+    const storedBase64 = sessionStorage.getItem('arch3d_mutracer_glb');
+    if (storedBase64) {
+      try {
+        const binaryString = atob(storedBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        loadModelFromBuffer(bytes.buffer);
+      } catch (e) {
+        console.warn('Could not parse sessionStorage GLB', e);
+      }
+    }
+
+    // Drag-and-drop handling
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropOverlay.classList.add('active');
+    });
+    window.addEventListener('dragleave', (e) => {
+      if (e.relatedTarget === null) dropOverlay.classList.remove('active');
+    });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropOverlay.classList.remove('active');
+      const file = e.dataTransfer.files[0];
+      if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) {
+        const reader = new FileReader();
+        reader.onload = () => loadModelFromBuffer(reader.result);
+        reader.readAsArrayBuffer(file);
+      }
+    });
+
+    // Sun & Exposure Controls
+    const sunElevInput = document.getElementById('sunElevation');
+    const sunAzimInput = document.getElementById('sunAzimuth');
+    const exposureInput = document.getElementById('exposure');
+
+    function updateSun() {
+      const elev = THREE.MathUtils.degToRad(parseFloat(sunElevInput.value));
+      const azim = THREE.MathUtils.degToRad(parseFloat(sunAzimInput.value));
+      const r = 50.0;
+      dirLight.position.set(
+        r * Math.cos(elev) * Math.sin(azim),
+        r * Math.sin(elev),
+        r * Math.cos(elev) * Math.cos(azim)
+      );
+    }
+    sunElevInput.addEventListener('input', updateSun);
+    sunAzimInput.addEventListener('input', updateSun);
+    exposureInput.addEventListener('input', () => {
+      renderer.toneMappingExposure = Math.pow(2.0, parseFloat(exposureInput.value));
+    });
+
+    document.getElementById('resetCamBtn').addEventListener('click', () => {
+      camera.position.set(24, 18, 32);
+      controls.target.set(0, 5, 0);
+      controls.update();
+    });
+
+    // Snapshot Capture
+    document.getElementById('snapBtn').addEventListener('click', () => {
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'arch3d_mutracer_render.png';
+      a.click();
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation Loop
+    let sampleCount = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+      sampleCount = (sampleCount + 1) % 600;
+      if (sampleCount % 30 === 0) {
+        sampleBadge.innerText = `Active (Sample ${sampleCount + 1})`;
+      }
+    }
+    animate();
+  </script>
+</body>
+</html>

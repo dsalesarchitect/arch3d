@@ -1,0 +1,16 @@
+schema_version = "1.0.0"
+id = "arch3d_live_sync"
+version = "1.0.0"
+name = "Arch3D Live Sync"
+tagline = "Live bidirectional synchronization bridge between Arch3D BIM and Blender Cycles/EEVEE"
+maintainer = "Arch3D Team & Dsales Architect <dsalesarchitect@gmail.com>"
+type = "add-on"
+blender_version_min = "3.6.0"
+license = [
+    "SPDX:MIT",
+]
+website = "https://github.com/redwood-ph/arch3d"
+tags = [
+    "Import-Export",
+    "3D View",
+]

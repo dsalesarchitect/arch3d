@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Arch3D Web — Native Rust Architectural BIM & CAD Studio</title>
+  
+  <meta name="description" content="Arch3D Web: The EXACT same 64-bit pure Rust BIM & CAD platform running in your browser via WebAssembly (WASM). ISO 10303-21 IFC4 standard, 100% local-first, zero cloud storage.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="arch3d_icon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0e0f13;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Fullscreen WebGL canvas for eframe / egui */
+    #the_canvas_id {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      outline: none;
+    }
+
+    /* Startup Loading Overlay */
+    #loadingOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0e0f13;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 50;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #loadingOverlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(217, 70, 239, 0.45);
+      border: 1px solid rgba(217, 70, 239, 0.5);
+    }
+
+    .loading-spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(217, 70, 239, 0.15);
+      border-top-color: #d946ef;
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-title {
+      color: #ffffff;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .loading-desc {
+      color: #8c93a8;
+      font-size: 13px;
+      max-width: 380px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .loading-privacy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    /* Floating Return Button (Positioned cleanly alongside Theme Toggle — zero overlap) */
+    .btn-return-home {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      height: 24px;
+      z-index: 100;
+      background: rgba(30, 34, 45, 0.90);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #94a3b8;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 0 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-return-home:hover {
+      background: rgba(45, 52, 68, 0.98);
+      color: #ffffff;
+      border-color: #d946ef;
+      box-shadow: 0 0 10px rgba(217, 70, 239, 0.35);
+    }
+
+    @media (max-width: 768px) {
+      .btn-return-home {
+        top: auto;
+        bottom: 34px;
+        right: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Return Home Button -->
+  <a href="index.html" class="btn-return-home" title="Return to Arch3D Landing Page">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Landing Page
+  </a>
+
+  <!-- Loading Screen -->
+  <div id="loadingOverlay">
+    <img src="logo.png" alt="Arch3D Logo" class="loading-logo">
+    <div class="loading-spinner"></div>
+    <div class="loading-title">Arch3D Web Studio</div>
+    <div class="loading-desc">
+      Launching the <strong>exact same pure Rust BIM & CAD engine</strong> in your browser via WebAssembly (WASM).
+    </div>
+    <div class="loading-privacy">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <span>100% Client-Side • Zero Cloud Storage • Files Stay in Your Local Folder</span>
+    </div>
+  </div>
+
+  <!-- The WebGL Canvas for eframe / egui -->
+  <canvas id="the_canvas_id"></canvas>
+
+  <script>
+    // Embed Mode Detection (when displayed on the Landing Page)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('embed') === '1' || urlParams.get('embed') === 'true') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const returnBtn = document.querySelector('.btn-return-home');
+        if (returnBtn) returnBtn.style.display = 'none';
+      });
+    }
+
+    // Detection for local file:// protocol
+    if (window.location.protocol === 'file:') {
+      window.addEventListener('DOMContentLoaded', () => {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.innerHTML = `
+            <img src="logo.png" alt="Arch3D Logo" class="loading-logo">
+            <div class="loading-title">Arch3D Web Studio (WASM)</div>
+            <div class="loading-desc">
+              Web browsers (Chrome, Edge, Firefox) prohibit WebAssembly from running directly from <code>file://</code> URLs due to browser CORS security rules.
+            </div>
+            <div style="background: rgba(22, 24, 31, 0.95); border: 1px solid rgba(217, 70, 239, 0.4); border-radius: 10px; padding: 14px 18px; max-width: 440px; text-align: left; font-size: 12.5px; color: #f0f2f7; line-height: 1.6;">
+              <strong style="color:#d946ef;">🚀 1-Click Launch:</strong><br>
+              Double-click <code style="color:#38bdf8;">Launch-Arch3D-Web.bat</code> in your Arch3D folder.<br>
+              It instantly launches the local offline server at <code style="color:#38bdf8;">http://localhost:8080/app.html</code> with zero installation!
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <a href="index.html" class="btn-return-home" style="position: static; padding: 8px 16px;">
+                ← Back to Landing Page
+              </a>
+            </div>
+          `;
+        }
+      });
+    }
+  </script>
+
+  <script type="module">
+    import init, { WebHandle } from './wasm/plinth_app.js';
+
+    window.arch3dSyncToBlender = async function(glbBytes, port = 9876) {
+      try {
+        console.log(`[Arch3D] Live Sync: Streaming ${glbBytes.length} bytes to Blender at http://127.0.0.1:${port}/...`);
+        const resp = await fetch(`http://127.0.0.1:${port}/`, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'model/gltf-binary',
+          },
+          body: glbBytes
+        });
+        const text = await resp.text();
+        console.log(`[Arch3D] Blender Live Sync response: ${text}`);
+        return { ok: true, message: text };
+      } catch (err) {
+        console.warn(`[Arch3D] Direct fetch to Blender port ${port} failed:`, err);
+        return { ok: false, error: err.message };
+      }
+    };
+
+    async function runArch3D() {
+      try {
+        console.log('[Arch3D] Initializing WebAssembly binary...');
+        await init('./wasm/plinth_app_bg.wasm?v=' + Date.now());
+        console.log('[Arch3D] WebAssembly loaded successfully. Mounting to canvas...');
+
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('hidden');
+          setTimeout(() => overlay.remove(), 400);
+        }
+
+        const handle = new WebHandle();
+        await handle.start('the_canvas_id');
+        console.log('[Arch3D] Web Studio running.');
+      } catch (err) {
+        console.error('[Arch3D] Failed to launch WebAssembly:', err);
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.remove('hidden');
+          overlay.innerHTML = `
+            <img src="logo.png" alt="Arch3D Logo" class="loading-logo" style="box-shadow: 0 0 25px rgba(239, 68, 68, 0.45); border-color: rgba(239, 68, 68, 0.5);">
+            <div class="loading-title" style="color: #ef4444;">Unable to Start WebAssembly Engine</div>
+            <div class="loading-desc" style="color: #cbd5e1;">${err.message || err}</div>
+            <div style="font-size: 12px; color: #8c93a8; max-width: 440px; text-align: center; line-height: 1.5; margin-top: 6px;">
+              Please ensure hardware acceleration / WebGL2 is enabled in your browser.
+            </div>
+            <a href="index.html" class="btn-return-home" style="position: static; margin-top: 14px;">
+              ← Return to Arch3D Home
+            </a>
+          `;
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runArch3D);
+  </script>
+</body>
+</html>

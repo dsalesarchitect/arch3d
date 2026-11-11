@@ -1,0 +1,7 @@
+[target.x86_64-pc-windows-gnu]
+rustflags = [
+    "-C", "link-arg=-fuse-ld=lld",
+    "-C", "link-arg=-B",
+    "-C", "link-arg=C:\\Users\\redwood-ph-pc\\.rustup\\toolchains\\stable-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\bin\\gcc-ld",
+    "-L", "native=C:\\Users\\redwood-ph-pc\\.rustup\\toolchains\\stable-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained",
+]
