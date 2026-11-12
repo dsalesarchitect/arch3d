@@ -300,3 +300,8 @@ See [d:\Arch3D\AGENTS.md](file:///d:/Arch3D/AGENTS.md) for full architecture and
          - **Active PayPal Donation Checkout**: Custom payment link `https://www.paypal.com/ncp/payment/PXBTVNQLUWF66` integrated across `.github/FUNDING.yml`, `README.md`, and `docs/index.html`.
          - **GitHub Sponsors Onboarding**: `https://github.com/sponsors/dsalesarchitect` configured and pending GitHub approval.
          - **Windows Defender SmartScreen Notice**: Documented standard unsigned open-source notice and 2-step click-through (*"More info"* -> *"Run anyway"*) in `README.md` and `docs/index.html`.
+     63. **Onda Design System Integration (Landing Page Modernization)**:
+         - **Typography Pairing**: `Host Grotesk` (weights 300–800) for all display headings, body copy, and UI controls with refined letter-spacing (`-0.035em`), paired with `DM Mono` (weights 400, 500) for coordinates, IFC metadata pills, code snippets, and version tags.
+         - **Color Tokens & Glass Hairlines**: Minimalist contrast with Azure Blue (`#2563eb`), Steel Cyan (`#0ea5e9`), deep Obsidian ink (`#0a0d14` dark / `#0a0a0c` light), and 1px hairline glass borders (`rgba(255, 255, 255, 0.07)`).
+         - **Micro-Interactions & Scroll-Reveal Animation Engine**: Pure CSS and vanilla `IntersectionObserver` driving organic spring scroll reveals (`cubic-bezier(0.16, 1, 0.3, 1)`), staggered grid cascading (`.reveal-stagger`), and dynamic frosted glass navbar blur on scroll (`.navbar.scrolled`).
+         - **Decoupled Architecture Invariant**: Landing page presentation styling strictly lives in `docs/index.html` and `docs/styles.css`, keeping the native desktop CAD engine (`crates/plinth-app`) and live Web Studio (`docs/app.html`, `docs/wasm/`) 100% untouched.
