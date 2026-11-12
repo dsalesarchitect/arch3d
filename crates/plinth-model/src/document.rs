@@ -944,12 +944,8 @@ mod tests {
 
     #[test]
     fn test_deserialize_commercial_office_building() {
-        let p = std::path::Path::new(r"c:\Users\redwood-ph-pc\Downloads\Commercial_Office_Building (1).arch3d");
-        if p.exists() {
-            let bytes = std::fs::read(p).unwrap();
-            let doc: Document = serde_json::from_slice(&bytes).unwrap();
-            println!("SUCCESSFULLY DESERIALIZED: {} elements, {} levels, {} views, {} sheets", 
-                doc.elements.len(), doc.levels.len(), doc.views.len(), doc.sheets.len());
-        }
+        let doc = Document::create_sample_building();
+        assert!(doc.elements.len() >= 400, "Sample building must contain at least 400 elements");
+        assert!(doc.levels.len() >= 5, "Sample building must contain building levels");
     }
 }

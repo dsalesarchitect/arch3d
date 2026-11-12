@@ -19,8 +19,8 @@ bl_info = {
     "location": "View3D > Sidebar > Arch3D Tab",
     "description": "Live bidirectional synchronization bridge between Arch3D BIM and Blender Cycles/EEVEE",
     "category": "Import-Export",
-    "doc_url": "https://github.com/redwood-ph/arch3d",
-    "tracker_url": "https://github.com/redwood-ph/arch3d/issues",
+    "doc_url": "https://github.com/dsalesarchitect/arch3d",
+    "tracker_url": "https://github.com/dsalesarchitect/arch3d/issues",
 }
 
 import bpy

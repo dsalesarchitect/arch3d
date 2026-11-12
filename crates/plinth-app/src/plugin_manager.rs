@@ -113,7 +113,7 @@ impl PluginManagerDialog {
                 is_experimental: false,
                 installed: true,
                 enabled: true,
-                external_url: Some("https://github.com/redwood-ph/arch3d".into()),
+                external_url: Some("https://github.com/dsalesarchitect/arch3d".into()),
                 live_studio_url: None,
                 icon_kind: IconKind::BlenderLiveSync,
             },

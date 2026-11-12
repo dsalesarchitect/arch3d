@@ -9,7 +9,7 @@ blender_version_min = "3.6.0"
 license = [
     "SPDX:MIT",
 ]
-website = "https://github.com/redwood-ph/arch3d"
+website = "https://github.com/dsalesarchitect/arch3d"
 tags = [
     "Import-Export",
     "3D View",
