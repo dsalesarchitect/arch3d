@@ -3970,4 +3970,183 @@ mod tests {
         assert!(app.plugin_manager.install_plugin("blender-live-sync"));
         assert!(app.plugin_manager.is_plugin_active("blender-live-sync"));
     }
+
+    #[test]
+    fn test_single_entity_selection_across_all_view_kinds() {
+        use plinth_geom::vec2;
+        use plinth_model::{Column, CurtainWall, Door, Element, Slab, ViewDef, ViewKind, Wall};
+
+        let mut app = PlinthApp::default();
+        let lvl1 = app.doc.active_level_id;
+
+        // 1. Create a Floor Plan scene with Wall, Door, Column, Slab
+        let mut wall = Wall::new(vec2(0.0, 0.0), vec2(6000.0, 0.0), lvl1);
+        wall.thickness = 200.0;
+        let wall_id = wall.id;
+        app.doc.elements.insert(wall_id, Element::Wall(wall));
+
+        let mut door = Door::new(wall_id, 2000.0);
+        door.width = 900.0;
+        let door_id = door.id;
+        app.doc.elements.insert(door_id, Element::Door(door));
+
+        let mut col = Column::new(vec2(6000.0, 0.0), lvl1);
+        col.width = 400.0;
+        col.depth = 400.0;
+        let col_id = col.id;
+        app.doc.elements.insert(col_id, Element::Column(col));
+
+        let mut slab = Slab::new(vec![vec2(-500.0, -500.0), vec2(6500.0, -500.0), vec2(6500.0, 4000.0), vec2(-500.0, 4000.0)], lvl1);
+        slab.thickness = 200.0;
+        let slab_id = slab.id;
+        app.doc.elements.insert(slab_id, Element::Slab(slab));
+
+        // 2. Test Floor Plan Selection:
+        // A) Clicking directly on the door center (2000, 0) MUST select the Door, not the Wall or Slab!
+        let mut best_id = None;
+        let mut best_score = 15.0f64;
+        let mouse_pos = vec2(2000.0, 0.0);
+        let zoom = 0.05f64;
+        for (id, el) in &app.doc.elements {
+            let (d_world, priority) = match el {
+                Element::Door(d) => {
+                    let hw = match app.doc.elements.get(&d.host_wall) {
+                        Some(Element::Wall(w)) => w,
+                        _ => continue,
+                    };
+                    let center = hw.start + hw.direction() * d.offset_along_wall;
+                    let d = (center.distance(mouse_pos) - d.width * 0.5).max(0.0);
+                    (d, 0.5)
+                }
+                Element::Wall(w) => {
+                    let d = (plinth_geom::polygon::distance_to_segment(mouse_pos, w.start, w.end) - w.thickness * 0.5).max(0.0);
+                    (d, 2.5)
+                }
+                Element::Column(c) => {
+                    let d = (c.location.distance(mouse_pos) - 200.0).max(0.0);
+                    (d, 1.0)
+                }
+                Element::Slab(s) => {
+                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) { 0.0 } else { 1000.0 };
+                    (d, 4.8)
+                }
+                _ => (f64::INFINITY, 10.0),
+            };
+            let dist_screen = d_world * zoom;
+            let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
+            if score < best_score {
+                best_score = score;
+                best_id = Some(*id);
+            }
+        }
+        assert_eq!(best_id, Some(door_id), "Clicking on door in plan must select Door, not Wall or Slab");
+
+        // B) Clicking on wall at x=4000 (away from door) MUST select Wall!
+        let mut best_id = None;
+        let mut best_score = 15.0f64;
+        let mouse_pos = vec2(4000.0, 0.0);
+        for (id, el) in &app.doc.elements {
+            let (d_world, priority) = match el {
+                Element::Door(d) => {
+                    let hw = match app.doc.elements.get(&d.host_wall) {
+                        Some(Element::Wall(w)) => w,
+                        _ => continue,
+                    };
+                    let center = hw.start + hw.direction() * d.offset_along_wall;
+                    let d = (center.distance(mouse_pos) - d.width * 0.5).max(0.0);
+                    (d, 0.5)
+                }
+                Element::Wall(w) => {
+                    let d = (plinth_geom::polygon::distance_to_segment(mouse_pos, w.start, w.end) - w.thickness * 0.5).max(0.0);
+                    (d, 2.5)
+                }
+                Element::Column(c) => {
+                    let d = (c.location.distance(mouse_pos) - 200.0).max(0.0);
+                    (d, 1.0)
+                }
+                Element::Slab(s) => {
+                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) { 0.0 } else { 1000.0 };
+                    (d, 4.8)
+                }
+                _ => (f64::INFINITY, 10.0),
+            };
+            let dist_screen = d_world * zoom;
+            let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
+            if score < best_score {
+                best_score = score;
+                best_id = Some(*id);
+            }
+        }
+        assert_eq!(best_id, Some(wall_id), "Clicking on wall at x=4000 must select Wall");
+
+        // C) Clicking in middle of room (2000, 2000) MUST select Slab!
+        let mut best_id = None;
+        let mut best_score = 15.0f64;
+        let mouse_pos = vec2(2000.0, 2000.0);
+        for (id, el) in &app.doc.elements {
+            let (d_world, priority) = match el {
+                Element::Door(d) => {
+                    let hw = match app.doc.elements.get(&d.host_wall) {
+                        Some(Element::Wall(w)) => w,
+                        _ => continue,
+                    };
+                    let center = hw.start + hw.direction() * d.offset_along_wall;
+                    let d = (center.distance(mouse_pos) - d.width * 0.5).max(0.0);
+                    (d, 0.5)
+                }
+                Element::Wall(w) => {
+                    let d = (plinth_geom::polygon::distance_to_segment(mouse_pos, w.start, w.end) - w.thickness * 0.5).max(0.0);
+                    (d, 2.5)
+                }
+                Element::Column(c) => {
+                    let d = (c.location.distance(mouse_pos) - 200.0).max(0.0);
+                    (d, 1.0)
+                }
+                Element::Slab(s) => {
+                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) { 0.0 } else { 1000.0 };
+                    (d, 4.8)
+                }
+                _ => (f64::INFINITY, 10.0),
+            };
+            let dist_screen = d_world * zoom;
+            let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
+            if score < best_score {
+                best_score = score;
+                best_id = Some(*id);
+            }
+        }
+        assert_eq!(best_id, Some(slab_id), "Clicking in open room must select Slab");
+
+        // 3. Test Elevation Selection includes CurtainWall and Door
+        let cw = CurtainWall::new(vec2(0.0, 5000.0), vec2(5000.0, 5000.0), lvl1);
+        let cw_id = cw.id;
+        app.doc.elements.insert(cw_id, Element::CurtainWall(cw));
+
+        let _elev_view = ViewDef::new_elevation("Elevation South", ViewKind::ElevationSouth);
+        let dist_to_box = |p: plinth_geom::Vec2, u0: f64, u1: f64, z0: f64, z1: f64| -> f64 {
+            let dx = if p.x < u0 { u0 - p.x } else if p.x > u1 { p.x - u1 } else { 0.0 };
+            let dz = if p.y < z0 { z0 - p.y } else if p.y > z1 { p.y - z1 } else { 0.0 };
+            dx.hypot(dz)
+        };
+
+        // Clicking curtain wall in elevation at (u=2500, z=1500)
+        let mouse_elev = vec2(2500.0, 1500.0);
+        let mut elev_best_id = None;
+        let mut elev_best_score = 15.0f64;
+        for (id, el) in &app.doc.elements {
+            if let Element::CurtainWall(cw) = el {
+                let (z0, z1) = cw.z_bounds(app.doc.level_elevation(cw.base_level), None);
+                let u0 = cw.start.x.min(cw.end.x);
+                let u1 = cw.start.x.max(cw.end.x);
+                let d = dist_to_box(mouse_elev, u0, u1, z0, z1);
+                let dist_screen = d * zoom;
+                let score = if dist_screen <= 10.0 { 2.2 } else { dist_screen + 22.0 };
+                if score < elev_best_score {
+                    elev_best_score = score;
+                    elev_best_id = Some(*id);
+                }
+            }
+        }
+        assert_eq!(elev_best_id, Some(cw_id), "Curtain wall must be selectable in Elevation views");
+    }
 }

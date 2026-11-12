@@ -1449,6 +1449,29 @@ impl Roof {
         self.gross_area() * self.thickness
     }
 
+    pub fn z_bounds(&self, base_z: f64, top_z: Option<f64>) -> (f64, f64) {
+        let z_bot = base_z + self.offset;
+        let span = if self.boundary.len() >= 3 {
+            let xs: Vec<f64> = self.boundary.iter().map(|p| p.x).collect();
+            let ys: Vec<f64> = self.boundary.iter().map(|p| p.y).collect();
+            let w = xs.iter().copied().fold(f64::NEG_INFINITY, f64::max) - xs.iter().copied().fold(f64::INFINITY, f64::min);
+            let h = ys.iter().copied().fold(f64::NEG_INFINITY, f64::max) - ys.iter().copied().fold(f64::INFINITY, f64::min);
+            w.min(h).max(100.0)
+        } else {
+            1000.0
+        };
+        let pitch_h = if self.shape != RoofShape::Flat {
+            (span * 0.5 * self.slope_degrees.to_radians().tan()).max(0.0)
+        } else {
+            0.0
+        };
+        let z_top = match top_z {
+            Some(tz) => (tz + self.top_offset + pitch_h).max(z_bot + self.thickness.max(20.0)),
+            None => (z_bot + self.thickness + self.top_offset + pitch_h).max(z_bot + 20.0),
+        };
+        (z_bot, z_top)
+    }
+
     pub fn solid(&self, level_z: f64) -> Prism {
         self.solid_with_bounds(level_z, None)
     }

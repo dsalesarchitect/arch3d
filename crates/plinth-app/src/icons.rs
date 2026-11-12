@@ -1895,63 +1895,79 @@ pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) 
         }
         IconKind::FloorPlanView => {
             // Authentic architectural floor plan blueprint symbol:
-            // 2D building partition layout with exterior walls, internal room wall, and door opening swing
-            let r = Rect::from_center_size(c, egui::vec2(w * 0.76, h * 0.76));
+            // 2D building partition layout with exterior walls, internal room division, and door swing opening
+            let r = Rect::from_center_size(c, egui::vec2(w * 0.78, h * 0.78));
             
-            // Exterior boundary walls
-            let wall_stroke = Stroke::new(1.8, color);
-            painter.rect_stroke(r, 0.0, wall_stroke, egui::StrokeKind::Middle);
-            painter.rect_filled(r, 0.0, color.gamma_multiply(0.08));
+            // Subtle blueprint background fill
+            painter.rect_filled(r, 0.5, color.gamma_multiply(0.10));
 
-            // Interior partition wall dividing rooms horizontally
-            let y_part = r.min.y + r.height() * 0.52;
+            // Exterior boundary walls (clean 1.5px architectural stroke)
+            let wall_stroke = Stroke::new(1.5, color);
+            painter.rect_stroke(r, 0.5, wall_stroke, egui::StrokeKind::Middle);
+
+            // Interior partition wall dividing layout horizontally with doorway opening
+            let y_mid = r.min.y + r.height() * 0.50;
             let door_open_x = r.min.x + r.width() * 0.48;
-            painter.line_segment([Pos2::new(r.min.x, y_part), Pos2::new(door_open_x, y_part)], wall_stroke);
+            painter.line_segment([Pos2::new(r.min.x, y_mid), Pos2::new(door_open_x, y_mid)], wall_stroke);
 
-            // Door opening quarter-circle swing arc + door leaf line
-            let door_w = r.width() * 0.30;
-            let hinge = Pos2::new(door_open_x, y_part);
-            painter.line_segment([hinge, Pos2::new(hinge.x, hinge.y - door_w)], thin_stroke);
-            
-            // Door swing arc
-            let arc_steps = 6;
+            // Door leaf angled at 45 degrees
+            let door_w = r.width() * 0.32;
+            let hinge = Pos2::new(door_open_x, y_mid);
+            let leaf_tip = Pos2::new(hinge.x + door_w * 0.707, hinge.y - door_w * 0.707);
+            painter.line_segment([hinge, leaf_tip], Stroke::new(1.3, color));
+
+            // Delicate door swing arc
+            let arc_steps = 5;
             for i in 0..arc_steps {
-                let a0 = -(std::f32::consts::FRAC_PI_2 * (i as f32) / (arc_steps as f32));
-                let a1 = -(std::f32::consts::FRAC_PI_2 * ((i + 1) as f32) / (arc_steps as f32));
+                let a0 = -(std::f32::consts::FRAC_PI_4 * (i as f32) / (arc_steps as f32));
+                let a1 = -(std::f32::consts::FRAC_PI_4 * ((i + 1) as f32) / (arc_steps as f32));
                 let p0 = Pos2::new(hinge.x + door_w * a0.cos(), hinge.y + door_w * a0.sin());
                 let p1 = Pos2::new(hinge.x + door_w * a1.cos(), hinge.y + door_w * a1.sin());
-                painter.line_segment([p0, p1], Stroke::new(1.0, color.gamma_multiply(0.65)));
+                painter.line_segment([p0, p1], Stroke::new(0.9, color.gamma_multiply(0.60)));
             }
         }
         IconKind::SectionView => {
-            // Authentic architectural building section cut symbol:
-            // Heavy dashed/solid cut plane line through a building profile with directional view arrow head
-            let cut_x = c.x - w * 0.05;
-            let y_top = c.y - h * 0.38;
-            let y_bot = c.y + h * 0.38;
+            // Authentic architectural building section symbol:
+            // Sliced building profile with solid cut-fill on section half, cutting plane line, and viewing arrow
+            let b_w = w * 0.78;
+            let b_h = h * 0.76;
+            let ground_y = c.y + b_h * 0.46;
+            let eaves_y = c.y - b_h * 0.08;
+            let ridge_y = c.y - b_h * 0.46;
+            let x_left = c.x - b_w * 0.48;
+            let x_right = c.x + b_w * 0.48;
+            let x_cut = c.x - b_w * 0.05;
 
-            // Vertical section cutting plane line
-            painter.line_segment([Pos2::new(cut_x, y_top), Pos2::new(cut_x, y_bot)], Stroke::new(2.0, color));
+            // Sectioned half (left of cut) filled to represent sliced building mass
+            let cut_half = vec![
+                Pos2::new(x_left, ground_y),
+                Pos2::new(x_left, eaves_y),
+                Pos2::new(x_cut, ridge_y + (eaves_y - ridge_y) * ((x_cut - c.x) / (b_w * 0.5)).abs()),
+                Pos2::new(x_cut, ground_y),
+            ];
+            painter.add(egui::Shape::convex_polygon(cut_half, color.gamma_multiply(0.25), Stroke::NONE));
 
-            // Circular section head bubble at top
-            let bub_r = w * 0.16;
-            let bub_c = Pos2::new(cut_x, y_top);
-            painter.circle_filled(bub_c, bub_r, color.gamma_multiply(0.20));
-            painter.circle_stroke(bub_c, bub_r, stroke);
+            // Building silhouette outline (ground, walls, roof)
+            let bldg_outline = [
+                Pos2::new(x_left, ground_y),
+                Pos2::new(x_left, eaves_y),
+                Pos2::new(c.x, ridge_y),
+                Pos2::new(x_right, eaves_y),
+                Pos2::new(x_right, ground_y),
+            ];
+            for i in 0..4 {
+                painter.line_segment([bldg_outline[i], bldg_outline[i + 1]], thin_stroke);
+            }
+            painter.line_segment([Pos2::new(x_left - 1.5, ground_y), Pos2::new(x_right + 1.5, ground_y)], Stroke::new(1.3, color));
 
-            // Directional arrow head pointing right (view direction)
-            let arr_tip = Pos2::new(cut_x + w * 0.34, y_top);
-            let arr_top = Pos2::new(cut_x + bub_r * 0.7, y_top - h * 0.14);
-            let arr_bot = Pos2::new(cut_x + bub_r * 0.7, y_top + h * 0.14);
-            painter.line_segment([arr_tip, arr_top], Stroke::new(1.8, color));
-            painter.line_segment([arr_tip, arr_bot], Stroke::new(1.8, color));
-            painter.line_segment([arr_top, arr_bot], thin_stroke);
+            // Bold vertical section cutting plane line
+            painter.line_segment([Pos2::new(x_cut, ridge_y - 1.5), Pos2::new(x_cut, ground_y + 1.5)], Stroke::new(1.8, color));
 
-            // Cut hash marks at bottom of section line
-            painter.line_segment(
-                [Pos2::new(cut_x - 3.5, y_bot - 2.0), Pos2::new(cut_x + 3.5, y_bot + 2.0)],
-                Stroke::new(1.8, color),
-            );
+            // Directional view arrow pointing right
+            let arr_tip = Pos2::new(x_cut + w * 0.28, c.y - b_h * 0.05);
+            let arr_top = Pos2::new(x_cut + 1.0, arr_tip.y - 2.8);
+            let arr_bot = Pos2::new(x_cut + 1.0, arr_tip.y + 2.8);
+            painter.add(egui::Shape::convex_polygon(vec![arr_tip, arr_top, arr_bot], color, Stroke::NONE));
         }
         IconKind::ElevationView => {
             // Architectural building facade elevation symbol:

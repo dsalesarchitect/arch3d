@@ -1827,14 +1827,34 @@ fn render_single_viewport(
                     draw_polygon_safe(&vp_painter, &pts, sel_fill, sel_stroke);
                 };
                 match el {
-                    Element::Slab(s) => {
-                        let (z_bot, z_top) = s.z_bounds(
-                            doc.level_elevation(s.level),
-                            s.top_level.map(|l| doc.level_elevation(l)),
-                        );
-                        let us: Vec<f64> = s.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
-                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
-                            draw_box(u_min, u_max, z_bot, z_top);
+                    Element::Door(d) => {
+                        if let Some(Element::Wall(w)) = doc.elements.get(&d.host_wall) {
+                            let wall_z0 = w.z_bounds(
+                                doc.level_elevation(w.base_level),
+                                w.top_level.map(|tl| doc.level_elevation(tl)),
+                            ).0;
+                            let d_base_z = d.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                            let (z0, z1) = d.z_bounds(d_base_z, d.top_level.map(|l| doc.level_elevation(l)));
+                            let dir = w.direction();
+                            let p_center = w.start + dir * d.offset_along_wall;
+                            let u_c = project_elev(p_center.extend(0.0)).x;
+                            let half_w = d.width * 0.5;
+                            draw_box(u_c - half_w, u_c + half_w, z0, z1);
+                        }
+                    }
+                    Element::Window(w) => {
+                        if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                            let wall_z0 = hw.z_bounds(
+                                doc.level_elevation(hw.base_level),
+                                hw.top_level.map(|tl| doc.level_elevation(tl)),
+                            ).0;
+                            let w_base_z = w.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                            let (z0, z1) = w.z_bounds(w_base_z, w.top_level.map(|l| doc.level_elevation(l)));
+                            let dir = hw.direction();
+                            let p_center = hw.start + dir * w.offset_along_wall;
+                            let u_c = project_elev(p_center.extend(0.0)).x;
+                            let half_w = w.width * 0.5;
+                            draw_box(u_c - half_w, u_c + half_w, z0, z1);
                         }
                     }
                     Element::Column(c) => {
@@ -1846,6 +1866,15 @@ fn render_single_viewport(
                         if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
                             draw_box(u_min, u_max, z0, z1);
                         }
+                    }
+                    Element::CurtainWall(cw) => {
+                        let (z0, z1) = cw.z_bounds(
+                            doc.level_elevation(cw.base_level),
+                            cw.top_level.map(|l| doc.level_elevation(l)),
+                        );
+                        let u0 = project_elev(cw.start.extend(0.0)).x;
+                        let u1 = project_elev(cw.end.extend(0.0)).x;
+                        draw_box(u0.min(u1), u0.max(u1), z0, z1);
                     }
                     Element::Beam(b) => {
                         let (z0, z1) = b.z_bounds(
@@ -1865,6 +1894,51 @@ fn render_single_viewport(
                         let u1 = project_elev(w.end.extend(0.0)).x;
                         draw_box(u0.min(u1), u0.max(u1), z0, z1);
                     }
+                    Element::Roof(r) => {
+                        let (z0, z1) = r.z_bounds(doc.level_elevation(r.level), r.top_level.map(|l| doc.level_elevation(l)));
+                        let us: Vec<f64> = r.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z0, z1);
+                        }
+                    }
+                    Element::Ceiling(c) => {
+                        let (z0, z1) = c.z_bounds(doc.level_elevation(c.level), c.top_level.map(|l| doc.level_elevation(l)));
+                        let us: Vec<f64> = c.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z0, z1);
+                        }
+                    }
+                    Element::Stair(s) => {
+                        let (z0, z1) = s.z_bounds(doc.level_elevation(s.base_level), s.top_level.map(|l| doc.level_elevation(l)));
+                        let us: Vec<f64> = s.footprint().iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z0, z1);
+                        }
+                    }
+                    Element::Ramp(r) => {
+                        let (z0, z1) = r.z_bounds(doc.level_elevation(r.base_level), r.top_level.map(|l| doc.level_elevation(l)));
+                        let us: Vec<f64> = r.footprint().iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z0, z1);
+                        }
+                    }
+                    Element::Railing(rl) => {
+                        let (z0, z1) = rl.z_bounds(doc.level_elevation(rl.level), rl.top_level.map(|l| doc.level_elevation(l)));
+                        let us: Vec<f64> = rl.path.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z0, z1);
+                        }
+                    }
+                    Element::Slab(s) => {
+                        let (z_bot, z_top) = s.z_bounds(
+                            doc.level_elevation(s.level),
+                            s.top_level.map(|l| doc.level_elevation(l)),
+                        );
+                        let us: Vec<f64> = s.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, z_bot, z_top);
+                        }
+                    }
                     Element::Footing(f) => {
                         let (z0, z1) = f.z_bounds(
                             doc.level_elevation(f.base_level),
@@ -1874,6 +1948,17 @@ fn render_single_viewport(
                         if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
                             draw_box(u_min, u_max, z0, z1);
                         }
+                    }
+                    Element::FreeformSolid(f) => {
+                        let us: Vec<f64> = f.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                        if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                            draw_box(u_min, u_max, f.z_min, f.z_max);
+                        }
+                    }
+                    Element::DetailLine(dl) => {
+                        let p1 = project_elev(dl.start.extend(0.0));
+                        let p2 = project_elev(dl.end.extend(0.0));
+                        vp_painter.line_segment([to_screen(p1), to_screen(p2)], sel_stroke);
                     }
                     _ => {}
                 }
@@ -1892,14 +1977,34 @@ fn render_single_viewport(
                         draw_polygon_safe(&vp_painter, &pts, sel_fill, sel_stroke);
                     };
                     match el {
-                        Element::Slab(s) => {
-                            let (z_bot, z_top) = s.z_bounds(
-                                doc.level_elevation(s.level),
-                                s.top_level.map(|l| doc.level_elevation(l)),
-                            );
-                            let ts: Vec<f64> = s.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
-                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
-                                draw_box(t_min, t_max, z_bot, z_top);
+                        Element::Door(d) => {
+                            if let Some(Element::Wall(w)) = doc.elements.get(&d.host_wall) {
+                                let wall_z0 = w.z_bounds(
+                                    doc.level_elevation(w.base_level),
+                                    w.top_level.map(|tl| doc.level_elevation(tl)),
+                                ).0;
+                                let d_base_z = d.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                let (z0, z1) = d.z_bounds(d_base_z, d.top_level.map(|l| doc.level_elevation(l)));
+                                let dir = w.direction();
+                                let p_center = w.start + dir * d.offset_along_wall;
+                                let t_c = (p_center - s1).dot(u_dir);
+                                let half_w = d.width * 0.5;
+                                draw_box(t_c - half_w, t_c + half_w, z0, z1);
+                            }
+                        }
+                        Element::Window(w) => {
+                            if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                                let wall_z0 = hw.z_bounds(
+                                    doc.level_elevation(hw.base_level),
+                                    hw.top_level.map(|tl| doc.level_elevation(tl)),
+                                ).0;
+                                let w_base_z = w.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                let (z0, z1) = w.z_bounds(w_base_z, w.top_level.map(|l| doc.level_elevation(l)));
+                                let dir = hw.direction();
+                                let p_center = hw.start + dir * w.offset_along_wall;
+                                let t_c = (p_center - s1).dot(u_dir);
+                                let half_w = w.width * 0.5;
+                                draw_box(t_c - half_w, t_c + half_w, z0, z1);
                             }
                         }
                         Element::Column(c) => {
@@ -1911,6 +2016,15 @@ fn render_single_viewport(
                             if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
                                 draw_box(t_min, t_max, z0, z1);
                             }
+                        }
+                        Element::CurtainWall(cw) => {
+                            let (z0, z1) = cw.z_bounds(
+                                doc.level_elevation(cw.base_level),
+                                cw.top_level.map(|l| doc.level_elevation(l)),
+                            );
+                            let t0 = (cw.start - s1).dot(u_dir);
+                            let t1 = (cw.end - s1).dot(u_dir);
+                            draw_box(t0.min(t1), t0.max(t1), z0, z1);
                         }
                         Element::Beam(b) => {
                             let (z0, z1) = b.z_bounds(
@@ -1930,6 +2044,51 @@ fn render_single_viewport(
                             let t1 = (w.end - s1).dot(u_dir);
                             draw_box(t0.min(t1), t0.max(t1), z0, z1);
                         }
+                        Element::Roof(r) => {
+                            let (z0, z1) = r.z_bounds(doc.level_elevation(r.level), r.top_level.map(|l| doc.level_elevation(l)));
+                            let ts: Vec<f64> = r.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z0, z1);
+                            }
+                        }
+                        Element::Ceiling(c) => {
+                            let (z0, z1) = c.z_bounds(doc.level_elevation(c.level), c.top_level.map(|l| doc.level_elevation(l)));
+                            let ts: Vec<f64> = c.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z0, z1);
+                            }
+                        }
+                        Element::Stair(s) => {
+                            let (z0, z1) = s.z_bounds(doc.level_elevation(s.base_level), s.top_level.map(|l| doc.level_elevation(l)));
+                            let ts: Vec<f64> = s.footprint().iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z0, z1);
+                            }
+                        }
+                        Element::Ramp(r) => {
+                            let (z0, z1) = r.z_bounds(doc.level_elevation(r.base_level), r.top_level.map(|l| doc.level_elevation(l)));
+                            let ts: Vec<f64> = r.footprint().iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z0, z1);
+                            }
+                        }
+                        Element::Railing(rl) => {
+                            let (z0, z1) = rl.z_bounds(doc.level_elevation(rl.level), rl.top_level.map(|l| doc.level_elevation(l)));
+                            let ts: Vec<f64> = rl.path.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z0, z1);
+                            }
+                        }
+                        Element::Slab(s) => {
+                            let (z_bot, z_top) = s.z_bounds(
+                                doc.level_elevation(s.level),
+                                s.top_level.map(|l| doc.level_elevation(l)),
+                            );
+                            let ts: Vec<f64> = s.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, z_bot, z_top);
+                            }
+                        }
                         Element::Footing(f) => {
                             let (z0, z1) = f.z_bounds(
                                 doc.level_elevation(f.base_level),
@@ -1939,6 +2098,17 @@ fn render_single_viewport(
                             if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
                                 draw_box(t_min, t_max, z0, z1);
                             }
+                        }
+                        Element::FreeformSolid(f) => {
+                            let ts: Vec<f64> = f.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                            if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                draw_box(t_min, t_max, f.z_min, f.z_max);
+                            }
+                        }
+                        Element::DetailLine(dl) => {
+                            let t1 = (dl.start - s1).dot(u_dir);
+                            let t2 = (dl.end - s1).dot(u_dir);
+                            vp_painter.line_segment([to_screen(plinth_geom::vec2(t1, 0.0)), to_screen(plinth_geom::vec2(t2, 0.0))], sel_stroke);
                         }
                         _ => {}
                     }
@@ -3025,7 +3195,32 @@ fn render_single_viewport(
                     let mut best_id = None;
                     let mut min_t = f64::INFINITY;
 
-                    // Pass 1: Direct 3D Surface Hits (highest priority, no edge bleeding)
+                    let screen_dist_to_poly = |pt: Pos2, poly: &[Pos2]| -> f32 {
+                        let mut min_d = f32::INFINITY;
+                        let n = poly.len();
+                        if n < 2 {
+                            return min_d;
+                        }
+                        for i in 0..n {
+                            let p0 = poly[i];
+                            let p1 = poly[(i + 1) % n];
+                            let v = p1 - p0;
+                            let l2 = v.length_sq();
+                            let d = if l2 <= 1e-4 {
+                                pt.distance(p0)
+                            } else {
+                                let t = ((pt - p0).dot(v) / l2).clamp(0.0, 1.0);
+                                let proj = p0 + v * t;
+                                pt.distance(proj)
+                            };
+                            if d < min_d {
+                                min_d = d;
+                            }
+                        }
+                        min_d
+                    };
+
+                    // Pass 1: Direct 3D Surface Hits (highest priority, avoids axis-projection flattening)
                     for (&id, el) in &doc.elements {
                         for face in doc.element_faces(id) {
                             let denom = face.normal.dot(ray_dir);
@@ -3040,7 +3235,9 @@ fn render_single_viewport(
                                 continue;
                             }
                             let bias = match el {
-                                Element::Door(_) | Element::Window(_) => -30.0,
+                                Element::Door(_) | Element::Window(_) => -150.0,
+                                Element::CurtainWall(_) => -40.0,
+                                Element::Column(_) | Element::Beam(_) => -30.0,
                                 _ => 0.0,
                             };
                             let eff_t = t + bias;
@@ -3048,30 +3245,9 @@ fn render_single_viewport(
                                 continue;
                             }
 
-                            let p_hit = ray_origin + ray_dir * t;
-                            let nx = face.normal.x.abs();
-                            let ny = face.normal.y.abs();
-                            let nz = face.normal.z.abs();
-
-                            let (p_2d, poly_2d) = if nz >= nx && nz >= ny {
-                                (
-                                    plinth_geom::vec2(p_hit.x, p_hit.y),
-                                    face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.y)).collect::<Vec<_>>(),
-                                )
-                            } else if nx >= ny {
-                                (
-                                    plinth_geom::vec2(p_hit.y, p_hit.z),
-                                    face.pts.iter().map(|p| plinth_geom::vec2(p.y, p.z)).collect::<Vec<_>>(),
-                                )
-                            } else {
-                                (
-                                    plinth_geom::vec2(p_hit.x, p_hit.z),
-                                    face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.z)).collect::<Vec<_>>(),
-                                )
-                            };
-
-                            let is_hit = plinth_geom::polygon::point_in_polygon(p_2d, &poly_2d)
-                                || plinth_geom::polygon::distance_to_polyline(p_2d, &poly_2d, true) <= 25.0;
+                            let screen_pts: Vec<Pos2> = face.pts.iter().map(|&p| project_3d(p)).collect();
+                            let is_hit = point_in_screen_poly(click_screen, &screen_pts)
+                                || screen_dist_to_poly(click_screen, &screen_pts) <= 3.5;
 
                             if is_hit {
                                 min_t = eff_t;
@@ -3080,10 +3256,27 @@ fn render_single_viewport(
                         }
                     }
 
-                    // Pass 2: Near-Edge Fallback (only if no direct surface hit, e.g. thin frames, mullions, wires)
+                    // Pass 2: Near-Edge Fallback (only if no direct surface hit, e.g. thin frames, mullions, wires, lines)
                     if best_id.is_none() {
                         let mut min_edge_score = f64::INFINITY;
-                        for (&id, _el) in &doc.elements {
+                        for (&id, el) in &doc.elements {
+                            if let Element::DetailLine(dl) = el {
+                                let p1 = project_3d(dl.start.extend(0.0));
+                                let p2 = project_3d(dl.end.extend(0.0));
+                                let (closest_pt, _) = plinth_geom::polygon::closest_point_on_segment(
+                                    click_v,
+                                    plinth_geom::vec2(p1.x as f64, p1.y as f64),
+                                    plinth_geom::vec2(p2.x as f64, p2.y as f64),
+                                );
+                                let d = click_v.distance(closest_pt);
+                                if d <= 8.0 {
+                                    let edge_score = 500.0 + d * 50.0;
+                                    if edge_score < min_edge_score {
+                                        min_edge_score = edge_score;
+                                        best_id = Some(id);
+                                    }
+                                }
+                            }
                             for face in doc.element_faces(id) {
                                 if face.normal.dot(ray_dir) >= -1e-5 {
                                     continue;
@@ -3158,9 +3351,43 @@ fn render_single_viewport(
                         dx.hypot(dz)
                     };
                     let mut best_id = None;
-                    let mut best_score = 400.0;
+                    let mut best_score = 15.0; // max screen-space threshold in px
                     for (id, el) in &doc.elements {
-                        let (d, priority) = match el {
+                        let (d_world, priority) = match el {
+                            Element::Door(d) => {
+                                if let Some(Element::Wall(w)) = doc.elements.get(&d.host_wall) {
+                                    let wall_z0 = w.z_bounds(
+                                        doc.level_elevation(w.base_level),
+                                        w.top_level.map(|tl| doc.level_elevation(tl)),
+                                    ).0;
+                                    let d_base_z = d.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                    let (z0, z1) = d.z_bounds(d_base_z, d.top_level.map(|l| doc.level_elevation(l)));
+                                    let dir = w.direction();
+                                    let p_center = w.start + dir * d.offset_along_wall;
+                                    let u_c = project_elev(p_center.extend(0.0)).x;
+                                    let half_w = d.width * 0.5;
+                                    (dist_to_box(mouse_pos, u_c - half_w, u_c + half_w, z0, z1), 0.5)
+                                } else {
+                                    (f64::INFINITY, 0.5)
+                                }
+                            }
+                            Element::Window(w) => {
+                                if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                                    let wall_z0 = hw.z_bounds(
+                                        doc.level_elevation(hw.base_level),
+                                        hw.top_level.map(|tl| doc.level_elevation(tl)),
+                                    ).0;
+                                    let w_base_z = w.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                    let (z0, z1) = w.z_bounds(w_base_z, w.top_level.map(|l| doc.level_elevation(l)));
+                                    let dir = hw.direction();
+                                    let p_center = hw.start + dir * w.offset_along_wall;
+                                    let u_c = project_elev(p_center.extend(0.0)).x;
+                                    let half_w = w.width * 0.5;
+                                    (dist_to_box(mouse_pos, u_c - half_w, u_c + half_w, z0, z1), 0.5)
+                                } else {
+                                    (f64::INFINITY, 0.5)
+                                }
+                            }
                             Element::Column(c) => {
                                 let (z0, z1) = c.z_bounds(
                                     doc.level_elevation(c.base_level),
@@ -3185,6 +3412,15 @@ fn render_single_viewport(
                                     (f64::INFINITY, 2.0)
                                 }
                             }
+                            Element::CurtainWall(cw) => {
+                                let (z0, z1) = cw.z_bounds(
+                                    doc.level_elevation(cw.base_level),
+                                    cw.top_level.map(|l| doc.level_elevation(l)),
+                                );
+                                let u0 = project_elev(cw.start.extend(0.0)).x;
+                                let u1 = project_elev(cw.end.extend(0.0)).x;
+                                (dist_to_box(mouse_pos, u0.min(u1), u0.max(u1), z0, z1), 2.2)
+                            }
                             Element::Beam(b) => {
                                 let (z0, z1) = b.z_bounds(
                                     doc.level_elevation(b.level),
@@ -3192,7 +3428,7 @@ fn render_single_viewport(
                                 );
                                 let u0 = project_elev(b.start.extend(0.0)).x;
                                 let u1 = project_elev(b.end.extend(0.0)).x;
-                                (dist_to_box(mouse_pos, u0.min(u1), u0.max(u1), z0, z1), 3.0)
+                                (dist_to_box(mouse_pos, u0.min(u1), u0.max(u1), z0, z1), 2.5)
                             }
                             Element::Wall(w) => {
                                 let (z0, z1) = w.z_bounds(
@@ -3201,7 +3437,52 @@ fn render_single_viewport(
                                 );
                                 let u0 = project_elev(w.start.extend(0.0)).x;
                                 let u1 = project_elev(w.end.extend(0.0)).x;
-                                (dist_to_box(mouse_pos, u0.min(u1), u0.max(u1), z0, z1), 4.0)
+                                (dist_to_box(mouse_pos, u0.min(u1), u0.max(u1), z0, z1), 3.0)
+                            }
+                            Element::Roof(r) => {
+                                let (z0, z1) = r.z_bounds(doc.level_elevation(r.level), r.top_level.map(|l| doc.level_elevation(l)));
+                                let us: Vec<f64> = r.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, z0, z1), 3.5)
+                                } else {
+                                    (f64::INFINITY, 3.5)
+                                }
+                            }
+                            Element::Ceiling(c) => {
+                                let (z0, z1) = c.z_bounds(doc.level_elevation(c.level), c.top_level.map(|l| doc.level_elevation(l)));
+                                let us: Vec<f64> = c.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, z0, z1), 3.8)
+                                } else {
+                                    (f64::INFINITY, 3.8)
+                                }
+                            }
+                            Element::Stair(s) => {
+                                let (z0, z1) = s.z_bounds(doc.level_elevation(s.base_level), s.top_level.map(|l| doc.level_elevation(l)));
+                                let us: Vec<f64> = s.footprint().iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, z0, z1), 2.8)
+                                } else {
+                                    (f64::INFINITY, 2.8)
+                                }
+                            }
+                            Element::Ramp(r) => {
+                                let (z0, z1) = r.z_bounds(doc.level_elevation(r.base_level), r.top_level.map(|l| doc.level_elevation(l)));
+                                let us: Vec<f64> = r.footprint().iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, z0, z1), 2.8)
+                                } else {
+                                    (f64::INFINITY, 2.8)
+                                }
+                            }
+                            Element::Railing(rl) => {
+                                let (z0, z1) = rl.z_bounds(doc.level_elevation(rl.level), rl.top_level.map(|l| doc.level_elevation(l)));
+                                let us: Vec<f64> = rl.path.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, z0, z1), 2.7)
+                                } else {
+                                    (f64::INFINITY, 2.7)
+                                }
                             }
                             Element::Slab(s) => {
                                 let (z_bot, z_top) = s.z_bounds(
@@ -3210,14 +3491,28 @@ fn render_single_viewport(
                                 );
                                 let us: Vec<f64> = s.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
                                 if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
-                                    (dist_to_box(mouse_pos, u_min, u_max, z_bot, z_top), 5.0)
+                                    (dist_to_box(mouse_pos, u_min, u_max, z_bot, z_top), 4.5)
                                 } else {
-                                    (f64::INFINITY, 5.0)
+                                    (f64::INFINITY, 4.5)
                                 }
+                            }
+                            Element::FreeformSolid(f) => {
+                                let us: Vec<f64> = f.boundary.iter().map(|&p| project_elev(p.extend(0.0)).x).collect();
+                                if let (Some(&u_min), Some(&u_max)) = (us.iter().min_by(|a, b| a.total_cmp(b)), us.iter().max_by(|a, b| a.total_cmp(b))) {
+                                    (dist_to_box(mouse_pos, u_min, u_max, f.z_min, f.z_max), 4.6)
+                                } else {
+                                    (f64::INFINITY, 4.6)
+                                }
+                            }
+                            Element::DetailLine(dl) => {
+                                let p1 = project_elev(dl.start.extend(0.0));
+                                let p2 = project_elev(dl.end.extend(0.0));
+                                (plinth_geom::polygon::distance_to_segment(mouse_pos, p1, p2), 0.8)
                             }
                             _ => (f64::INFINITY, 10.0),
                         };
-                        let score = if d <= 15.0 { priority } else { d + priority * 10.0 };
+                        let dist_screen = d_world * (zoom as f64);
+                        let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
                         if score < best_score {
                             best_score = score;
                             best_id = Some(*id);
@@ -3250,9 +3545,43 @@ fn render_single_viewport(
                             dt.hypot(dz)
                         };
                         let mut best_id = None;
-                        let mut best_score = 400.0;
+                        let mut best_score = 15.0; // max screen-space threshold in px
                         for (id, el) in &doc.elements {
-                            let (d, priority) = match el {
+                            let (d_world, priority) = match el {
+                                Element::Door(d) => {
+                                    if let Some(Element::Wall(w)) = doc.elements.get(&d.host_wall) {
+                                        let wall_z0 = w.z_bounds(
+                                            doc.level_elevation(w.base_level),
+                                            w.top_level.map(|tl| doc.level_elevation(tl)),
+                                        ).0;
+                                        let d_base_z = d.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                        let (z0, z1) = d.z_bounds(d_base_z, d.top_level.map(|l| doc.level_elevation(l)));
+                                        let dir = w.direction();
+                                        let p_center = w.start + dir * d.offset_along_wall;
+                                        let t_c = (p_center - s1).dot(u_dir);
+                                        let half_w = d.width * 0.5;
+                                        (dist_to_box(mouse_pos, t_c - half_w, t_c + half_w, z0, z1), 0.5)
+                                    } else {
+                                        (f64::INFINITY, 0.5)
+                                    }
+                                }
+                                Element::Window(w) => {
+                                    if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                                        let wall_z0 = hw.z_bounds(
+                                            doc.level_elevation(hw.base_level),
+                                            hw.top_level.map(|tl| doc.level_elevation(tl)),
+                                        ).0;
+                                        let w_base_z = w.base_level.map(|l| doc.level_elevation(l)).unwrap_or(wall_z0);
+                                        let (z0, z1) = w.z_bounds(w_base_z, w.top_level.map(|l| doc.level_elevation(l)));
+                                        let dir = hw.direction();
+                                        let p_center = hw.start + dir * w.offset_along_wall;
+                                        let t_c = (p_center - s1).dot(u_dir);
+                                        let half_w = w.width * 0.5;
+                                        (dist_to_box(mouse_pos, t_c - half_w, t_c + half_w, z0, z1), 0.5)
+                                    } else {
+                                        (f64::INFINITY, 0.5)
+                                    }
+                                }
                                 Element::Column(c) => {
                                     let (z0, z1) = c.z_bounds(
                                         doc.level_elevation(c.base_level),
@@ -3277,6 +3606,15 @@ fn render_single_viewport(
                                         (f64::INFINITY, 2.0)
                                     }
                                 }
+                                Element::CurtainWall(cw) => {
+                                    let (z0, z1) = cw.z_bounds(
+                                        doc.level_elevation(cw.base_level),
+                                        cw.top_level.map(|l| doc.level_elevation(l)),
+                                    );
+                                    let t0 = (cw.start - s1).dot(u_dir);
+                                    let t1 = (cw.end - s1).dot(u_dir);
+                                    (dist_to_box(mouse_pos, t0.min(t1), t0.max(t1), z0, z1), 2.2)
+                                }
                                 Element::Beam(b) => {
                                     let (z0, z1) = b.z_bounds(
                                         doc.level_elevation(b.level),
@@ -3284,7 +3622,7 @@ fn render_single_viewport(
                                     );
                                     let t0 = (b.start - s1).dot(u_dir);
                                     let t1 = (b.end - s1).dot(u_dir);
-                                    (dist_to_box(mouse_pos, t0.min(t1), t0.max(t1), z0, z1), 3.0)
+                                    (dist_to_box(mouse_pos, t0.min(t1), t0.max(t1), z0, z1), 2.5)
                                 }
                                 Element::Wall(w) => {
                                     let (z0, z1) = w.z_bounds(
@@ -3293,7 +3631,52 @@ fn render_single_viewport(
                                     );
                                     let t0 = (w.start - s1).dot(u_dir);
                                     let t1 = (w.end - s1).dot(u_dir);
-                                    (dist_to_box(mouse_pos, t0.min(t1), t0.max(t1), z0, z1), 4.0)
+                                    (dist_to_box(mouse_pos, t0.min(t1), t0.max(t1), z0, z1), 3.0)
+                                }
+                                Element::Roof(r) => {
+                                    let (z0, z1) = r.z_bounds(doc.level_elevation(r.level), r.top_level.map(|l| doc.level_elevation(l)));
+                                    let ts: Vec<f64> = r.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, z0, z1), 3.5)
+                                    } else {
+                                        (f64::INFINITY, 3.5)
+                                    }
+                                }
+                                Element::Ceiling(c) => {
+                                    let (z0, z1) = c.z_bounds(doc.level_elevation(c.level), c.top_level.map(|l| doc.level_elevation(l)));
+                                    let ts: Vec<f64> = c.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, z0, z1), 3.8)
+                                    } else {
+                                        (f64::INFINITY, 3.8)
+                                    }
+                                }
+                                Element::Stair(s) => {
+                                    let (z0, z1) = s.z_bounds(doc.level_elevation(s.base_level), s.top_level.map(|l| doc.level_elevation(l)));
+                                    let ts: Vec<f64> = s.footprint().iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, z0, z1), 2.8)
+                                    } else {
+                                        (f64::INFINITY, 2.8)
+                                    }
+                                }
+                                Element::Ramp(r) => {
+                                    let (z0, z1) = r.z_bounds(doc.level_elevation(r.base_level), r.top_level.map(|l| doc.level_elevation(l)));
+                                    let ts: Vec<f64> = r.footprint().iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, z0, z1), 2.8)
+                                    } else {
+                                        (f64::INFINITY, 2.8)
+                                    }
+                                }
+                                Element::Railing(rl) => {
+                                    let (z0, z1) = rl.z_bounds(doc.level_elevation(rl.level), rl.top_level.map(|l| doc.level_elevation(l)));
+                                    let ts: Vec<f64> = rl.path.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, z0, z1), 2.7)
+                                    } else {
+                                        (f64::INFINITY, 2.7)
+                                    }
                                 }
                                 Element::Slab(s) => {
                                     let (z_bot, z_top) = s.z_bounds(
@@ -3302,35 +3685,49 @@ fn render_single_viewport(
                                     );
                                     let ts: Vec<f64> = s.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
                                     if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
-                                        (dist_to_box(mouse_pos, t_min, t_max, z_bot, z_top), 5.0)
+                                        (dist_to_box(mouse_pos, t_min, t_max, z_bot, z_top), 4.5)
                                     } else {
-                                        (f64::INFINITY, 5.0)
+                                        (f64::INFINITY, 4.5)
                                     }
+                                }
+                                Element::FreeformSolid(f) => {
+                                    let ts: Vec<f64> = f.boundary.iter().map(|&p| (p - s1).dot(u_dir)).collect();
+                                    if let (Some(&t_min), Some(&t_max)) = (ts.iter().min_by(|a, b| a.total_cmp(b)), ts.iter().max_by(|a, b| a.total_cmp(b))) {
+                                        (dist_to_box(mouse_pos, t_min, t_max, f.z_min, f.z_max), 4.6)
+                                    } else {
+                                        (f64::INFINITY, 4.6)
+                                    }
+                                }
+                                Element::DetailLine(dl) => {
+                                    let t1 = (dl.start - s1).dot(u_dir);
+                                    let t2 = (dl.end - s1).dot(u_dir);
+                                    (dist_to_box(mouse_pos, t1.min(t2), t1.max(t2), 0.0, 0.0), 0.8)
                                 }
                                 _ => (f64::INFINITY, 10.0),
                             };
-                            let score = if d <= 15.0 { priority } else { d + priority * 10.0 };
+                            let dist_screen = d_world * (zoom as f64);
+                            let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
                             if score < best_score {
                                 best_score = score;
                                 best_id = Some(*id);
                             }
                         }
                         let is_shift = ui.input(|i| i.modifiers.shift);
-                    let is_ctrl = ui.input(|i| i.modifiers.ctrl || i.modifiers.command);
-                    if is_shift || is_ctrl {
-                        if let Some(id) = best_id {
-                            if canvas_state.selected_elements.contains(&id) {
-                                canvas_state.selected_elements.retain(|&x| x != id);
-                                *selected_element = canvas_state.selected_elements.first().copied();
-                            } else {
-                                canvas_state.selected_elements.push(id);
-                                *selected_element = Some(id);
+                        let is_ctrl = ui.input(|i| i.modifiers.ctrl || i.modifiers.command);
+                        if is_shift || is_ctrl {
+                            if let Some(id) = best_id {
+                                if canvas_state.selected_elements.contains(&id) {
+                                    canvas_state.selected_elements.retain(|&x| x != id);
+                                    *selected_element = canvas_state.selected_elements.first().copied();
+                                } else {
+                                    canvas_state.selected_elements.push(id);
+                                    *selected_element = Some(id);
+                                }
                             }
+                        } else {
+                            *selected_element = best_id;
+                            canvas_state.selected_elements = best_id.map(|id| vec![id]).unwrap_or_default();
                         }
-                    } else {
-                        *selected_element = best_id;
-                        canvas_state.selected_elements = best_id.map(|id| vec![id]).unwrap_or_default();
-                    }
                     }
                 } else {
                     // 2D Floor Plan nearest element selection
@@ -3342,43 +3739,9 @@ fn render_single_viewport(
                     };
 
                     let mut best_id = None;
-                    let mut best_dist = 280.0; // threshold in mm
+                    let mut best_score = 15.0; // max screen-space threshold in px (zoom-independent)
                     for (id, el) in &doc.elements {
-                        let d = match el {
-                            Element::Wall(w) => {
-                                let (base_z, top_z) = w.z_bounds(
-                                    doc.level_elevation(w.base_level),
-                                    w.top_level.map(|tl| doc.level_elevation(tl)),
-                                );
-                                if cut_z >= base_z && cut_z <= top_z + 100.0 {
-                                    let center_dist = plinth_geom::polygon::distance_to_segment(mouse_pos, w.start, w.end);
-                                    let half_thick = w.thickness * 0.5;
-                                    if center_dist <= half_thick + 40.0 {
-                                        (center_dist - half_thick).max(0.0)
-                                    } else {
-                                        center_dist
-                                    }
-                                } else {
-                                    f64::INFINITY
-                                }
-                            }
-                            Element::CurtainWall(cw) => {
-                                let (base_z, top_z) = cw.z_bounds(
-                                    doc.level_elevation(cw.base_level),
-                                    cw.top_level.map(|tl| doc.level_elevation(tl)),
-                                );
-                                if cut_z >= base_z && cut_z <= top_z + 100.0 {
-                                    let center_dist = plinth_geom::polygon::distance_to_segment(mouse_pos, cw.start, cw.end);
-                                    let half_thick = cw.mullion_depth * 0.5;
-                                    if center_dist <= half_thick + 40.0 {
-                                        (center_dist - half_thick).max(0.0)
-                                    } else {
-                                        center_dist
-                                    }
-                                } else {
-                                    f64::INFINITY
-                                }
-                            }
+                        let (d_world, priority) = match el {
                             Element::Door(door) => {
                                 if let Some(Element::Wall(hw)) = doc.elements.get(&door.host_wall) {
                                     let wall_z0 = hw.z_bounds(
@@ -3395,16 +3758,17 @@ fn render_single_viewport(
                                         let d_center = center.distance(mouse_pos);
                                         let d_hinge = hinge.distance(mouse_pos);
                                         let d_strike = strike.distance(mouse_pos);
-                                        if d_center <= door.width * 0.6 || d_hinge <= door.width * 0.95 || d_strike <= 60.0 {
+                                        let d = if d_center <= door.width * 0.6 || d_hinge <= door.width * 0.95 || d_strike <= 60.0 {
                                             0.0
                                         } else {
                                             (d_center - door.width * 0.5).max(0.0)
-                                        }
+                                        };
+                                        (d, 0.5)
                                     } else {
-                                        f64::INFINITY
+                                        (f64::INFINITY, 0.5)
                                     }
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 0.5)
                                 }
                             }
                             Element::Window(win) => {
@@ -3418,16 +3782,17 @@ fn render_single_viewport(
                                     if cut_z >= win_bottom && cut_z <= win_top {
                                         let center = hw.start + hw.direction() * win.offset_along_wall;
                                         let dist = center.distance(mouse_pos);
-                                        if dist <= win.width * 0.6 {
+                                        let d = if dist <= win.width * 0.6 {
                                             0.0
                                         } else {
                                             (dist - win.width * 0.5).max(0.0)
-                                        }
+                                        };
+                                        (d, 0.5)
                                     } else {
-                                        f64::INFINITY
+                                        (f64::INFINITY, 0.5)
                                     }
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 0.5)
                                 }
                             }
                             Element::Column(c) => {
@@ -3436,15 +3801,69 @@ fn render_single_viewport(
                                     c.top_level.map(|tl| doc.level_elevation(tl)),
                                 );
                                 if cut_z >= c_base_z && cut_z <= c_top_z + 100.0 {
-                                    let dist = c.location.distance(mouse_pos);
-                                    let radius = c.width.max(c.depth) * 0.5;
-                                    if dist <= radius + 40.0 {
+                                    let fp = c.footprint();
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
                                         0.0
                                     } else {
-                                        dist - radius
-                                    }
+                                        plinth_geom::polygon::distance_to_polyline(mouse_pos, &fp, true)
+                                    };
+                                    (d, 1.0)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 1.0)
+                                }
+                            }
+                            Element::CurtainWall(cw) => {
+                                let (base_z, top_z) = cw.z_bounds(
+                                    doc.level_elevation(cw.base_level),
+                                    cw.top_level.map(|tl| doc.level_elevation(tl)),
+                                );
+                                if cut_z >= base_z && cut_z <= top_z + 100.0 {
+                                    let center_dist = plinth_geom::polygon::distance_to_segment(mouse_pos, cw.start, cw.end);
+                                    let half_thick = cw.mullion_depth * 0.5;
+                                    let d = if center_dist <= half_thick {
+                                        0.0
+                                    } else {
+                                        center_dist - half_thick
+                                    };
+                                    (d, 2.0)
+                                } else {
+                                    (f64::INFINITY, 2.0)
+                                }
+                            }
+                            Element::Wall(w) => {
+                                let (base_z, top_z) = w.z_bounds(
+                                    doc.level_elevation(w.base_level),
+                                    w.top_level.map(|tl| doc.level_elevation(tl)),
+                                );
+                                if cut_z >= base_z && cut_z <= top_z + 100.0 {
+                                    let center_dist = plinth_geom::polygon::distance_to_segment(mouse_pos, w.start, w.end);
+                                    let half_thick = w.thickness * 0.5;
+                                    let d = if center_dist <= half_thick {
+                                        0.0
+                                    } else {
+                                        center_dist - half_thick
+                                    };
+                                    (d, 2.5)
+                                } else {
+                                    (f64::INFINITY, 2.5)
+                                }
+                            }
+                            Element::Beam(b) => {
+                                let (b_base_z, b_top_z) = b.z_bounds(
+                                    doc.level_elevation(b.level),
+                                    b.top_level.map(|tl| doc.level_elevation(tl)),
+                                );
+                                if b_top_z >= view_level_z - 100.0 && b_base_z <= cut_z + 2000.0 {
+                                    let d_seg = plinth_geom::polygon::distance_to_segment(mouse_pos, b.start, b.end);
+                                    let half_w = b.width * 0.5;
+                                    let d = if d_seg <= half_w {
+                                        0.0
+                                    } else {
+                                        d_seg - half_w
+                                    };
+                                    (d, 2.8)
+                                } else {
+                                    (f64::INFINITY, 2.8)
                                 }
                             }
                             Element::Footing(f) => {
@@ -3454,30 +3873,14 @@ fn render_single_viewport(
                                 );
                                 if f_top <= cut_z && f_top >= view_level_z - 2000.0 {
                                     let fp = f.footprint();
-                                    if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
-                                        5.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
+                                        0.0
                                     } else {
                                         plinth_geom::polygon::distance_to_polyline(mouse_pos, &fp, true)
-                                    }
+                                    };
+                                    (d, 3.5)
                                 } else {
-                                    f64::INFINITY
-                                }
-                            }
-                            Element::Beam(b) => {
-                                let (b_base_z, b_top_z) = b.z_bounds(
-                                    doc.level_elevation(b.level),
-                                    b.top_level.map(|tl| doc.level_elevation(tl)),
-                                );
-                                if b_top_z >= view_level_z - 100.0 && b_base_z <= cut_z + 2000.0 {
-                                    let d = plinth_geom::polygon::distance_to_segment(mouse_pos, b.start, b.end);
-                                    let half_w = b.width * 0.5;
-                                    if d <= half_w + 30.0 {
-                                        (d - half_w).max(0.0)
-                                    } else {
-                                        d
-                                    }
-                                } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 3.5)
                                 }
                             }
                             Element::Stair(s) => {
@@ -3487,13 +3890,14 @@ fn render_single_viewport(
                                 );
                                 if s_top >= view_level_z - 100.0 && s_bot <= cut_z {
                                     let fp = s.footprint();
-                                    if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
                                         0.0
                                     } else {
                                         plinth_geom::polygon::distance_to_polyline(mouse_pos, &fp, true)
-                                    }
+                                    };
+                                    (d, 3.0)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 3.0)
                                 }
                             }
                             Element::Ramp(r) => {
@@ -3503,60 +3907,57 @@ fn render_single_viewport(
                                 );
                                 if r_top >= view_level_z - 100.0 && r_bot <= cut_z {
                                     let fp = r.footprint();
-                                    if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &fp) {
                                         0.0
                                     } else {
                                         plinth_geom::polygon::distance_to_polyline(mouse_pos, &fp, true)
-                                    }
+                                    };
+                                    (d, 3.0)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 3.0)
                                 }
                             }
-                            Element::Railing(rl) => plinth_geom::polygon::distance_to_polyline(mouse_pos, &rl.path, false),
+                            Element::Railing(rl) => (plinth_geom::polygon::distance_to_polyline(mouse_pos, &rl.path, false), 2.2),
                             Element::Fascia(f) => {
                                 let f_z = doc.level_elevation(f.level);
                                 if (f_z - cut_z).abs() <= 1500.0 {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &f.path, false)
+                                    (plinth_geom::polygon::distance_to_polyline(mouse_pos, &f.path, false), 2.9)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 2.9)
                                 }
                             }
                             Element::Gutter(g) => {
                                 let g_z = doc.level_elevation(g.level);
                                 if (g_z - cut_z).abs() <= 1500.0 {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &g.path, false)
+                                    (plinth_geom::polygon::distance_to_polyline(mouse_pos, &g.path, false), 2.9)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 2.9)
                                 }
                             }
                             Element::Ceiling(c) => {
                                 if active_view.kind == ViewKind::CeilingPlan {
-                                    let edge_d = plinth_geom::polygon::distance_to_polyline(mouse_pos, &c.boundary, true);
-                                    if edge_d <= 80.0 {
-                                        edge_d
-                                    } else if plinth_geom::polygon::point_in_polygon(mouse_pos, &c.boundary) {
-                                        250.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &c.boundary) {
+                                        0.0
                                     } else {
-                                        f64::INFINITY
-                                    }
+                                        plinth_geom::polygon::distance_to_polyline(mouse_pos, &c.boundary, true)
+                                    };
+                                    (d, 4.2)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 4.2)
                                 }
                             }
                             Element::Roof(r) => {
                                 let r_lvl_z = doc.level_elevation(r.level);
                                 let r_base_z = r_lvl_z + r.offset;
                                 if r_base_z > cut_z + 200.0 {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 4.5)
                                 } else {
-                                    let edge_d = plinth_geom::polygon::distance_to_polyline(mouse_pos, &r.boundary, true);
-                                    if edge_d <= 80.0 {
-                                        edge_d
-                                    } else if plinth_geom::polygon::point_in_polygon(mouse_pos, &r.boundary) {
-                                        260.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &r.boundary) {
+                                        0.0
                                     } else {
-                                        f64::INFINITY
-                                    }
+                                        plinth_geom::polygon::distance_to_polyline(mouse_pos, &r.boundary, true)
+                                    };
+                                    (d, 4.5)
                                 }
                             }
                             Element::Slab(s) => {
@@ -3565,47 +3966,44 @@ fn render_single_viewport(
                                     s.top_level.map(|l| doc.level_elevation(l)),
                                 );
                                 // In plan view, only slabs that are at or below the cut plane are visible.
-                                // Slabs above the cut plane (e.g. upper storey floor slabs, roof decks) MUST NEVER BE SELECTABLE!
                                 if slab_top > cut_z || slab_top < view_level_z - 1500.0 {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 4.8)
                                 } else {
-                                    let edge_d = plinth_geom::polygon::distance_to_polyline(mouse_pos, &s.boundary, true);
-                                    if edge_d <= 80.0 {
-                                        edge_d
-                                    } else if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) {
-                                        // Background priority penalty (250 mm) so that walls, doors, windows, columns, etc.
-                                        // are always prioritized over the floor slab.
-                                        250.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) {
+                                        0.0
                                     } else {
-                                        f64::INFINITY
-                                    }
+                                        plinth_geom::polygon::distance_to_polyline(mouse_pos, &s.boundary, true)
+                                    };
+                                    (d, 4.8)
                                 }
                             }
                             Element::FreeformSurface(s) => {
                                 let s_z = s.elevation;
                                 if (s_z - view_level_z).abs() <= 3500.0 || (s_z <= cut_z && s_z >= view_level_z - 500.0) {
-                                    if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) {
-                                        5.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &s.boundary) {
+                                        0.0
                                     } else {
                                         plinth_geom::polygon::distance_to_polyline(mouse_pos, &s.boundary, true)
-                                    }
+                                    };
+                                    (d, 4.5)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 4.5)
                                 }
                             }
                             Element::FreeformSolid(f) => {
                                 if (cut_z >= f.z_min && cut_z <= f.z_max) || (f.z_max <= cut_z && f.z_max >= view_level_z - 1000.0) {
-                                    if plinth_geom::polygon::point_in_polygon(mouse_pos, &f.boundary) {
-                                        5.0
+                                    let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &f.boundary) {
+                                        0.0
                                     } else {
                                         plinth_geom::polygon::distance_to_polyline(mouse_pos, &f.boundary, true)
-                                    }
+                                    };
+                                    (d, 4.5)
                                 } else {
-                                    f64::INFINITY
+                                    (f64::INFINITY, 4.5)
                                 }
                             }
                             Element::Dimension(dim) => {
-                                match dim.kind {
+                                let d = match dim.kind {
                                     plinth_model::DimensionKind::Linear => {
                                         let diff = dim.p2 - dim.p1;
                                         let len = diff.length();
@@ -3632,68 +4030,53 @@ fn render_single_viewport(
                                     plinth_model::DimensionKind::Angular => {
                                         plinth_geom::polygon::distance_to_segment(mouse_pos, dim.p1, dim.p2)
                                     }
-                                }
+                                };
+                                (d, 0.8)
                             }
                             Element::DetailLine(dl) => {
-                                plinth_geom::polygon::distance_to_segment(mouse_pos, dl.start, dl.end)
+                                (plinth_geom::polygon::distance_to_segment(mouse_pos, dl.start, dl.end), 0.8)
                             }
                             Element::TextNote(t) => {
                                 let d = mouse_pos.distance(t.pos);
-                                if d <= 300.0 {
-                                    d * 0.1
-                                } else {
-                                    f64::INFINITY
-                                }
+                                let d_eff = if d <= 300.0 { 0.0 } else { d - 300.0 };
+                                (d_eff, 0.8)
                             }
                             Element::Leader(l) => {
                                 let d1 = plinth_geom::polygon::distance_to_segment(mouse_pos, l.target_pt, l.shoulder_pt);
                                 let d2 = plinth_geom::polygon::distance_to_segment(mouse_pos, l.shoulder_pt, l.text_pt);
-                                d1.min(d2)
+                                (d1.min(d2), 0.8)
                             }
                             Element::BuildingPad(bp) => {
-                                if plinth_geom::polygon::point_in_polygon(mouse_pos, &bp.boundary) {
-                                    10.0
-                                } else {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &bp.boundary, true)
-                                }
+                                let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &bp.boundary) { 0.0 } else { plinth_geom::polygon::distance_to_polyline(mouse_pos, &bp.boundary, true) };
+                                (d, 5.0)
                             }
                             Element::Toposolid(ts) => {
-                                if plinth_geom::polygon::point_in_polygon(mouse_pos, &ts.boundary) {
-                                    15.0
-                                } else {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &ts.boundary, true)
-                                }
+                                let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &ts.boundary) { 0.0 } else { plinth_geom::polygon::distance_to_polyline(mouse_pos, &ts.boundary, true) };
+                                (d, 5.0)
                             }
                             Element::PropertyLine(pl) => {
-                                plinth_geom::polygon::distance_to_polyline(mouse_pos, &pl.boundary, true)
+                                (plinth_geom::polygon::distance_to_polyline(mouse_pos, &pl.boundary, true), 5.0)
                             }
                             Element::Road(rd) => {
                                 let poly = rd.footprint();
-                                if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) {
-                                    12.0
-                                } else {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true)
-                                }
+                                let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) { 0.0 } else { plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true) };
+                                (d, 5.0)
                             }
                             Element::Sidewalk(sw) => {
                                 let poly = sw.footprint();
-                                if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) {
-                                    12.0
-                                } else {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true)
-                                }
+                                let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) { 0.0 } else { plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true) };
+                                (d, 5.0)
                             }
                             Element::Pathwalk(pw) => {
                                 let poly = pw.footprint();
-                                if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) {
-                                    12.0
-                                } else {
-                                    plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true)
-                                }
+                                let d = if plinth_geom::polygon::point_in_polygon(mouse_pos, &poly) { 0.0 } else { plinth_geom::polygon::distance_to_polyline(mouse_pos, &poly, true) };
+                                (d, 5.0)
                             }
                         };
-                        if d < best_dist {
-                            best_dist = d;
+                        let dist_screen = d_world * (zoom as f64);
+                        let score = if dist_screen <= 10.0 { priority } else { dist_screen + priority * 10.0 };
+                        if score < best_score {
+                            best_score = score;
                             best_id = Some(*id);
                         }
                     }
