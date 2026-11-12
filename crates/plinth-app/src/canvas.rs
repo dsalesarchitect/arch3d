@@ -174,6 +174,11 @@ pub struct CanvasState {
     pub cached_gpu_visual_style: VisualStyle,
     pub cached_gpu_is_dark: bool,
     pub cached_gpu_selection: Vec<plinth_model::ElementId>,
+
+    // Viewport Sizing & Auto-Zoom Extents
+    pub viewport_size: Vec2,
+    pub initial_zoom_fitted: bool,
+    pub zoom_extents_requested: bool,
 }
 
 impl CanvasState {
@@ -253,6 +258,9 @@ impl Default for CanvasState {
             cached_gpu_visual_style: VisualStyle::Shaded,
             cached_gpu_is_dark: false,
             cached_gpu_selection: Vec::new(),
+            viewport_size: Vec2::ZERO,
+            initial_zoom_fitted: false,
+            zoom_extents_requested: true,
         }
     }
 }
@@ -351,6 +359,453 @@ fn resolve_pane_view(
     }
 }
 
+/// Fits the active view in the specified viewport pane to the 3D or 2D extents of all model geometry.
+pub fn zoom_extents_viewport(
+    doc: &mut Document,
+    canvas_state: &mut CanvasState,
+    pane_idx: usize,
+    vp_size: Vec2,
+) {
+    let p_idx = pane_idx.min(3);
+    let view_id = canvas_state.panes[p_idx].view_id.unwrap_or(doc.active_view_id);
+    let active_view = match doc.views.get(&view_id) {
+        Some(v) => v.clone(),
+        None => return,
+    };
+
+    let is_3d = active_view.kind.is_3d();
+    let vp_w = vp_size.x.max(100.0);
+    let vp_h = vp_size.y.max(100.0);
+
+    if is_3d {
+        let mut min_x = f64::INFINITY;
+        let mut max_x = f64::NEG_INFINITY;
+        let mut min_y = f64::INFINITY;
+        let mut max_y = f64::NEG_INFINITY;
+        let mut min_z = f64::INFINITY;
+        let mut max_z = f64::NEG_INFINITY;
+
+        let mut include_pt = |x: f64, y: f64, z: f64| {
+            if x.is_finite() && y.is_finite() && z.is_finite() {
+                min_x = min_x.min(x);
+                max_x = max_x.max(x);
+                min_y = min_y.min(y);
+                max_y = max_y.max(y);
+                min_z = min_z.min(z);
+                max_z = max_z.max(z);
+            }
+        };
+
+        for el in doc.elements.values() {
+            match el {
+                Element::Wall(w) => {
+                    let (z0, z1) = w.z_bounds(
+                        doc.level_elevation(w.base_level),
+                        w.top_level.map(|l| doc.level_elevation(l)),
+                    );
+                    include_pt(w.start.x, w.start.y, z0);
+                    include_pt(w.start.x, w.start.y, z1);
+                    include_pt(w.end.x, w.end.y, z0);
+                    include_pt(w.end.x, w.end.y, z1);
+                }
+                Element::Column(c) => {
+                    let (z0, z1) = c.z_bounds(
+                        doc.level_elevation(c.base_level),
+                        c.top_level.map(|l| doc.level_elevation(l)),
+                    );
+                    let hw = c.width * 0.5;
+                    let hd = c.depth * 0.5;
+                    include_pt(c.location.x - hw, c.location.y - hd, z0);
+                    include_pt(c.location.x + hw, c.location.y + hd, z1);
+                }
+                Element::Beam(b) => {
+                    let (z0, z1) = b.z_bounds(
+                        doc.level_elevation(b.level),
+                        b.top_level.map(|l| doc.level_elevation(l)),
+                    );
+                    include_pt(b.start.x, b.start.y, z0);
+                    include_pt(b.end.x, b.end.y, z1);
+                }
+                Element::Slab(s) => {
+                    let (z0, z1) = s.z_bounds(
+                        doc.level_elevation(s.level),
+                        s.top_level.map(|l| doc.level_elevation(l)),
+                    );
+                    for p in &s.boundary {
+                        include_pt(p.x, p.y, z0);
+                        include_pt(p.x, p.y, z1);
+                    }
+                }
+                Element::Roof(r) => {
+                    let r_base = doc.level_elevation(r.level) + r.offset;
+                    let (z0, z1) = (r_base, r_base + r.thickness + 2000.0);
+                    for p in &r.boundary {
+                        include_pt(p.x, p.y, z0);
+                        include_pt(p.x, p.y, z1);
+                    }
+                }
+                Element::CurtainWall(cw) => {
+                    let (z0, z1) = cw.z_bounds(
+                        doc.level_elevation(cw.base_level),
+                        cw.top_level.map(|l| doc.level_elevation(l)),
+                    );
+                    include_pt(cw.start.x, cw.start.y, z0);
+                    include_pt(cw.end.x, cw.end.y, z1);
+                }
+                Element::Footing(f) => {
+                    let (z0, z1) = f.z_bounds(doc.level_elevation(f.base_level), None);
+                    let hw = f.width * 0.5;
+                    let hd = f.length * 0.5;
+                    include_pt(f.location.x - hw, f.location.y - hd, z0);
+                    include_pt(f.location.x + hw, f.location.y + hd, z1);
+                }
+                Element::FreeformSolid(f) => {
+                    for p in &f.boundary {
+                        include_pt(p.x, p.y, f.z_min);
+                        include_pt(p.x, p.y, f.z_max);
+                    }
+                    for face in f.faces() {
+                        for p in &face.pts {
+                            include_pt(p.x, p.y, p.z);
+                        }
+                    }
+                }
+                Element::Ceiling(c) => {
+                    let z = doc.level_elevation(c.level) + c.height_above_level;
+                    for p in &c.boundary {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Door(d) => {
+                    if let Some(Element::Wall(hw)) = doc.elements.get(&d.host_wall) {
+                        let p = hw.start + hw.direction() * d.offset_along_wall;
+                        let z = d.base_level.map(|l| doc.level_elevation(l)).unwrap_or_else(|| doc.level_elevation(hw.base_level));
+                        include_pt(p.x, p.y, z);
+                        include_pt(p.x, p.y, z + d.height);
+                    }
+                }
+                Element::Window(w) => {
+                    if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                        let p = hw.start + hw.direction() * w.offset_along_wall;
+                        let z = w.base_level.map(|l| doc.level_elevation(l)).unwrap_or_else(|| doc.level_elevation(hw.base_level)) + w.sill_height;
+                        include_pt(p.x, p.y, z);
+                        include_pt(p.x, p.y, z + w.height);
+                    }
+                }
+                Element::Stair(s) => {
+                    let (z0, z1) = (doc.level_elevation(s.base_level), s.top_level.map(|l| doc.level_elevation(l)).unwrap_or(3000.0));
+                    for p in s.footprint() {
+                        include_pt(p.x, p.y, z0);
+                        include_pt(p.x, p.y, z1);
+                    }
+                }
+                Element::Ramp(r) => {
+                    let (z0, z1) = (doc.level_elevation(r.base_level), r.top_level.map(|l| doc.level_elevation(l)).unwrap_or(3000.0));
+                    for p in r.footprint() {
+                        include_pt(p.x, p.y, z0);
+                        include_pt(p.x, p.y, z1);
+                    }
+                }
+                Element::Railing(ra) => {
+                    let z = doc.level_elevation(ra.level) + ra.base_offset;
+                    for p in &ra.path {
+                        include_pt(p.x, p.y, z);
+                        include_pt(p.x, p.y, z + ra.height);
+                    }
+                }
+                Element::BuildingPad(bp) => {
+                    let z = doc.level_elevation(bp.level) + bp.elevation_offset;
+                    for p in &bp.boundary {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Toposolid(topo) => {
+                    let z = doc.level_elevation(topo.level);
+                    for p in &topo.boundary {
+                        include_pt(p.x, p.y, z);
+                    }
+                    for pt in &topo.elevation_points {
+                        include_pt(pt.x, pt.y, pt.z);
+                    }
+                }
+                Element::Road(road) => {
+                    let z = doc.level_elevation(road.level) + road.base_offset;
+                    for p in &road.path {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Sidewalk(sw) => {
+                    let z = doc.level_elevation(sw.level) + sw.base_offset;
+                    for p in &sw.path {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Pathwalk(pw) => {
+                    let z = doc.level_elevation(pw.level) + pw.base_offset;
+                    for p in &pw.path {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Fascia(f) => {
+                    let z = doc.level_elevation(f.level) + f.vertical_offset;
+                    for p in &f.path {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::Gutter(g) => {
+                    let z = doc.level_elevation(g.level) + g.vertical_offset;
+                    for p in &g.path {
+                        include_pt(p.x, p.y, z);
+                    }
+                }
+                Element::DetailLine(l) => {
+                    include_pt(l.start.x, l.start.y, 0.0);
+                    include_pt(l.end.x, l.end.y, 0.0);
+                }
+                Element::Dimension(d) => {
+                    include_pt(d.p1.x, d.p1.y, 0.0);
+                    include_pt(d.p2.x, d.p2.y, 0.0);
+                }
+                Element::FreeformSurface(s) => {
+                    for p in &s.boundary {
+                        include_pt(p.x, p.y, s.elevation);
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        let has_geometry = !min_x.is_infinite();
+        if !has_geometry {
+            min_x = 0.0;
+            max_x = 12000.0;
+            min_y = 0.0;
+            max_y = 8000.0;
+            min_z = 0.0;
+            max_z = 3500.0;
+        }
+
+        let mut cam_3d = active_view.camera_3d.unwrap_or_default();
+        if has_geometry {
+            cam_3d.target_x = (min_x + max_x) * 0.5;
+            cam_3d.target_y = (min_y + max_y) * 0.5;
+            cam_3d.target_z = (min_z + max_z) * 0.5;
+            let extent_diag = ((max_x - min_x).powi(2) + (max_y - min_y).powi(2) + (max_z - min_z).powi(2)).sqrt();
+            cam_3d.distance = (extent_diag * 1.8).max(15000.0);
+            if let Some(v) = doc.views.get_mut(&view_id) {
+                v.camera_3d = Some(cam_3d);
+            }
+        }
+
+        let target_3d = plinth_geom::Vec3::new(cam_3d.target_x, cam_3d.target_y, cam_3d.target_z);
+        let (sin_y, cos_y) = cam_3d.yaw.sin_cos();
+        let (sin_p, cos_p) = cam_3d.pitch.sin_cos();
+
+        let mut min_vx = f64::INFINITY;
+        let mut max_vx = f64::NEG_INFINITY;
+        let mut min_vz = f64::INFINITY;
+        let mut max_vz = f64::NEG_INFINITY;
+
+        for &x in &[min_x, max_x] {
+            for &y in &[min_y, max_y] {
+                for &z in &[min_z, max_z] {
+                    let d = plinth_geom::Vec3::new(x, y, z) - target_3d;
+                    let x1 = d.x * cos_y - d.y * sin_y;
+                    let y1 = d.x * sin_y + d.y * cos_y;
+                    let z1 = d.z;
+                    let x2 = x1;
+                    let z2 = y1 * sin_p + z1 * cos_p;
+                    min_vx = min_vx.min(x2);
+                    max_vx = max_vx.max(x2);
+                    min_vz = min_vz.min(z2);
+                    max_vz = max_vz.max(z2);
+                }
+            }
+        }
+
+        let span_x = (max_vx - min_vx).max(100.0);
+        let span_z = (max_vz - min_vz).max(100.0);
+        let center_vx = (min_vx + max_vx) * 0.5;
+        let center_vz = (min_vz + max_vz) * 0.5;
+
+        let fit_zoom = ((vp_w * 0.76) / span_x as f32).min((vp_h * 0.76) / span_z as f32).clamp(0.0005, 2.0);
+        let fit_pan = Vec2::new((-center_vx as f32) * fit_zoom, (center_vz as f32) * fit_zoom);
+
+        canvas_state.panes[p_idx].zoom = fit_zoom;
+        canvas_state.panes[p_idx].pan = fit_pan;
+        canvas_state.zoom = fit_zoom;
+        canvas_state.pan = fit_pan;
+    } else {
+        let mut min_x = f64::INFINITY;
+        let mut max_x = f64::NEG_INFINITY;
+        let mut min_y = f64::INFINITY;
+        let mut max_y = f64::NEG_INFINITY;
+
+        let mut include_pt_2d = |x: f64, y: f64| {
+            if x.is_finite() && y.is_finite() {
+                min_x = min_x.min(x);
+                max_x = max_x.max(x);
+                min_y = min_y.min(y);
+                max_y = max_y.max(y);
+            }
+        };
+
+        for el in doc.elements.values() {
+            match el {
+                Element::Wall(w) => {
+                    include_pt_2d(w.start.x, w.start.y);
+                    include_pt_2d(w.end.x, w.end.y);
+                }
+                Element::Column(c) => {
+                    let hw = c.width * 0.5;
+                    let hd = c.depth * 0.5;
+                    include_pt_2d(c.location.x - hw, c.location.y - hd);
+                    include_pt_2d(c.location.x + hw, c.location.y + hd);
+                }
+                Element::Beam(b) => {
+                    include_pt_2d(b.start.x, b.start.y);
+                    include_pt_2d(b.end.x, b.end.y);
+                }
+                Element::Slab(s) => {
+                    for p in &s.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Roof(r) => {
+                    for p in &r.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::CurtainWall(cw) => {
+                    include_pt_2d(cw.start.x, cw.start.y);
+                    include_pt_2d(cw.end.x, cw.end.y);
+                }
+                Element::Footing(f) => {
+                    let hw = f.width * 0.5;
+                    let hd = f.length * 0.5;
+                    include_pt_2d(f.location.x - hw, f.location.y - hd);
+                    include_pt_2d(f.location.x + hw, f.location.y + hd);
+                }
+                Element::FreeformSolid(f) => {
+                    for p in &f.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                    for face in f.faces() {
+                        for p in &face.pts {
+                            include_pt_2d(p.x, p.y);
+                        }
+                    }
+                }
+                Element::Ceiling(c) => {
+                    for p in &c.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Door(d) => {
+                    if let Some(Element::Wall(hw)) = doc.elements.get(&d.host_wall) {
+                        let p = hw.start + hw.direction() * d.offset_along_wall;
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Window(w) => {
+                    if let Some(Element::Wall(hw)) = doc.elements.get(&w.host_wall) {
+                        let p = hw.start + hw.direction() * w.offset_along_wall;
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Stair(s) => {
+                    for p in s.footprint() {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Ramp(r) => {
+                    for p in r.footprint() {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Railing(ra) => {
+                    for p in &ra.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::BuildingPad(bp) => {
+                    for p in &bp.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Toposolid(topo) => {
+                    for p in &topo.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                    for pt in &topo.elevation_points {
+                        include_pt_2d(pt.x, pt.y);
+                    }
+                }
+                Element::Road(road) => {
+                    for p in &road.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Sidewalk(sw) => {
+                    for p in &sw.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Pathwalk(pw) => {
+                    for p in &pw.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Fascia(f) => {
+                    for p in &f.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::Gutter(g) => {
+                    for p in &g.path {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                Element::DetailLine(l) => {
+                    include_pt_2d(l.start.x, l.start.y);
+                    include_pt_2d(l.end.x, l.end.y);
+                }
+                Element::Dimension(d) => {
+                    include_pt_2d(d.p1.x, d.p1.y);
+                    include_pt_2d(d.p2.x, d.p2.y);
+                }
+                Element::FreeformSurface(s) => {
+                    for p in &s.boundary {
+                        include_pt_2d(p.x, p.y);
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        let has_geom = !min_x.is_infinite();
+        if !has_geom {
+            min_x = 0.0;
+            max_x = 12000.0;
+            min_y = 0.0;
+            max_y = 8000.0;
+        }
+
+        let span_x = (max_x - min_x).max(100.0);
+        let span_y = (max_y - min_y).max(100.0);
+        let center_x = (min_x + max_x) * 0.5;
+        let center_y = (min_y + max_y) * 0.5;
+
+        let fit_zoom = ((vp_w * 0.80) / span_x as f32).min((vp_h * 0.80) / span_y as f32).clamp(0.0005, 2.0);
+        let fit_pan = Vec2::new((-center_x as f32) * fit_zoom, (center_y as f32) * fit_zoom);
+
+        canvas_state.panes[p_idx].zoom = fit_zoom;
+        canvas_state.panes[p_idx].pan = fit_pan;
+        canvas_state.zoom = fit_zoom;
+        canvas_state.pan = fit_pan;
+    }
+}
+
 pub fn render_canvas(
     ui: &mut Ui,
     doc: &mut Document,
@@ -371,6 +826,23 @@ pub fn render_canvas(
 
     let slots = compute_viewport_slots(rect, canvas_state.layout, canvas_state.split_x, canvas_state.split_y);
     let total_panes = slots.len();
+
+    // Auto-fit zoom extents on initial launch or when requested (e.g. sample project load, file open, view switch)
+    if !canvas_state.initial_zoom_fitted || canvas_state.zoom_extents_requested {
+        let active_p = canvas_state.active_pane_idx.min(total_panes.saturating_sub(1));
+        let slot_size = slots.get(active_p).map(|s| s.rect.size()).unwrap_or_else(|| rect.size());
+        if slot_size.x > 20.0 && slot_size.y > 20.0 {
+            canvas_state.viewport_size = slot_size;
+            zoom_extents_viewport(doc, canvas_state, active_p, slot_size);
+            canvas_state.initial_zoom_fitted = true;
+            canvas_state.zoom_extents_requested = false;
+        }
+    } else {
+        let active_p = canvas_state.active_pane_idx.min(total_panes.saturating_sub(1));
+        if let Some(slot) = slots.get(active_p) {
+            canvas_state.viewport_size = slot.rect.size();
+        }
+    }
 
     let pointer_pos = ui.input(|i| i.pointer.interact_pos().or(i.pointer.hover_pos()).or(i.pointer.latest_pos()));
     let mouse_pos = pointer_pos.unwrap_or(Pos2::ZERO);
