@@ -836,6 +836,7 @@ impl eframe::App for PlinthApp {
             }
         }
         let trigger_save = ctx.input(|i| i.modifiers.command && !i.modifiers.shift && i.key_pressed(Key::S));
+        #[allow(unused_mut)]
         let mut trigger_save_as = ctx.input(|i| i.modifiers.command && i.modifiers.shift && i.key_pressed(Key::S));
         #[allow(unused_variables)]
         let trigger_open = ctx.input(|i| i.modifiers.command && i.key_pressed(Key::O));
@@ -3979,7 +3980,8 @@ mod tests {
         let mut app = PlinthApp::default();
         let lvl1 = app.doc.active_level_id;
 
-        // 1. Create a Floor Plan scene with Wall, Door, Column, Slab
+        // 1. Create a clean isolated scene with Wall, Door, Column, Slab
+        app.doc.elements.clear();
         let mut wall = Wall::new(vec2(0.0, 0.0), vec2(6000.0, 0.0), lvl1);
         wall.thickness = 200.0;
         let wall_id = wall.id;
@@ -4148,5 +4150,93 @@ mod tests {
             }
         }
         assert_eq!(elev_best_id, Some(cw_id), "Curtain wall must be selectable in Elevation views");
+
+        // 4. Test 3D View Ray-Polygon Picking:
+        let threed_pick = |ray_origin: plinth_geom::Vec3, ray_dir: plinth_geom::Vec3| -> Option<ElementId> {
+            let mut best_id = None;
+            let mut min_t = f64::INFINITY;
+            for (&id, el) in &app.doc.elements {
+                for face in app.doc.element_faces(id) {
+                    let denom = face.normal.dot(ray_dir);
+                    if denom >= -1e-5 || face.pts.len() < 3 {
+                        continue;
+                    }
+                    let t = face.normal.dot(face.pts[0] - ray_origin) / denom;
+                    if t <= 0.0 {
+                        continue;
+                    }
+                    let bias = match el {
+                        Element::Door(_) | Element::Window(_) => -60.0,
+                        Element::CurtainWall(_) => -30.0,
+                        Element::Column(_) | Element::Beam(_) => -25.0,
+                        Element::Railing(_) => -20.0,
+                        Element::Wall(_) => 0.0,
+                        Element::Slab(_) | Element::Roof(_) | Element::Ceiling(_) => 20.0,
+                        _ => 0.0,
+                    };
+                    let eff_t = t + bias;
+                    if eff_t >= min_t {
+                        continue;
+                    }
+
+                    let p_hit = ray_origin + ray_dir * t;
+                    let nx = face.normal.x.abs();
+                    let ny = face.normal.y.abs();
+                    let nz = face.normal.z.abs();
+
+                    let (p_2d, poly_2d) = if nz >= nx && nz >= ny {
+                        (
+                            plinth_geom::vec2(p_hit.x, p_hit.y),
+                            face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.y)).collect::<Vec<_>>(),
+                        )
+                    } else if nx >= ny {
+                        (
+                            plinth_geom::vec2(p_hit.y, p_hit.z),
+                            face.pts.iter().map(|p| plinth_geom::vec2(p.y, p.z)).collect::<Vec<_>>(),
+                        )
+                    } else {
+                        (
+                            plinth_geom::vec2(p_hit.x, p_hit.z),
+                            face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.z)).collect::<Vec<_>>(),
+                        )
+                    };
+
+                    let is_hit = plinth_geom::polygon::point_in_polygon(p_2d, &poly_2d)
+                        || plinth_geom::polygon::distance_to_polyline(p_2d, &poly_2d, true) <= 2.0;
+
+                    if is_hit && eff_t < min_t {
+                        min_t = eff_t;
+                        best_id = Some(id);
+                    }
+                }
+            }
+            best_id
+        };
+
+        // Ray looking at south wall at (4000, 0, 1500) from in front of it:
+        let ray_dir = plinth_geom::Vec3::new(0.0, 1.0, -0.5).normalized();
+        let target_pt = plinth_geom::Vec3::new(4000.0, -100.0, 1500.0);
+        let ray_origin = target_pt - ray_dir * 10000.0;
+        let hit_wall = threed_pick(ray_origin, ray_dir);
+        assert_eq!(hit_wall, Some(wall_id), "3D Raycast aimed at Wall standing on Slab MUST select Wall, not Slab");
+
+        // Ray looking at door panel at (2000, 0, 1000) from in front of it:
+        let target_door = plinth_geom::Vec3::new(2000.0, 0.0, 1000.0);
+        let ray_origin_door = target_door - ray_dir * 10000.0;
+        let hit_door = threed_pick(ray_origin_door, ray_dir);
+        assert_eq!(hit_door, Some(door_id), "3D Raycast aimed at Door inside Wall opening MUST select Door, not host Wall");
+
+        // Ray looking at exposed slab surface at (2000, 2000, 0) from above:
+        let ray_dir_slab = plinth_geom::Vec3::new(0.0, 0.2, -1.0).normalized();
+        let target_slab = plinth_geom::Vec3::new(2000.0, 2000.0, 0.0);
+        let ray_origin_slab = target_slab - ray_dir_slab * 5000.0;
+        let hit_slab = threed_pick(ray_origin_slab, ray_dir_slab);
+        assert_eq!(hit_slab, Some(slab_id), "3D Raycast aimed at exposed Slab MUST select Slab");
+
+        // Ray looking at column at (6000, 0, 1500) from in front of it:
+        let target_col = plinth_geom::Vec3::new(6000.0, -100.0, 1500.0);
+        let ray_origin_col = target_col - ray_dir * 10000.0;
+        let hit_col = threed_pick(ray_origin_col, ray_dir);
+        assert_eq!(hit_col, Some(col_id), "3D Raycast aimed at Column MUST select Column");
     }
 }

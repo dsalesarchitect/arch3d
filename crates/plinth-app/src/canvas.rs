@@ -3157,87 +3157,32 @@ fn render_single_viewport(
         match active_tool {
             Tool::Select => {
                 if active_view.kind.is_3d() {
-                    // True 3D Ray-Polygon Intersection Picking Engine
-                    let cam = active_view.camera_3d.unwrap_or_default();
-                    let target = plinth_geom::Vec3::new(cam.target_x, cam.target_y, cam.target_z);
-                    let (sin_y, cos_y) = cam.yaw.sin_cos();
-                    let (sin_p, cos_p) = cam.pitch.sin_cos();
-                    let cam_forward = plinth_geom::Vec3::new(sin_y * cos_p, cos_y * cos_p, -sin_p);
-                    let is_persp = cam.fov_degrees > 1.0;
-                    let cam_dist = cam.distance.max(1000.0);
-
+                    // True 3D Ray-Polygon Surface Intersection Picking Engine
                     let click_screen = pointer_pos.unwrap_or(mouse_screen);
                     let click_v = plinth_geom::vec2(click_screen.x as f64, click_screen.y as f64);
-                    let v_x = ((click_screen.x - center.x - pan.x) / zoom) as f64;
-                    let v_z = -((click_screen.y - center.y - pan.y) / zoom) as f64;
-
-                    // Unrotate screen ray to 3D world space:
-                    let (ray_origin, ray_dir) = if !is_persp {
-                        let x1 = v_x;
-                        let y1 = v_z * sin_p;
-                        let z1 = v_z * cos_p;
-                        let dx = x1 * cos_y + y1 * sin_y;
-                        let dy = -x1 * sin_y + y1 * cos_y;
-                        let pt_on_ray = target + plinth_geom::Vec3::new(dx, dy, z1);
-                        (pt_on_ray - cam_forward * cam_dist, cam_forward)
-                    } else {
-                        let origin = target - cam_forward * cam_dist;
-                        let dir_view = plinth_geom::Vec3::new(v_x, cam_dist, v_z).normalized();
-                        let x1 = dir_view.x;
-                        let y1 = dir_view.y * cos_p + dir_view.z * sin_p;
-                        let z1 = -dir_view.y * sin_p + dir_view.z * cos_p;
-                        let dx = x1 * cos_y + y1 * sin_y;
-                        let dy = -x1 * sin_y + y1 * cos_y;
-                        let dir = plinth_geom::Vec3::new(dx, dy, z1).normalized();
-                        (origin, dir)
-                    };
+                    let (ray_origin, ray_dir) = unproject_ray(click_screen);
 
                     let mut best_id = None;
                     let mut min_t = f64::INFINITY;
 
-                    let screen_dist_to_poly = |pt: Pos2, poly: &[Pos2]| -> f32 {
-                        let mut min_d = f32::INFINITY;
-                        let n = poly.len();
-                        if n < 2 {
-                            return min_d;
-                        }
-                        for i in 0..n {
-                            let p0 = poly[i];
-                            let p1 = poly[(i + 1) % n];
-                            let v = p1 - p0;
-                            let l2 = v.length_sq();
-                            let d = if l2 <= 1e-4 {
-                                pt.distance(p0)
-                            } else {
-                                let t = ((pt - p0).dot(v) / l2).clamp(0.0, 1.0);
-                                let proj = p0 + v * t;
-                                pt.distance(proj)
-                            };
-                            if d < min_d {
-                                min_d = d;
-                            }
-                        }
-                        min_d
-                    };
-
-                    // Pass 1: Direct 3D Surface Hits (highest priority, avoids axis-projection flattening)
+                    // Pass 1: True 3D Ray-Polygon Surface Intersection (Closest front-most face along ray line of sight)
                     for (&id, el) in &doc.elements {
                         for face in doc.element_faces(id) {
                             let denom = face.normal.dot(ray_dir);
-                            if denom >= -1e-5 {
-                                continue; // Culled: facing away from ray
-                            }
-                            if face.pts.len() < 3 {
-                                continue;
+                            if denom >= -1e-5 || face.pts.len() < 3 {
+                                continue; // Culled: back-facing or degenerate
                             }
                             let t = face.normal.dot(face.pts[0] - ray_origin) / denom;
                             if t <= 0.0 {
                                 continue;
                             }
                             let bias = match el {
-                                Element::Door(_) | Element::Window(_) => -150.0,
-                                Element::CurtainWall(_) => -40.0,
-                                Element::Column(_) | Element::Beam(_) => -30.0,
+                                Element::Door(_) | Element::Window(_) => -60.0,
+                                Element::CurtainWall(_) => -30.0,
+                                Element::Column(_) | Element::Beam(_) => -25.0,
+                                Element::Railing(_) => -20.0,
+                                Element::Wall(_) => 0.0,
+                                Element::Slab(_) | Element::Roof(_) | Element::Ceiling(_) => 20.0,
                                 _ => 0.0,
                             };
                             let eff_t = t + bias;
@@ -3245,9 +3190,31 @@ fn render_single_viewport(
                                 continue;
                             }
 
-                            let screen_pts: Vec<Pos2> = face.pts.iter().map(|&p| project_3d(p)).collect();
-                            let is_hit = point_in_screen_poly(click_screen, &screen_pts)
-                                || screen_dist_to_poly(click_screen, &screen_pts) <= 3.5;
+                            // Compute exact 3D hit point on the face plane
+                            let p_hit = ray_origin + ray_dir * t;
+                            let nx = face.normal.x.abs();
+                            let ny = face.normal.y.abs();
+                            let nz = face.normal.z.abs();
+
+                            let (p_2d, poly_2d) = if nz >= nx && nz >= ny {
+                                (
+                                    plinth_geom::vec2(p_hit.x, p_hit.y),
+                                    face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.y)).collect::<Vec<_>>(),
+                                )
+                            } else if nx >= ny {
+                                (
+                                    plinth_geom::vec2(p_hit.y, p_hit.z),
+                                    face.pts.iter().map(|p| plinth_geom::vec2(p.y, p.z)).collect::<Vec<_>>(),
+                                )
+                            } else {
+                                (
+                                    plinth_geom::vec2(p_hit.x, p_hit.z),
+                                    face.pts.iter().map(|p| plinth_geom::vec2(p.x, p.z)).collect::<Vec<_>>(),
+                                )
+                            };
+
+                            let is_hit = plinth_geom::polygon::point_in_polygon(p_2d, &poly_2d)
+                                || plinth_geom::polygon::distance_to_polyline(p_2d, &poly_2d, true) <= 2.0;
 
                             if is_hit {
                                 min_t = eff_t;
@@ -3305,8 +3272,17 @@ fn render_single_viewport(
                                         let p1 = screen_pts[(i + 1) % n_pts];
                                         let (closest_pt, _) = plinth_geom::polygon::closest_point_on_segment(click_v, p0, p1);
                                         let d = click_v.distance(closest_pt);
-                                        if d <= 8.0 {
-                                            let edge_score = face_t + d * 50.0;
+                                        if d <= 6.0 {
+                                            let bias = match el {
+                                                Element::Door(_) | Element::Window(_) => -60.0,
+                                                Element::CurtainWall(_) => -30.0,
+                                                Element::Column(_) | Element::Beam(_) => -25.0,
+                                                Element::Railing(_) => -20.0,
+                                                Element::Wall(_) => 0.0,
+                                                Element::Slab(_) | Element::Roof(_) | Element::Ceiling(_) => 20.0,
+                                                _ => 0.0,
+                                            };
+                                            let edge_score = face_t + bias + d * 50.0;
                                             if edge_score < min_edge_score {
                                                 min_edge_score = edge_score;
                                                 best_id = Some(id);
