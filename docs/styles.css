@@ -9,33 +9,36 @@
   --font-sans: 'Host Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'DM Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
-  /* Architectural Dark Theme (Default — Onda Aesthetic) */
-  --bg-primary: #0a0d14;
-  --bg-secondary: #101522;
-  --bg-tertiary: #182032;
-  --bg-card: rgba(16, 21, 34, 0.72);
-  --bg-card-hover: rgba(24, 32, 50, 0.88);
-  --bg-glass: rgba(10, 13, 20, 0.85);
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-hover: rgba(37, 99, 235, 0.45);
+  /* Onda Signature Editorial White Canvas (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.88);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.14);
+  --border-hover: rgba(0, 0, 0, 0.35);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* All Typography in Deep Black Ink */
+  --text-primary: #0a0a0c;    /* Deep Ink Black */
+  --text-secondary: #374151;  /* Slate Charcoal Body */
+  --text-muted: #6b7280;      /* Muted Technical Gray */
 
-  /* 3 Core Professional Brand Colors (Onda Precision Palette) */
-  --accent-primary: #2563eb;    /* Color 1: Precision CAD Blueprint Blue (Azure) */
-  --accent-secondary: #0ea5e9;  /* Color 2: Steel Slate / Engineering Cyan */
-  --accent-cyan: #0284c7;       /* Deep Steel Accent */
-  --accent-green: #10b981;      /* Status indicator */
-  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  /* Black Pill Branding */
+  --btn-black: #0a0a0c;
+  --btn-black-hover: #1f2937;
+  --accent-primary: #0a0a0c;  /* Solid Black */
+  --accent-secondary: #2563eb;/* Precision Azure accent for links & highlights */
+  --accent-cyan: #0284c7;
+  --accent-green: #10b981;
+  --accent-gradient: linear-gradient(135deg, #0a0a0c 0%, #1f2937 100%);
 
   /* Clean Architectural Drop Shadows (Zero Neon Glow, Hairline Elevation) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.06);
 
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -48,28 +51,30 @@
   --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] {
-  --bg-primary: #fcfdfe;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-card: rgba(255, 255, 255, 0.92);
-  --bg-card-hover: #ffffff;
-  --bg-glass: rgba(252, 253, 254, 0.88);
-  --border-subtle: rgba(0, 0, 0, 0.07);
-  --border-medium: rgba(0, 0, 0, 0.12);
-  --border-hover: rgba(37, 99, 235, 0.45);
+[data-theme="dark"] {
+  --bg-primary: #0a0d14;
+  --bg-secondary: #101522;
+  --bg-tertiary: #182032;
+  --bg-card: rgba(16, 21, 34, 0.75);
+  --bg-card-hover: rgba(24, 32, 50, 0.90);
+  --bg-glass: rgba(10, 13, 20, 0.85);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-hover: rgba(255, 255, 255, 0.35);
 
-  --text-primary: #0a0a0c;
-  --text-secondary: #475569;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
   --text-muted: #64748b;
 
-  --accent-primary: #2563eb;
-  --accent-secondary: #0284c7;
+  --btn-black: #f8fafc;
+  --btn-black-hover: #e2e8f0;
+  --accent-primary: #f8fafc;
+  --accent-secondary: #38bdf8;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* Reset & Base */
@@ -221,148 +226,90 @@ code {
   border-color: var(--border-medium);
 }
 
-/* Buttons */
-.btn {
+/* Buttons — Onda Signature Black Pill Aesthetic */
+.btn, .pill-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-family: var(--font-sans);
   font-size: 0.92rem;
   font-weight: 600;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
+  padding: 11px 22px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   border: 1px solid transparent;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   white-space: nowrap;
 }
 
 .btn-sm {
-  padding: 7px 14px;
+  padding: 7px 16px;
   font-size: 0.85rem;
 }
 
-.btn-primary {
-  background: var(--accent-primary);
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+.btn-primary, .pill-btn-black, .btn-launch-hero, .btn-launch-nav {
+  background: var(--btn-black) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--btn-black) !important;
+  border-radius: var(--radius-full) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-primary:hover {
-  background: #1d4ed8;
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+.btn-primary:hover, .pill-btn-black:hover, .btn-launch-hero:hover, .btn-launch-nav:hover {
+  background: var(--btn-black-hover) !important;
+  border-color: var(--btn-black-hover) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
 }
 
-[data-theme="light"] .btn-primary {
-  background: #1d4ed8;
-  color: #ffffff;
+[data-theme="dark"] .btn-primary, [data-theme="dark"] .pill-btn-black {
+  color: #0a0a0c !important;
+  background: #f8fafc !important;
+  border-color: #f8fafc !important;
 }
 
-[data-theme="light"] .btn-primary:hover {
-  background: #1e40af;
+[data-theme="dark"] .btn-primary:hover, [data-theme="dark"] .pill-btn-black:hover {
+  background: #e2e8f0 !important;
 }
 
-.btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border-color: var(--border-medium);
+.btn-secondary, .btn-outline, .pill-btn-outline {
+  background: var(--bg-card);
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: var(--radius-full) !important;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover, .btn-outline:hover, .pill-btn-outline:hover {
   background: var(--bg-tertiary);
-  border-color: var(--border-hover);
-  transform: translateY(-1px);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--text-secondary);
-  border-color: var(--border-subtle);
-}
-
-.btn-outline:hover {
-  color: var(--text-primary);
-  border-color: var(--border-medium);
-}
-
-.btn-sponsor {
-  background: rgba(37, 99, 235, 0.08);
-  color: #93c5fd;
-  border-color: rgba(37, 99, 235, 0.3);
-}
-
-.btn-sponsor:hover {
-  background: rgba(37, 99, 235, 0.16);
-  border-color: var(--accent-primary);
-  color: #ffffff;
-}
-
-/* Launch App Buttons (Zero-Install Browser Web Studio) */
-.btn-launch-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #2563eb;
-  color: #ffffff !important;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 7px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all var(--transition-fast);
-}
-
-.btn-launch-nav:hover {
-  background: #1d4ed8;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-  transform: translateY(-1px);
-}
-
-.btn-launch-hero {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: #2563eb;
-  color: #ffffff !important;
-  font-size: 1.05rem;
-  font-weight: 700;
-  padding: 13px 26px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-  transition: all var(--transition-fast);
-}
-
-.btn-launch-hero:hover {
-  background: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  border-color: var(--border-hover) !important;
+  color: var(--text-primary) !important;
   transform: translateY(-2px);
 }
 
-.hero-privacy-notice {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #34d399;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 6px 16px;
-  border-radius: 20px;
+.btn-sponsor {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+}
+
+.btn-sponsor:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 /* Hero Section (Onda Silk Wave Motion Background) */
-.hero {
+.hero, .hero-onda-section {
   position: relative;
   overflow: hidden;
-  padding: 140px 0 60px;
-  text-align: center;
+  padding: 100px 0 60px;
+  min-height: calc(100vh - 68px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .hero-silk-bg {
@@ -387,13 +334,201 @@ code {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 42%;
-  background: linear-gradient(to top, var(--bg-primary) 12%, rgba(10, 13, 20, 0.4) 65%, transparent 100%);
+  height: 38%;
+  background: linear-gradient(to top, var(--bg-primary) 15%, transparent 100%);
   pointer-events: none;
 }
 
-[data-theme="light"] .hero-silk-fade {
-  background: linear-gradient(to top, var(--bg-primary) 12%, rgba(252, 253, 254, 0.4) 65%, transparent 100%);
+/* Onda Split Hero Container */
+.hero-onda-container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+/* Top Meta Bar */
+.hero-onda-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  padding-top: 20px;
+  margin-bottom: 50px;
+}
+
+.hero-meta-left p, .hero-meta-right p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hero-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: right;
+}
+
+.hero-meta-bullet {
+  font-size: 9px;
+  color: #7c3aed; /* Violet bullet accent matching silk wave */
+}
+
+/* Main Split Grid (Title on left, Description & Pills on right) */
+.hero-onda-body {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: flex-end;
+  gap: 56px;
+  margin-top: auto;
+  padding-bottom: 24px;
+}
+
+.hero-onda-title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .hero-brand-pill {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero-onda-title {
+  font-family: var(--font-sans);
+  font-size: clamp(3.4rem, 7vw, 6.2rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  color: var(--text-primary);
+  margin: 0 0 18px 0;
+}
+
+.hero-onda-tagline {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.02em;
+}
+
+.hero-onda-info-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 520px;
+}
+
+.hero-onda-desc {
+  font-size: 1.05rem;
+  line-height: 1.68;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+}
+
+.hero-notice-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .hero-notice-pill {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.notice-badge {
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.hero-onda-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.hero-onda-smartscreen {
+  font-size: 0.80rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+  .hero-onda-body {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    align-items: flex-start;
+  }
+  .hero-onda-title {
+    font-size: clamp(2.8rem, 8vw, 4.4rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-onda-top {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hero-meta-right {
+    text-align: left;
+  }
+  .hero-onda-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .pill-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .hero-content {

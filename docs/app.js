@@ -7,18 +7,18 @@
 
   // --- Theme Toggle ---
   const themeToggleBtn = document.getElementById('themeToggleBtn');
-  const currentTheme = localStorage.getItem('arch3d-theme') || 'dark';
+  const currentTheme = localStorage.getItem('arch3d-theme') || 'light';
 
   const sunIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
   const moonIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
 
   function setTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      if (themeToggleBtn) themeToggleBtn.innerHTML = moonIcon;
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      if (themeToggleBtn) themeToggleBtn.innerHTML = sunIcon;
     } else {
       document.documentElement.removeAttribute('data-theme');
-      if (themeToggleBtn) themeToggleBtn.innerHTML = sunIcon;
+      if (themeToggleBtn) themeToggleBtn.innerHTML = moonIcon;
     }
     localStorage.setItem('arch3d-theme', theme);
   }
@@ -27,8 +27,8 @@
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      setTheme(isLight ? 'dark' : 'light');
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(isDark ? 'light' : 'dark');
     });
   }
 
@@ -135,17 +135,8 @@
 
     // Colors matching active visual theme
     function getDotColors() {
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      if (isLight) {
-        return [
-          'rgba(124, 58, 237, 0.20)', // Level 1 - subtle violet
-          'rgba(124, 58, 237, 0.42)', // Level 2
-          'rgba(109, 40, 217, 0.68)', // Level 3
-          '#7c3aed',                   // Level 4
-          '#6d28d9',                   // Level 5
-          '#5b21b6'                    // Level 6 - deep royal violet
-        ];
-      } else {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
         return [
           'rgba(167, 139, 250, 0.22)', // Level 1
           'rgba(167, 139, 250, 0.48)', // Level 2
@@ -153,6 +144,15 @@
           '#a855f7',                   // Level 4
           '#9333ea',                   // Level 5
           '#7c3aed'                    // Level 6 - vibrant electric violet
+        ];
+      } else {
+        return [
+          'rgba(124, 58, 237, 0.18)', // Level 1 - subtle violet
+          'rgba(124, 58, 237, 0.38)', // Level 2
+          'rgba(109, 40, 217, 0.65)', // Level 3
+          '#7c3aed',                   // Level 4
+          '#6d28d9',                   // Level 5
+          '#5b21b6'                    // Level 6 - deep royal violet
         ];
       }
     }

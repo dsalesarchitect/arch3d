@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=20261112c">
+  <link rel="stylesheet" href="styles.css?v=20261112d">
 </head>
 <body>
 
@@ -85,65 +85,93 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero" id="heroSection">
+  <!-- Hero Section (Onda Split Asymmetrical Layout) -->
+  <section class="hero-onda-section" id="heroSection">
     <!-- Onda Interactive Violet Pixel Silk Wave Background -->
     <div class="hero-silk-bg" aria-hidden="true">
       <canvas id="silkCanvas" class="hero-silk-canvas"></canvas>
       <div class="hero-silk-fade"></div>
     </div>
 
-    <div class="container hero-content" style="position: relative; z-index: 2;">
-      <div class="hero-logo-badge">
-        <img src="logo.png" alt="Arch3D Official Logo" class="hero-logo-img">
-      </div>
-      <h1 class="hero-title">Free Open-Source BIM Authoring Application<br><span style="color: var(--accent-cyan); font-weight: 700; font-size: 0.82em; display: inline-block; margin-top: 6px;">Tailored for Architects, Engineers, &amp; Designers</span></h1>
-      <p class="hero-subtitle">
-        Arch3D is a fast, lightweight BIM authoring platform powered by a pure Rust engine and hardware-accelerated OpenGL 3D viewports at 1:1 millimetre scale. Built from clean-room open specifications without reverse engineering or decompilation of proprietary software, it reads .dwg/.dxf via <code>acadrust</code>, SketchUp .skp via <code>openskp</code>, and supports openBIM IFC schemas (IFC2x3, IFC4, &amp; IFC4x3). The core application is free to use, with optional plugins planned for advanced workflows.
-      </p>
-
-      <!-- Active Development Stage Notice -->
-      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.40); border-radius: 8px; padding: 10px 18px; margin: 4px auto 26px auto; max-width: 720px; text-align: left; font-size: 0.88rem; color: #fbbf24; line-height: 1.45;">
-        <span style="font-size: 1.3rem; flex-shrink: 0; line-height: 1;">⚠️</span>
-        <span><strong>Development Notice:</strong> Arch3D is currently in active development and is <em>not yet ready for production construction drawings or contract documentation</em>. It is tailored for testing, research, and openBIM modeling experimentation.</span>
+    <div class="hero-onda-container">
+      <!-- Top Technical Meta Bar -->
+      <div class="hero-onda-top">
+        <div class="hero-meta-left">
+          <p>FREE OPEN-SOURCE BIM STUDIO</p>
+          <p>PHILIPPINES, SINCE 2026</p>
+        </div>
+        <div class="hero-meta-right">
+          <span class="hero-meta-bullet">■</span>
+          <p>NATIVE 64-BIT CLEAN-ROOM RUST CAD ENGINE</p>
+        </div>
       </div>
 
-      <div class="hero-actions">
-        <a href="app.html" class="btn btn-launch-hero">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          Launch in Browser (Zero Install)
-        </a>
-        <a href="https://github.com/dsalesarchitect/arch3d/releases" class="btn btn-primary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Download for Windows (x64)
-        </a>
-        <a href="#support" class="btn btn-sponsor">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-          Support Development
-        </a>
-        <a href="https://github.com/dsalesarchitect/arch3d" target="_blank" rel="noopener" class="btn btn-secondary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="16 18 22 12 16 6"></polyline>
-            <polyline points="8 6 2 12 8 18"></polyline>
-          </svg>
-          Source Code
-        </a>
-      </div>
+      <!-- Main Asymmetrical Split Grid -->
+      <div class="hero-onda-body">
+        <!-- Left Column: Big Headline -->
+        <div class="hero-onda-title-box">
+          <div class="hero-brand-pill">
+            <img src="logo.png" alt="Arch3D" style="width: 18px; height: 18px; border-radius: 4px;">
+            <span>Arch3D BIM Platform</span>
+          </div>
+          <h1 class="hero-onda-title">
+            BIM authoring<br>
+            in motion.
+          </h1>
+          <div class="hero-onda-tagline">
+            Tailored for Architects, Engineers, &amp; Designers
+          </div>
+        </div>
 
-      <!-- Quick Windows Defender SmartScreen Note below Hero CTAs -->
-      <div style="margin-top: 14px; font-size: 0.81rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">
-        <span>🛡️</span>
-        <span><strong>Windows Installer Notice:</strong> Unsigned open-source preview. If Microsoft Defender SmartScreen appears, click <strong>"More info"</strong> &rarr; <strong>"Run anyway"</strong>.</span>
+        <!-- Right Column: Paragraph + Black Pill Actions -->
+        <div class="hero-onda-info-box">
+          <p class="hero-onda-desc">
+            Arch3D is a fast, lightweight BIM authoring platform powered by a pure Rust engine and hardware-accelerated OpenGL 3D viewports at 1:1 millimetre scale. Built from clean-room open specifications without reverse engineering or proprietary lock-in. Free to use with optional modular plugins planned for advanced workflows.
+          </p>
+
+          <div class="hero-notice-pill">
+            <span class="notice-badge">PREVIEW</span>
+            <span>Tailored for testing, research, and openBIM modeling experimentation.</span>
+          </div>
+
+          <div class="hero-onda-actions">
+            <a href="app.html" class="pill-btn pill-btn-black">
+              <span>Launch in Browser</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </a>
+            <a href="https://github.com/dsalesarchitect/arch3d/releases" class="pill-btn pill-btn-outline">
+              <span>Download for Windows (x64)</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </a>
+            <a href="#support" class="pill-btn pill-btn-outline">
+              <span>Support Development</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </a>
+            <a href="https://github.com/dsalesarchitect/arch3d" target="_blank" rel="noopener" class="pill-btn pill-btn-outline">
+              <span>Source Code</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </a>
+          </div>
+
+          <div class="hero-onda-smartscreen">
+            <span>🛡️ <strong>Windows Notice:</strong> Unsigned open-source preview. If Microsoft Defender SmartScreen appears, click <strong>"More info"</strong> &rarr; <strong>"Run anyway"</strong>.</span>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
     <!-- Real Live 3D Model Viewport — Actual Arch3D App UI -->
     <div class="container" id="viewport">
@@ -1116,6 +1144,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261112c"></script>
+  <script src="app.js?v=20261112d"></script>
 </body>
 </html>
