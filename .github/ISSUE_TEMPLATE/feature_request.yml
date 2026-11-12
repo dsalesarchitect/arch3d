@@ -1,0 +1,63 @@
+name: Feature Proposal / Architectural Requirement
+description: Propose a new architectural tool, calculation workflow, or IFC capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ Mandatory Cleanroom & Intellectual Property Notice
+        Arch3D is an independent, cleanroom BIM authoring engine built from mathematical first principles and open standards (ISO 10303-21 / IFC4).
+        - **PROPRIETARY SCREENSHOTS ARE STRICTLY PROHIBITED**: Do NOT upload screenshots, UI captures, or recordings of commercial proprietary CAD/BIM software (e.g. Autodesk Revit, Graphisoft ArchiCAD, AutoCAD, Rhino, Vectorworks) to request "make it look or work like this".
+        - Propose features based on **real-world architectural requirements, standard construction geometries, or openBIM specifications**.
+        - Use hand-drawn sketches, architectural 2D/3D geometry diagrams, or official buildingSMART documentation.
+        - Any issue containing proprietary software captures will be **closed and scrubbed immediately** to maintain strict IP independence.
+
+  - type: checkboxes
+    id: cleanroom_compliance
+    attributes:
+      label: Cleanroom & Originality Compliance (Mandatory)
+      description: You must explicitly confirm compliance before opening this feature proposal.
+      options:
+        - label: "I certify that this proposal contains NO screenshots, UI captures, or assets from proprietary commercial software."
+          required: true
+        - label: "I certify that this request describes real-world architectural/geometric workflows or open standards (IFC4, STEP, CAD geometry math)."
+          required: true
+        - label: "I understand that any proprietary assets uploaded will result in immediate issue closure and deletion."
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Architectural Tool / Feature Description
+      description: What capability or workflow are you proposing?
+      placeholder: Describe the architectural tool or analytical feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: architectural_rationale
+    attributes:
+      label: Real-World Architectural & Engineering Need
+      description: How does this benefit architects, structural engineers, or drafters in real construction projects?
+      placeholder: Explain why this capability is necessary for building documentation or IFC exchange...
+    validations:
+      required: true
+
+  - type: textarea
+    id: geometry_specs
+    attributes:
+      label: Proposed Geometric Behavior & Standards (1:1 mm scale)
+      description: Detail how the tool should behave geometrically (e.g., wall thickness, cut planes, analytical snapping, level constraints, IFC entity mapping).
+      placeholder: e.g. Extrude 6-sided solid prism, align with floor plan cut plane at 1200mm, export to IfcCurtainWall...
+    validations:
+      required: false
+
+  - type: textarea
+    id: sketches_diagrams
+    attributes:
+      label: Sketches & Diagrams (Original / Hand-Drawn Only)
+      description: ONLY attach original drawings, hand-sketched blueprints, or Arch3D screenshots. NEVER attach proprietary software captures.
+      placeholder: Drag and drop original sketches or diagrams here...
+    validations:
+      required: false

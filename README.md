@@ -215,4 +215,4 @@ Arch3D is open-source software licensed under the **GNU General Public License v
 - The core Arch3D application, its source code, and derivative works are protected under the GNU General Public License v3.0 or later.
 - Under the **Arch3D Commercial Plugin Exception** (GNU GPLv3 Section 7), third-party and author plugins, modules, scripts, and add-ons communicating via the plugin API, WebAssembly interface, or socket/IPC bridges may be developed, distributed, and monetized under proprietary, commercial, or alternative terms without requiring the plugin itself to be open-sourced.
 
-All contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+All contributions and issue reports must strictly adhere to our [Cleanroom & Intellectual Property Policy](CONTRIBUTING.md#cleanroom-architecture--intellectual-property-policy) (proprietary software screenshots and decompiled references are strictly prohibited). Please see [CONTRIBUTING.md](CONTRIBUTING.md).

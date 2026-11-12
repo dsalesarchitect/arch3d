@@ -1,0 +1,88 @@
+name: Bug Report
+description: Report an issue or unexpected behavior in Arch3D
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ Mandatory Cleanroom & Intellectual Property Notice
+        Arch3D is developed strictly under an independent **cleanroom architecture policy**.
+        - **PROPRIETARY SCREENSHOTS ARE STRICTLY FORBIDDEN**: Never upload screenshots, videos, or UI captures of proprietary commercial software (e.g., Autodesk Revit, Graphisoft ArchiCAD, AutoCAD, Vectorworks, SketchUp, MicroStation).
+        - Only upload screenshots of **Arch3D itself**, public domain diagrams, or hand-drawn sketches.
+        - Any issue containing proprietary commercial screenshots or references to proprietary internals will be **immediately closed and deleted** to prevent IP contamination.
+
+  - type: checkboxes
+    id: cleanroom_compliance
+    attributes:
+      label: Cleanroom & Screenshot Compliance (Mandatory)
+      description: You must explicitly confirm compliance before opening this issue.
+      options:
+        - label: "I confirm that NO screenshots, UI captures, or assets from proprietary commercial software (Revit, ArchiCAD, AutoCAD, etc.) are included in this report."
+          required: true
+        - label: "I confirm that any attached images are from Arch3D itself, open-source software (e.g., BlenderBIM/FreeCAD), or my own hand-drawn sketches."
+          required: true
+        - label: "I confirm that this report is based on public open specifications (e.g., buildingSMART IFC4 schema docs) and not internal proprietary documentation."
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the problem...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed step-by-step instructions to reproduce the behavior in Arch3D.
+      placeholder: |
+        1. Open Arch3D (or Web Studio)
+        2. Select 'Architecture' -> 'Wall' tool
+        3. Draw a wall from (0, 0) to (5000, 0)
+        4. Observe unexpected behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen based on open architectural or geometric standards?
+      placeholder: The wall corner should miter cleanly at 45 degrees...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating System / Environment
+      options:
+        - Windows 10/11 (Desktop Launcher / Native exe)
+        - Web Browser (Web Studio on GitHub Pages)
+        - Source Build (Cargo / Rust compiler)
+        - Linux (WINE or native build)
+        - macOS (Web or native build)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Arch3D Version / Git Commit Hash
+      description: Git commit hash or application build version.
+      placeholder: "e.g. commit d63dc39 or v0.1.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Allowed Screenshots / Console Logs
+      description: ONLY attach screenshots taken directly from Arch3D, console logs, or original sketches. PROPRIETARY SOFTWARE SCREENSHOTS WILL BE DELETED IMMEDIATELY.
+      placeholder: Paste Arch3D screenshots or console output here...
+    validations:
+      required: false

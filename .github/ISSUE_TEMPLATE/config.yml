@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Cleanroom & IP Architecture Policy
+    url: https://github.com/dsalesarchitect/arch3d/blob/main/CONTRIBUTING.md#cleanroom-architecture-policy
+    about: Read Arch3D's strict cleanroom policy before submitting issues or proposals.
+  - name: Official YouTube Community & Dev Logs
+    url: https://www.youtube.com/@OpenSourceArchitecture
+    about: Watch BIM tutorials, dev logs, and feature walk-throughs.
