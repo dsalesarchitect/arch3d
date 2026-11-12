@@ -86,6 +86,9 @@ pub enum IconKind {
     ProjectTree,
     Blocks,
     SearchFilter,
+    FloorPlanView,
+    SectionView,
+    ElevationView,
 }
 
 pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) {
@@ -1889,6 +1892,86 @@ pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) 
             let h_start = Pos2::new(lens_c.x + lens_r * 0.707, lens_c.y + lens_r * 0.707);
             let h_end = Pos2::new(c.x + w * 0.35, c.y + h * 0.35);
             painter.line_segment([h_start, h_end], Stroke::new(2.4, color));
+        }
+        IconKind::FloorPlanView => {
+            // Authentic architectural floor plan blueprint symbol:
+            // 2D building partition layout with exterior walls, internal room wall, and door opening swing
+            let r = Rect::from_center_size(c, egui::vec2(w * 0.76, h * 0.76));
+            
+            // Exterior boundary walls
+            let wall_stroke = Stroke::new(1.8, color);
+            painter.rect_stroke(r, 0.0, wall_stroke, egui::StrokeKind::Middle);
+            painter.rect_filled(r, 0.0, color.gamma_multiply(0.08));
+
+            // Interior partition wall dividing rooms horizontally
+            let y_part = r.min.y + r.height() * 0.52;
+            let door_open_x = r.min.x + r.width() * 0.48;
+            painter.line_segment([Pos2::new(r.min.x, y_part), Pos2::new(door_open_x, y_part)], wall_stroke);
+
+            // Door opening quarter-circle swing arc + door leaf line
+            let door_w = r.width() * 0.30;
+            let hinge = Pos2::new(door_open_x, y_part);
+            painter.line_segment([hinge, Pos2::new(hinge.x, hinge.y - door_w)], thin_stroke);
+            
+            // Door swing arc
+            let arc_steps = 6;
+            for i in 0..arc_steps {
+                let a0 = -(std::f32::consts::FRAC_PI_2 * (i as f32) / (arc_steps as f32));
+                let a1 = -(std::f32::consts::FRAC_PI_2 * ((i + 1) as f32) / (arc_steps as f32));
+                let p0 = Pos2::new(hinge.x + door_w * a0.cos(), hinge.y + door_w * a0.sin());
+                let p1 = Pos2::new(hinge.x + door_w * a1.cos(), hinge.y + door_w * a1.sin());
+                painter.line_segment([p0, p1], Stroke::new(1.0, color.gamma_multiply(0.65)));
+            }
+        }
+        IconKind::SectionView => {
+            // Authentic architectural building section cut symbol:
+            // Heavy dashed/solid cut plane line through a building profile with directional view arrow head
+            let cut_x = c.x - w * 0.05;
+            let y_top = c.y - h * 0.38;
+            let y_bot = c.y + h * 0.38;
+
+            // Vertical section cutting plane line
+            painter.line_segment([Pos2::new(cut_x, y_top), Pos2::new(cut_x, y_bot)], Stroke::new(2.0, color));
+
+            // Circular section head bubble at top
+            let bub_r = w * 0.16;
+            let bub_c = Pos2::new(cut_x, y_top);
+            painter.circle_filled(bub_c, bub_r, color.gamma_multiply(0.20));
+            painter.circle_stroke(bub_c, bub_r, stroke);
+
+            // Directional arrow head pointing right (view direction)
+            let arr_tip = Pos2::new(cut_x + w * 0.34, y_top);
+            let arr_top = Pos2::new(cut_x + bub_r * 0.7, y_top - h * 0.14);
+            let arr_bot = Pos2::new(cut_x + bub_r * 0.7, y_top + h * 0.14);
+            painter.line_segment([arr_tip, arr_top], Stroke::new(1.8, color));
+            painter.line_segment([arr_tip, arr_bot], Stroke::new(1.8, color));
+            painter.line_segment([arr_top, arr_bot], thin_stroke);
+
+            // Cut hash marks at bottom of section line
+            painter.line_segment(
+                [Pos2::new(cut_x - 3.5, y_bot - 2.0), Pos2::new(cut_x + 3.5, y_bot + 2.0)],
+                Stroke::new(1.8, color),
+            );
+        }
+        IconKind::ElevationView => {
+            // Architectural building facade elevation symbol:
+            // Multi-storey exterior facade with pitched roofline, wall borders, and window openings
+            let r = Rect::from_min_max(Pos2::new(c.x - w * 0.36, c.y - h * 0.08), Pos2::new(c.x + w * 0.36, c.y + h * 0.38));
+            painter.rect_stroke(r, 0.0, stroke, egui::StrokeKind::Middle);
+            painter.rect_filled(r, 0.0, color.gamma_multiply(0.12));
+
+            // Pitched roof pediment / gable outline
+            let ridge = Pos2::new(c.x, c.y - h * 0.38);
+            painter.line_segment([ridge, r.left_top()], stroke);
+            painter.line_segment([ridge, r.right_top()], stroke);
+
+            // Facade window punctures (2 small windows)
+            let win_w = w * 0.16;
+            let win_h = h * 0.18;
+            let w1 = Rect::from_center_size(Pos2::new(r.min.x + r.width() * 0.30, r.center().y), egui::vec2(win_w, win_h));
+            let w2 = Rect::from_center_size(Pos2::new(r.max.x - r.width() * 0.30, r.center().y), egui::vec2(win_w, win_h));
+            painter.rect_stroke(w1, 0.0, thin_stroke, egui::StrokeKind::Middle);
+            painter.rect_stroke(w2, 0.0, thin_stroke, egui::StrokeKind::Middle);
         }
     }
 }

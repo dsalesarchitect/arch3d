@@ -90,7 +90,7 @@ pub fn render_project_browser(
                         .show(ui, |ui| {
                             for v in floor_plans {
                                 let is_active = doc.active_view_id == v.id && doc.active_sheet_id.is_none();
-                                if view_tree_row(ui, v, IconKind::Grid, is_active, theme) {
+                                if view_tree_row(ui, v, IconKind::FloorPlanView, is_active, theme) {
                                     response.activated_view = Some(v.id);
                                 }
                             }
@@ -134,7 +134,7 @@ pub fn render_project_browser(
                         .show(ui, |ui| {
                             for v in elevations {
                                 let is_active = doc.active_view_id == v.id && doc.active_sheet_id.is_none();
-                                if view_tree_row(ui, v, IconKind::Wall, is_active, theme) {
+                                if view_tree_row(ui, v, IconKind::ElevationView, is_active, theme) {
                                     response.activated_view = Some(v.id);
                                 }
                             }
@@ -156,7 +156,7 @@ pub fn render_project_browser(
                         .show(ui, |ui| {
                             for v in sections {
                                 let is_active = doc.active_view_id == v.id && doc.active_sheet_id.is_none();
-                                if view_tree_row(ui, v, IconKind::Select, is_active, theme) {
+                                if view_tree_row(ui, v, IconKind::SectionView, is_active, theme) {
                                     response.activated_view = Some(v.id);
                                 }
                             }
