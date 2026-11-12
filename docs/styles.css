@@ -159,6 +159,9 @@ code {
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .brand {
@@ -168,6 +171,8 @@ code {
   font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
+  margin-right: 32px;
+  flex-shrink: 0;
 }
 
 .brand-logo-img {
@@ -186,15 +191,17 @@ code {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 22px;
   list-style: none;
+  margin: 0 auto 0 0;
 }
 
 .nav-link {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: color var(--transition-fast);
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -204,7 +211,8 @@ code {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn {
