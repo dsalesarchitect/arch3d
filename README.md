@@ -128,6 +128,17 @@ cargo run --bin arch3d
 ### Windows One-Click Launcher
 Double-click `Launch-Arch3D.bat` in the repository root.
 
+### Windows Installer & Microsoft Defender SmartScreen Notice
+
+> [!NOTE]
+> **Windows Defender SmartScreen Notice**:
+> Arch3D Windows installer and executable binaries are not yet digitally signed with an expensive commercial Microsoft code-signing certificate (which is standard and normal for independent, newly released open-source software under active development).
+>
+> When installing or launching for the first time, Windows Defender SmartScreen may display:
+> *"Windows protected your PC — Microsoft Defender SmartScreen prevented an unrecognized app from starting"*.
+> - **To install/run:** Click **"More info"**, then click **"Run anyway"**.
+> - Arch3D is 100% free and open-source (GPL-3.0-or-later), pure clean-room Rust, completely malware-free, and all source code is publicly auditable right here on GitHub. You can also build directly from source using `cargo run --bin arch3d`.
+
 ### Web Studio (GitHub Pages)
 Test live in your browser without installation: [https://dsalesarchitect.github.io/arch3d/](https://dsalesarchitect.github.io/arch3d/)
 
