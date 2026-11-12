@@ -17,6 +17,10 @@
 
 </div>
 
+> [!WARNING]
+> **Project Status: Active Development**
+> Arch3D is currently in active alpha development and is **not yet ready for production construction drawings or contract documentation**. Features, analytical tools, viewport workflows, and data schemas are evolving rapidly. We welcome testing, feedback, bug reports, and openBIM modeling experimentation!
+
 ---
 
 ## 🌟 Highlights

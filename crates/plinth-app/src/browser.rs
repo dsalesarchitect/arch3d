@@ -362,7 +362,7 @@ pub fn render_project_browser(
 fn view_tree_row(ui: &mut Ui, view: &ViewDef, icon: IconKind, is_active: bool, theme: &AppTheme) -> bool {
     let mut clicked = false;
     ui.horizontal(|ui| {
-        let (icon_rect, _) = ui.allocate_exact_size(Vec2::new(14.0, 14.0), egui::Sense::hover());
+        let (icon_rect, _) = ui.allocate_exact_size(Vec2::new(15.0, 15.0), egui::Sense::hover());
         let icon_col = if is_active { theme.accent } else { theme.text_muted };
         draw_icon(ui.painter(), icon_rect, icon, icon_col);
 
@@ -389,7 +389,7 @@ fn view_tree_row(ui: &mut Ui, view: &ViewDef, icon: IconKind, is_active: bool, t
 /// Helper to render a Component Block row with vector icon and instance count badge
 fn block_category_row(ui: &mut Ui, name: &str, count: usize, icon: IconKind, theme: &AppTheme) {
     ui.horizontal(|ui| {
-        let (icon_rect, _) = ui.allocate_exact_size(Vec2::new(14.0, 14.0), egui::Sense::hover());
+        let (icon_rect, _) = ui.allocate_exact_size(Vec2::new(15.0, 15.0), egui::Sense::hover());
         let icon_col = if count > 0 { theme.text_primary } else { theme.text_muted.gamma_multiply(0.6) };
         draw_icon(ui.painter(), icon_rect, icon, icon_col);
 

@@ -1895,78 +1895,86 @@ pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) 
         }
         IconKind::FloorPlanView => {
             // Authentic architectural floor plan blueprint symbol:
-            // 2D building partition layout with exterior walls, internal room division, and door swing opening
-            let r = Rect::from_center_size(c, egui::vec2(w * 0.78, h * 0.78));
-            
+            // 2D building partition layout with exterior perimeter walls, multi-room division, doorway and swing arc
+            let r = Rect::from_center_size(c, egui::vec2(w * 0.82, h * 0.80));
+
             // Subtle blueprint background fill
             painter.rect_filled(r, 0.5, color.gamma_multiply(0.10));
 
-            // Exterior boundary walls (clean 1.5px architectural stroke)
+            // Exterior boundary walls (solid 1.5px architectural cut stroke)
             let wall_stroke = Stroke::new(1.5, color);
             painter.rect_stroke(r, 0.5, wall_stroke, egui::StrokeKind::Middle);
 
-            // Interior partition wall dividing layout horizontally with doorway opening
-            let y_mid = r.min.y + r.height() * 0.50;
-            let door_open_x = r.min.x + r.width() * 0.48;
-            painter.line_segment([Pos2::new(r.min.x, y_mid), Pos2::new(door_open_x, y_mid)], wall_stroke);
+            // Interior partition walls forming 3 distinct rooms (Living room left, 2 rooms right)
+            let x_div = r.min.x + r.width() * 0.46;
+            let y_div = r.min.y + r.height() * 0.52;
 
-            // Door leaf angled at 45 degrees
-            let door_w = r.width() * 0.32;
-            let hinge = Pos2::new(door_open_x, y_mid);
-            let leaf_tip = Pos2::new(hinge.x + door_w * 0.707, hinge.y - door_w * 0.707);
+            // Vertical partition wall with doorway opening
+            let door_open_y0 = r.min.y + r.height() * 0.32;
+            let door_open_y1 = r.min.y + r.height() * 0.68;
+            painter.line_segment([Pos2::new(x_div, r.min.y), Pos2::new(x_div, door_open_y0)], wall_stroke);
+            painter.line_segment([Pos2::new(x_div, door_open_y1), Pos2::new(x_div, r.max.y)], wall_stroke);
+
+            // Horizontal partition dividing top-right and bottom-right rooms
+            painter.line_segment([Pos2::new(x_div, y_div), Pos2::new(r.max.x, y_div)], wall_stroke);
+
+            // Door leaf angled at 45 degrees swinging into the left room
+            let door_w = (door_open_y1 - door_open_y0) * 0.95;
+            let hinge = Pos2::new(x_div, door_open_y0);
+            let leaf_tip = Pos2::new(hinge.x - door_w * 0.707, hinge.y + door_w * 0.707);
             painter.line_segment([hinge, leaf_tip], Stroke::new(1.3, color));
 
-            // Delicate door swing arc
+            // Door swing quarter-circle arc
             let arc_steps = 5;
             for i in 0..arc_steps {
-                let a0 = -(std::f32::consts::FRAC_PI_4 * (i as f32) / (arc_steps as f32));
-                let a1 = -(std::f32::consts::FRAC_PI_4 * ((i + 1) as f32) / (arc_steps as f32));
-                let p0 = Pos2::new(hinge.x + door_w * a0.cos(), hinge.y + door_w * a0.sin());
-                let p1 = Pos2::new(hinge.x + door_w * a1.cos(), hinge.y + door_w * a1.sin());
-                painter.line_segment([p0, p1], Stroke::new(0.9, color.gamma_multiply(0.60)));
+                let a0 = std::f32::consts::FRAC_PI_2 * (i as f32) / (arc_steps as f32);
+                let a1 = std::f32::consts::FRAC_PI_2 * ((i + 1) as f32) / (arc_steps as f32);
+                let p0 = Pos2::new(hinge.x - door_w * a0.cos(), hinge.y + door_w * a0.sin());
+                let p1 = Pos2::new(hinge.x - door_w * a1.cos(), hinge.y + door_w * a1.sin());
+                painter.line_segment([p0, p1], Stroke::new(0.9, color.gamma_multiply(0.65)));
             }
         }
         IconKind::SectionView => {
             // Authentic architectural building section symbol:
-            // Sliced building profile with solid cut-fill on section half, cutting plane line, and viewing arrow
-            let b_w = w * 0.78;
-            let b_h = h * 0.76;
-            let ground_y = c.y + b_h * 0.46;
+            // Sliced building cross-section showing sliced mass with floor slabs, vertical cutting plane, and viewing direction arrow
+            let b_w = w * 0.82;
+            let b_h = h * 0.78;
+            let ground_y = c.y + b_h * 0.44;
             let eaves_y = c.y - b_h * 0.08;
-            let ridge_y = c.y - b_h * 0.46;
+            let ridge_y = c.y - b_h * 0.44;
             let x_left = c.x - b_w * 0.48;
             let x_right = c.x + b_w * 0.48;
-            let x_cut = c.x - b_w * 0.05;
+            let x_cut = c.x - b_w * 0.04;
 
-            // Sectioned half (left of cut) filled to represent sliced building mass
-            let cut_half = vec![
+            // Ground datum line
+            painter.line_segment([Pos2::new(x_left - 1.5, ground_y), Pos2::new(x_right + 1.5, ground_y)], Stroke::new(1.3, color));
+
+            // Sectioned interior mass (left of cut line) with subtle shaded cut fill
+            let cut_mass = vec![
                 Pos2::new(x_left, ground_y),
                 Pos2::new(x_left, eaves_y),
                 Pos2::new(x_cut, ridge_y + (eaves_y - ridge_y) * ((x_cut - c.x) / (b_w * 0.5)).abs()),
                 Pos2::new(x_cut, ground_y),
             ];
-            painter.add(egui::Shape::convex_polygon(cut_half, color.gamma_multiply(0.25), Stroke::NONE));
+            painter.add(egui::Shape::convex_polygon(cut_mass, color.gamma_multiply(0.18), Stroke::NONE));
 
-            // Building silhouette outline (ground, walls, roof)
-            let bldg_outline = [
-                Pos2::new(x_left, ground_y),
-                Pos2::new(x_left, eaves_y),
-                Pos2::new(c.x, ridge_y),
-                Pos2::new(x_right, eaves_y),
-                Pos2::new(x_right, ground_y),
-            ];
-            for i in 0..4 {
-                painter.line_segment([bldg_outline[i], bldg_outline[i + 1]], thin_stroke);
-            }
-            painter.line_segment([Pos2::new(x_left - 1.5, ground_y), Pos2::new(x_right + 1.5, ground_y)], Stroke::new(1.3, color));
+            // Building silhouette outline: left wall, roof slopes, right wall
+            painter.line_segment([Pos2::new(x_left, ground_y), Pos2::new(x_left, eaves_y)], thin_stroke);
+            painter.line_segment([Pos2::new(x_left, eaves_y), Pos2::new(c.x, ridge_y)], thin_stroke);
+            painter.line_segment([Pos2::new(c.x, ridge_y), Pos2::new(x_right, eaves_y)], thin_stroke);
+            painter.line_segment([Pos2::new(x_right, eaves_y), Pos2::new(x_right, ground_y)], thin_stroke);
 
-            // Bold vertical section cutting plane line
-            painter.line_segment([Pos2::new(x_cut, ridge_y - 1.5), Pos2::new(x_cut, ground_y + 1.5)], Stroke::new(1.8, color));
+            // Sliced horizontal floor slabs (Level 1 floor and Level 2 intermediate floor) inside section cut
+            let slab_y1 = eaves_y + (ground_y - eaves_y) * 0.48;
+            painter.line_segment([Pos2::new(x_left, slab_y1), Pos2::new(x_cut, slab_y1)], Stroke::new(1.4, color));
 
-            // Directional view arrow pointing right
-            let arr_tip = Pos2::new(x_cut + w * 0.28, c.y - b_h * 0.05);
-            let arr_top = Pos2::new(x_cut + 1.0, arr_tip.y - 2.8);
-            let arr_bot = Pos2::new(x_cut + 1.0, arr_tip.y + 2.8);
+            // Heavy vertical section cutting plane line
+            painter.line_segment([Pos2::new(x_cut, ridge_y - 2.0), Pos2::new(x_cut, ground_y + 1.5)], Stroke::new(1.8, color));
+
+            // Directional view arrow pointing right at top of cutting plane
+            let arr_tip = Pos2::new(x_cut + b_w * 0.30, ridge_y + 2.0);
+            let arr_top = Pos2::new(x_cut + 1.0, ridge_y - 2.0);
+            let arr_bot = Pos2::new(x_cut + 1.0, ridge_y + 5.5);
             painter.add(egui::Shape::convex_polygon(vec![arr_tip, arr_top, arr_bot], color, Stroke::NONE));
         }
         IconKind::ElevationView => {
@@ -2317,5 +2325,28 @@ mod tests {
         );
         let rect = Rect::from_min_size(Pos2::new(10.0, 10.0), Vec2::new(32.0, 32.0));
         draw_icon(&painter, rect, IconKind::BlenderLiveSync, Color32::from_rgb(118, 118, 118));
+    }
+
+    #[test]
+    fn test_architectural_view_icons_render() {
+        let painter = Painter::new(
+            egui::Context::default(),
+            egui::LayerId::background(),
+            Rect::from_min_size(Pos2::ZERO, Vec2::new(100.0, 100.0)),
+        );
+        let sizes = [14.0, 15.0, 16.0, 24.0];
+        let icons = [
+            IconKind::FloorPlanView,
+            IconKind::SectionView,
+            IconKind::ElevationView,
+            IconKind::ThreeD,
+            IconKind::Ceiling,
+        ];
+        for &sz in &sizes {
+            for &icon in &icons {
+                let rect = Rect::from_min_size(Pos2::new(10.0, 10.0), Vec2::new(sz, sz));
+                draw_icon(&painter, rect, icon, Color32::from_rgb(200, 200, 200));
+            }
+        }
     }
 }
