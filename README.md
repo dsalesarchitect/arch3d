@@ -4,12 +4,13 @@
 
 **A cleanroom, modern BIM authoring application powered by a high-performance pure Rust engine.**
 
-[![Rust 1.81+](https://img.shields.io/badge/rust-1.81%2B-orange.svg)](https://www.rust-lang.org)
-[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
-[![Schema: IFC4](https://img.shields.io/badge/IFC-4_ISO_10303--21-brightgreen.svg)](https://technical.buildingsmart.org/standards/ifc/)
-[![Web Studio](https://img.shields.io/badge/Web_Studio-Live_on_GitHub_Pages-cyan.svg)](https://dsalesarchitect.github.io/arch3d/)
-[![YouTube](https://img.shields.io/badge/YouTube-%40OpenSourceArchitecture-red.svg?logo=youtube)](https://www.youtube.com/@OpenSourceArchitecture)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c.svg?logo=paypal)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66)
+[![Rust 1.81+](https://img.shields.io/badge/Rust-1.81%2B-black?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-2563eb?style=flat-square)](LICENSE)
+[![Schema: IFC4](https://img.shields.io/badge/Schema-IFC4_ISO_10303--21-0ea5e9?style=flat-square)](https://technical.buildingsmart.org/standards/ifc/)
+[![Web Studio](https://img.shields.io/badge/Web_Studio-Live_Preview-10b981?style=flat-square&logo=webassembly&logoColor=white)](https://dsalesarchitect.github.io/arch3d/)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/dsalesarchitect)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c?style=flat-square&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66)
+[![YouTube](https://img.shields.io/badge/YouTube-%40OpenSourceArchitecture-ff0000?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/@OpenSourceArchitecture)
 
 <br><br>
 
@@ -23,7 +24,7 @@
 
 ---
 
-## 🌟 Highlights
+## Highlights
 
 Arch3D offers a streamlined, developer-friendly architectural and structural modeler that delivers the core power of modern BIM authoring with the speed, memory safety, and simplicity of Rust.
 
@@ -39,7 +40,7 @@ Arch3D offers a streamlined, developer-friendly architectural and structural mod
 
 ---
 
-## 🏛 Workspace Architecture
+## Workspace Architecture
 
 ```text
 arch3d/
@@ -66,7 +67,7 @@ arch3d/
 
 ---
 
-## 🎛 Ribbon Tools
+## Ribbon Tools & Modeling Suite
 
 ### 1. Architecture
 - **Wall**: Architectural partition and exterior walls with real-time thickness and length feedback.
@@ -106,7 +107,7 @@ arch3d/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Build and Run
 
@@ -144,7 +145,7 @@ Test live in your browser without installation: [https://dsalesarchitect.github.
 
 ---
 
-## 📐 Single Source of Truth Projection Engine
+## Analytical Projection Engine
 
 In Arch3D, every building element is stored once in 3D world space at standard 1:1 scale (mm):
 $$\mathbf{X}_{world} = (x, y, z) \in \mathbb{R}^3$$
@@ -158,52 +159,56 @@ When viewing the model:
 
 ---
 
-## 🏗 BIM Level of Development (LOD) Roadmap & Current State
+## BIM Level of Development (LOD) Specification
 
 Arch3D aligns with the international **AIA G202 / BIMForum Level of Development (LOD)** industry specification:
 
 | Level | Definition | Arch3D Implementation & Capabilities | Status |
 | :--- | :--- | :--- | :--- |
-| **LOD 100** | Conceptual Massing | Site boundary lot polygons, building pads, toposolids, massing volumes, gross floor area. | 🟢 **Core Engine** |
-| **LOD 200** | Schematic Assemblies | Parametric elements with live dimensions, datum grids, storeys, generic walls/slabs/doors/windows. | 🟢 **Core Engine** |
-| **LOD 300** | Specific Assemblies & Quantities | True 1:1 mm watertight 6-sided solid B-Reps, compound assemblies with thermal U-values, ISO 10303-21 IFC4 Psets. | 🟢 **ACTIVE BASELINE** |
-| **LOD 350** | System Coordination & Interfaces | Mitered wall corners, beam-to-column analytical ray trimming, bay slab inner-face beam attachments, hosted curtain wall cutouts. | 🟢 **ACTIVE BASELINE** |
-| **LOD 400** | Fabrication & Detailing | Automated 3D rebar cages, bar bending schedules, structural steel connection plates, bolts, CNC fabrication exports. | 🟡 **Planned (Plugins)** |
-| **LOD 500** | As-Built & Facility Management | Scan-to-BIM point cloud comparison, COBie facility management tabular data, IoT telemetry digital twin. | 🔵 **Future Lifecycle** |
+| **LOD 100** | Conceptual Massing | Site boundary lot polygons, building pads, toposolids, massing volumes, gross floor area. | `Core Engine` |
+| **LOD 200** | Schematic Assemblies | Parametric elements with live dimensions, datum grids, storeys, generic walls/slabs/doors/windows. | `Core Engine` |
+| **LOD 300** | Specific Assemblies & Quantities | True 1:1 mm watertight 6-sided solid B-Reps, compound assemblies with thermal U-values, ISO 10303-21 IFC4 Psets. | `Active Baseline` |
+| **LOD 350** | System Coordination & Interfaces | Mitered wall corners, beam-to-column analytical ray trimming, bay slab inner-face beam attachments, hosted curtain wall cutouts. | `Active Baseline` |
+| **LOD 400** | Fabrication & Detailing | Automated 3D rebar cages, bar bending schedules, structural steel connection plates, bolts, CNC fabrication exports. | `Planned (Plugin)` |
+| **LOD 500** | As-Built & Facility Management | Scan-to-BIM point cloud comparison, COBie facility management tabular data, IoT telemetry digital twin. | `Future Lifecycle` |
 
-### 🔍 Current Feature Readiness (v0.1.0)
+### Feature Readiness Matrix (v0.1.0)
 
-- **🟢 Production-Ready & Validated (100% Operational in Core)**:
-  - **3D Solid Geometry**: 18 core architectural/structural primitives with 1:1 mm analytical B-Rep solids and compound multi-layer assemblies.
-  - **Dynamic Multi-View Projections**: Single Source of Truth Floor Plans (1200mm cut plane), RCP, 4 Elevations, arbitrary Section cuts, and 3D Axonometric views.
-  - **GPU Hardware Viewport**: 24-bit depth testing with 4x MSAA, directional sunlight shading, and translucent glazing passes.
-  - **Open Industry Exchange**: buildingSMART IFC4 STEP export/import, AutoCAD DWG/DXF ingestion (`acadrust`), SketchUp SKP mesh ingestion (`openskp`), and glTF 2.0 Binary (`.glb`) export.
-  - **Interoperability & Sheets**: Bidirectional Blender Live Sync socket bridge, WebGPU Path Tracing Studio (`@meimu/mutracer`), multi-sheet layouts, and vector PDF export.
-  - **Snapping & Automation**: Full CAD snapping (Endpoint, Midpoint, Perpendicular, Center, Nearest, Ortho, Polar 15°/30°/45°), multi-storey replication, and automatic bay framing.
-- **🟡 In Active Development (Near-Term Pipeline)**:
-  - Automated cross-compilation pipeline for native macOS (Apple Silicon/Intel) and Linux desktop binaries (Windows x64 and WebAssembly are fully active).
-  - External dynamic `.wasm` runtime plugin sandboxing.
-  - Automated tabular Bill of Quantities (BOQ) CSV/Excel schedule export.
-- **🔴 Not Yet Implemented (LOD 400+ Roadmap)**:
-  - 3D structural rebar reinforcement cages (planned via structural plugin).
-  - Steel connection plates, cleats, and bolt assemblies.
-  - MEP (Mechanical, Electrical, Plumbing) duct and pipe routing.
-  - Multi-user real-time cloud worksharing / central file checkout.
+#### 1. Validated Core Capabilities (Production-Ready)
+- **3D Solid Geometry**: 18 core architectural/structural primitives with 1:1 mm analytical B-Rep solids and compound multi-layer assemblies.
+- **Dynamic Multi-View Projections**: Single Source of Truth Floor Plans (1200mm cut plane), RCP, 4 Elevations, arbitrary Section cuts, and 3D Axonometric views.
+- **GPU Hardware Viewport**: 24-bit depth testing with 4x MSAA, directional sunlight shading, and translucent glazing passes.
+- **Open Industry Exchange**: buildingSMART IFC4 STEP export/import, AutoCAD DWG/DXF ingestion (`acadrust`), SketchUp SKP mesh ingestion (`openskp`), and glTF 2.0 Binary (`.glb`) export.
+- **Interoperability & Sheets**: Bidirectional Blender Live Sync socket bridge, WebGPU Path Tracing Studio (`@meimu/mutracer`), multi-sheet layouts, and vector PDF export.
+- **Snapping & Automation**: Full CAD snapping (Endpoint, Midpoint, Perpendicular, Center, Nearest, Ortho, Polar 15°/30°/45°), multi-storey replication, and automatic bay framing.
+
+#### 2. In Active Development (Near-Term Pipeline)
+- Automated cross-compilation pipeline for native macOS (Apple Silicon/Intel) and Linux desktop binaries (Windows x64 and WebAssembly are fully active).
+- External dynamic `.wasm` runtime plugin sandboxing.
+- Automated tabular Bill of Quantities (BOQ) CSV/Excel schedule export.
+
+#### 3. Planned Lifecycle Milestones (LOD 400+ Roadmap)
+- 3D structural rebar reinforcement cages (planned via structural plugin).
+- Steel connection plates, cleats, and bolt assemblies.
+- MEP (Mechanical, Electrical, Plumbing) duct and pipe routing.
+- Multi-user real-time cloud worksharing / central file checkout.
 
 ---
 
-## 💖 Community & Sponsorship
+## Community & Sponsorship
 
 Arch3D is developed as open-source software for the global AEC community. Voluntary contributions, sponsorships, and channel memberships directly support independent CAD/BIM engine development, IFC4 certification testing, and native cross-platform builds.
 
-- 📺 **Official YouTube Channel**: Watch dev logs, release demos, and architectural BIM tutorials at [@OpenSourceArchitecture](https://www.youtube.com/@OpenSourceArchitecture).
-- ⭐ **YouTube Membership**: Join as a channel member for community perks and direct support at [YouTube Channel Membership](https://www.youtube.com/@OpenSourceArchitecture/join).
-- 💖 **GitHub Sponsors**: Back ongoing development and continuous testing infrastructure via [GitHub Sponsors](https://github.com/sponsors/dsalesarchitect).
-- ☕ **PayPal Donation**: Send an instant contribution directly via [PayPal](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66).
+| Channel | Direct Link | Purpose |
+| :--- | :--- | :--- |
+| **GitHub Sponsors** | [![GitHub Sponsors](https://img.shields.io/badge/Sponsor_on_GitHub-EA4AAA?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/dsalesarchitect) | Monthly sponsorships funding ongoing development & CI testing infrastructure |
+| **PayPal Donation** | [![PayPal](https://img.shields.io/badge/Donate_with_PayPal-00457C?style=flat-square&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66) | Direct voluntary contribution for engine engineering & open standards |
+| **YouTube Channel** | [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/@OpenSourceArchitecture) | Architectural BIM tutorials, dev logs, and feature walk-throughs |
+| **YouTube Membership** | [![Join Member](https://img.shields.io/badge/Membership-Join-333333?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/@OpenSourceArchitecture/join) | Community member perks and direct ongoing channel support |
 
 ---
 
-## 📄 License
+## License
 
 Arch3D is open-source software licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)** with the **Arch3D Commercial Plugin Exception** (see [LICENSE](LICENSE)).
 

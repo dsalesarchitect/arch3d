@@ -4,7 +4,7 @@ Thank you for your interest in contributing to **Arch3D**! Arch3D is an open-sou
 
 ---
 
-## 🏛 Cleanroom Architecture Policy
+## Cleanroom Architecture Policy
 
 Arch3D is strictly authored from scratch under a **cleanroom engineering policy**:
 - **No decompiled, proprietary, or reverse-engineered code**: Do not copy or reference proprietary CAD/BIM source code.
@@ -13,7 +13,7 @@ Arch3D is strictly authored from scratch under a **cleanroom engineering policy*
 
 ---
 
-## 📦 Workspace Crates
+## Workspace Crates
 
 Arch3D is modularized into 5 focused crates:
 
@@ -27,7 +27,7 @@ Arch3D is modularized into 5 focused crates:
 
 ---
 
-## 🛠 Development Workflow
+## Development Workflow
 
 ### Prerequisites
 - Rust 1.81+ (stable toolchain)
@@ -51,7 +51,7 @@ cargo run --bin arch3d
 
 ---
 
-## 🎨 Code Style and Guidelines
+## Code Style and Guidelines
 1. **Millimetres standard (1:1 scale)**: All coordinate and dimension calculations throughout the data model and geometry kernel must be in millimetres.
 2. **Zero Warnings**: Ensure `cargo check --workspace` finishes with zero compiler warnings.
 3. **Tests Required**: Every geometric routine, entity serializer, or projection filter should have unit tests.
