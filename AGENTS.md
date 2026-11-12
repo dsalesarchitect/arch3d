@@ -270,8 +270,8 @@ See [d:\Arch3D\AGENTS.md](file:///d:/Arch3D/AGENTS.md) for full architecture and
          5. Dual orbital cyan sync arrows for real-time live bridge indication.
        - **Zero Raster Artifacts**: Drawn 100% via `egui::Painter` mathematical strokes and fills, rendering crisp contours at any DPI scale or screen resolution.
 
-     56. **Dual Licensing (MIT & GPL-3.0) & Official GitHub Presence**:
-        - **Dual License Invariant**: Arch3D is dual-licensed under MIT and GPL-3.0 (license = "MIT OR GPL-3.0-or-later"). Master summary is in LICENSE, MIT terms in LICENSE-MIT, and GNU GPL-3.0 terms in LICENSE-GPL.
+     56. **GNU GPL-3.0 Licensing with Commercial Plugin Exception & Official GitHub Presence**:
+        - **License Invariant**: Arch3D is licensed under the GNU General Public License v3.0 or later (`license = "GPL-3.0-or-later"`) with the **Arch3D Commercial Plugin Exception** (GNU GPLv3 Section 7) set forth in `LICENSE`. Third-party plugins, scripts, and add-ons communicating via the plugin API, Wasm interface, or socket/IPC bridges are permitted to be licensed under separate proprietary, commercial, or alternative terms without requiring the plugin itself to be open-sourced.
         - **Official Repository & Pages**: Primary repository is [https://github.com/dsalesarchitect/arch3d](https://github.com/dsalesarchitect/arch3d) and live GitHub Pages web app is [https://dsalesarchitect.github.io/arch3d/](https://dsalesarchitect.github.io/arch3d/) with Web Studio at /app.html.
         - **Complete Non-Infringing Nomenclature**: Zero legacy "Plinth BIM" references in user-facing UI, documentation, writer, or web metadata.
      57. **Embedded Real-World Sample Project & Test Isolation Standard (document.rs)**:

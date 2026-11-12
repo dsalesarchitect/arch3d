@@ -239,8 +239,8 @@ d:\Arch3D/
 
 ---
 
-### E. Dual Licensing (MIT & GPL-3.0) & Complete Rebranding
-- **Dual Licensing Invariant**: Configured official dual licensing: master summary in LICENSE, standard MIT terms in LICENSE-MIT, and GNU GPL-3.0 terms in LICENSE-GPL. Cargo workspace package defines license = "MIT OR GPL-3.0-or-later".
+### E. GNU GPL-3.0 Licensing with Commercial Plugin Exception & Complete Rebranding
+- **License Invariant**: Licensed under the GNU General Public License v3.0 or later (`license = "GPL-3.0-or-later"`) with the **Arch3D Commercial Plugin Exception** (GNU GPLv3 Section 7). The core application is protected copyleft, while plugins, scripts, and add-ons can be distributed and monetized under proprietary terms without requiring plugin source release. Master terms are consolidated in `LICENSE`.
 - **Clean Nomenclature**: Complete elimination of legacy "Plinth BIM" references from GUI, status bars, IFC writer metadata, settings dialogs, documentation, and web assets. Obsolete launcher Launch-Plinth-BIM.bat removed in favor of Launch-Arch3D.bat.
 
 ### F. Live GitHub Repository & GitHub Pages Publishing

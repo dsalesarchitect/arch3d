@@ -12,7 +12,7 @@ default-members = ["crates/plinth-app"]
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-license = "MIT OR GPL-3.0-or-later"
+license = "GPL-3.0-or-later"
 repository = "https://github.com/dsalesarchitect/arch3d"
 rust-version = "1.81"
 authors = ["David Sales <dsalesarchitect@gmail.com>", "Arch3D Contributors"]

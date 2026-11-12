@@ -7,7 +7,7 @@ maintainer = "Arch3D Team & Dsales Architect <dsalesarchitect@gmail.com>"
 type = "add-on"
 blender_version_min = "3.6.0"
 license = [
-    "SPDX:MIT",
+    "SPDX:GPL-3.0-or-later",
 ]
 website = "https://github.com/dsalesarchitect/arch3d"
 tags = [

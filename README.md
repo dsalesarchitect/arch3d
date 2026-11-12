@@ -5,7 +5,7 @@
 **A cleanroom, modern BIM authoring application powered by a high-performance pure Rust engine.**
 
 [![Rust 1.81+](https://img.shields.io/badge/rust-1.81%2B-orange.svg)](https://www.rust-lang.org)
-[![License: MIT OR GPL-3.0](https://img.shields.io/badge/License-MIT%20%7C%20GPL--3.0-blue.svg)](LICENSE)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Schema: IFC4](https://img.shields.io/badge/IFC-4_ISO_10303--21-brightgreen.svg)](https://technical.buildingsmart.org/standards/ifc/)
 [![Web Studio](https://img.shields.io/badge/Web_Studio-Live_on_GitHub_Pages-cyan.svg)](https://dsalesarchitect.github.io/arch3d/)
 
@@ -139,8 +139,9 @@ When viewing the model:
 
 ## 📄 License
 
-Arch3D is open-source software dual-licensed under your choice of either:
-- **MIT License** ([LICENSE-MIT](LICENSE-MIT) or [LICENSE](LICENSE))
-- **GNU General Public License v3.0** ([LICENSE-GPL](LICENSE-GPL))
+Arch3D is open-source software licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)** with the **Arch3D Commercial Plugin Exception** (see [LICENSE](LICENSE)).
+
+- The core Arch3D application, its source code, and derivative works are protected under the GNU General Public License v3.0 or later.
+- Under the **Arch3D Commercial Plugin Exception** (GNU GPLv3 Section 7), third-party and author plugins, modules, scripts, and add-ons communicating via the plugin API, WebAssembly interface, or socket/IPC bridges may be developed, distributed, and monetized under proprietary, commercial, or alternative terms without requiring the plugin itself to be open-sourced.
 
 All contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
