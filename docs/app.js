@@ -56,6 +56,43 @@
     });
   };
 
+  // --- Navbar Scroll State (Onda Dynamic Frosted Glass) ---
+  const navbar = document.querySelector('.navbar');
+  if (navbar) {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  // --- Scroll-Triggered Reveal Animations (Onda Spring Curve) ---
+  if ('IntersectionObserver' in window) {
+    const revealTargets = document.querySelectorAll(
+      '.reveal, .section-header, .card, .gallery-card, .table-card, .app-ui-frame, .support-card'
+    );
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -50px 0px',
+      threshold: 0.08
+    });
+
+    revealTargets.forEach(el => {
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
+  }
+
   // --- Interactive 3D BIM Model Viewport Simulation ---
   const canvas = document.getElementById('bimCanvas');
   if (!canvas) return;
