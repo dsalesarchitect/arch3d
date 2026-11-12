@@ -185,7 +185,7 @@ pub fn render_ribbon(
             }
         }
 
-        // Right side: Dark/Light Theme toggle
+        // Right side: Dark/Light Theme toggle & Official Links
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             // In WebAssembly, reserve clear space for the floating "Landing Page" HTML button FIRST
             // (in right_to_left layout, the first added element occupies the rightmost edge)
@@ -199,6 +199,12 @@ pub fn render_ribbon(
             if ui.button(theme_label).clicked() {
                 action.toggle_theme = true;
             }
+
+            ui.add_space(6.0);
+            ui.hyperlink_to(
+                egui::RichText::new("▶ YouTube").size(11.0).strong().color(Color32::from_rgb(255, 90, 90)),
+                "https://www.youtube.com/@OpenSourceArchitecture",
+            );
         });
     });
 
@@ -951,7 +957,14 @@ pub fn render_ribbon(
                 ui.separator();
 
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("Datum, Storey Replication & Settings").size(11.0).strong().color(theme.text_primary));
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("Datum, Storey Replication & Settings").size(11.0).strong().color(theme.text_primary));
+                        ui.label(egui::RichText::new("•").size(10.0).color(theme.text_muted));
+                        ui.hyperlink_to(
+                            egui::RichText::new("▶ @OpenSourceArchitecture").size(10.5).color(Color32::from_rgb(255, 90, 90)),
+                            "https://www.youtube.com/@OpenSourceArchitecture",
+                        );
+                    });
                     ui.label(egui::RichText::new("Level & Grid Managers • Multi-Storey Copy/Paste • 1:1 mm IFC4").size(10.0).color(theme.text_muted));
                 });
             }

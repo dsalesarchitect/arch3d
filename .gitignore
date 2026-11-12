@@ -7,7 +7,7 @@
 .vscode
 *.log
 *.tmp
-.github/
+.github/workflows/
 tools/
 *.tar.gz
 find_params.ps1

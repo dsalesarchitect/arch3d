@@ -1758,11 +1758,14 @@ mod tests {
         assert!(settings.snapping.ortho_mode);
 
         settings.reset_defaults();
+        settings.apply();
+        let _ = std::fs::remove_file(AppSettings::settings_file_path());
         assert_eq!(settings.pending_units.length_unit, LengthUnit::Millimeters);
         assert_eq!(settings.pending_theme.theme_mode, ThemeMode::Dark);
         assert_eq!(settings.pending_theme.canvas_bg, CanvasBgStyle::ThemeMatch);
         assert_eq!(settings.pending_snapping.polar_increment_deg, 45.0);
         assert!(!settings.pending_snapping.ortho_mode);
+        let _ = std::fs::remove_file(AppSettings::settings_file_path());
     }
 
     #[test]

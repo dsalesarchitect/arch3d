@@ -8,6 +8,8 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Schema: IFC4](https://img.shields.io/badge/IFC-4_ISO_10303--21-brightgreen.svg)](https://technical.buildingsmart.org/standards/ifc/)
 [![Web Studio](https://img.shields.io/badge/Web_Studio-Live_on_GitHub_Pages-cyan.svg)](https://dsalesarchitect.github.io/arch3d/)
+[![YouTube](https://img.shields.io/badge/YouTube-%40OpenSourceArchitecture-red.svg?logo=youtube)](https://www.youtube.com/@OpenSourceArchitecture)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c.svg?logo=paypal)](https://www.paypal.com/paypalme/dsalesarchitect)
 
 </div>
 
@@ -134,6 +136,17 @@ When viewing the model:
 3. **Elevations**: Orthographically projects exterior faces onto North, South, East, and West planes with level datum markers and heavy ground lines.
 4. **Sections**: Slices model prisms against arbitrary vertical cutting lines $(S_1, S_2)$, computing mathematically exact cut polygons and background projection lines.
 5. **3D View**: Directional sunlight shading ($I = 0.45 + 0.55 \max(0, \mathbf{n} \cdot \mathbf{l})$), back-face culling, depth sorting, and crisp architectural edge linework.
+
+---
+
+## 💖 Community & Sponsorship
+
+Arch3D is developed as open-source software for the global AEC community. Voluntary contributions, sponsorships, and channel memberships directly support independent CAD/BIM engine development, IFC4 certification testing, and native cross-platform builds.
+
+- 📺 **Official YouTube Channel**: Watch dev logs, release demos, and architectural BIM tutorials at [@OpenSourceArchitecture](https://www.youtube.com/@OpenSourceArchitecture).
+- ⭐ **YouTube Membership**: Join as a channel member for community perks and direct support at [YouTube Channel Membership](https://www.youtube.com/@OpenSourceArchitecture/join).
+- 💖 **GitHub Sponsors**: Back ongoing development and continuous testing infrastructure via [GitHub Sponsors](https://github.com/sponsors/dsalesarchitect).
+- ☕ **PayPal Donation**: Send an instant one-time contribution directly via [PayPal.me](https://www.paypal.com/paypalme/dsalesarchitect).
 
 ---
 
