@@ -269,3 +269,12 @@ See [d:\Arch3D\AGENTS.md](file:///d:/Arch3D/AGENTS.md) for full architecture and
          4. Three radiating rounded lobes: top arm inclined at $62.7^\circ$, middle horizontal arm at $0^\circ$, and bottom-left arm angled at $225^\circ$.
          5. Dual orbital cyan sync arrows for real-time live bridge indication.
        - **Zero Raster Artifacts**: Drawn 100% via `egui::Painter` mathematical strokes and fills, rendering crisp contours at any DPI scale or screen resolution.
+
+     56. **Dual Licensing (MIT & GPL-3.0) & Official GitHub Presence**:
+        - **Dual License Invariant**: Arch3D is dual-licensed under MIT and GPL-3.0 (license = "MIT OR GPL-3.0-or-later"). Master summary is in LICENSE, MIT terms in LICENSE-MIT, and GNU GPL-3.0 terms in LICENSE-GPL.
+        - **Official Repository & Pages**: Primary repository is [https://github.com/dsalesarchitect/arch3d](https://github.com/dsalesarchitect/arch3d) and live GitHub Pages web app is [https://dsalesarchitect.github.io/arch3d/](https://dsalesarchitect.github.io/arch3d/) with Web Studio at /app.html.
+        - **Complete Non-Infringing Nomenclature**: Zero legacy "Plinth BIM" references in user-facing UI, documentation, writer, or web metadata.
+     57. **Embedded Real-World Sample Project & Test Isolation Standard (document.rs)**:
+        - **Embedded Gzip Model**: Document::create_sample_building() embeds and decompresses sample_project.arch3d.gz (~24.9 KB) containing the authentic 10-storey apartment highrise model (450 elements, 10 levels, 24 views, layout sheet) for instant review on desktop and web app launch (pp.html).
+        - **Unit Test Isolation**: Regression unit tests that verify specific coordinates, opening offsets, and ray intersections must use Document::create_test_box_building() or Document::new_empty() to avoid dependencies on sample building scale or layout changes.
+        - **Public Download**: Published as [docs/sample_project.arch3d](file:///d:/Arch3D/docs/sample_project.arch3d) for direct import/export exchange testing.

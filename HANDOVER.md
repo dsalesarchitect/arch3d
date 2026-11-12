@@ -1,10 +1,13 @@
-# Arch3D (formerly Plinth BIM) — Master Engineering Handover Notes
+# Arch3D — Master Engineering Handover Notes
 
-**Project**: Arch3D / Plinth BIM  
+**Project**: Arch3D  
 **Location**: `d:\Arch3D`  
 **Target**: `x86_64-pc-windows-gnu`  
-**Date**: November 5, 2026  
-**Status**: 100% Passing Tests (93/93 unit & integration tests passed across all crates, 0 warnings)  
+**Date**: November 12, 2026  
+**Status**: 100% Passing Tests (107/107 unit & integration tests passed across all crates, 0 errors)  
+**Live Site**: https://dsalesarchitect.github.io/arch3d/  
+**Web Studio**: https://dsalesarchitect.github.io/arch3d/app.html  
+**Repository**: https://github.com/dsalesarchitect/arch3d  
 
 ---
 
@@ -236,18 +239,47 @@ d:\Arch3D/
 
 ---
 
+### E. Dual Licensing (MIT & GPL-3.0) & Complete Rebranding
+- **Dual Licensing Invariant**: Configured official dual licensing: master summary in LICENSE, standard MIT terms in LICENSE-MIT, and GNU GPL-3.0 terms in LICENSE-GPL. Cargo workspace package defines license = "MIT OR GPL-3.0-or-later".
+- **Clean Nomenclature**: Complete elimination of legacy "Plinth BIM" references from GUI, status bars, IFC writer metadata, settings dialogs, documentation, and web assets. Obsolete launcher Launch-Plinth-BIM.bat removed in favor of Launch-Arch3D.bat.
+
+### F. Live GitHub Repository & GitHub Pages Publishing
+- **Repository Setup**: Initialized and configured official GitHub repository at [https://github.com/dsalesarchitect/arch3d](https://github.com/dsalesarchitect/arch3d) with GitHub CLI authentication under user dsalesarchitect.
+- **GitHub Pages Web Studio**: Automated web deployment from main branch folder /docs. Web studio accessible at [https://dsalesarchitect.github.io/arch3d/app.html](https://dsalesarchitect.github.io/arch3d/app.html) with zero-install WebAssembly in-browser BIM authoring.
+
+### G. Universal Move, Rotate, and Mirror Tool Snapping & Free 3D Transformation
+- **Full Viewport Coverage**: Tool::Move, Tool::Rotate, and Tool::Mirror execute uniformly across all 2D plan views, ceiling plans, elevations, building sections, and 3D views.
+- **Universal Snapping**: Real-time magnetic snapping to all architectural and structural vertices, midpoints, and segment edges within 18 px screen-space tolerance.
+- **Axis Locking & HUD**: Single-key axis constraints (X, Y, Z), orthogonal shift-lock, translation distance badge, bullseye center with degree sweep pie, and symmetry mirror line.
+
+### H. Embedded Real-World Sample Project (Commercial_Office_Building (1).arch3d)
+- **Embedded Gzip Model**: Document::create_sample_building() in [crates/plinth-model/src/document.rs](file:///d:/Arch3D/crates/plinth-model/src/document.rs) embeds and decompresses sample_project.arch3d.gz (~24.9 KB) representing the 10-storey apartment highrise model (450 elements, 10 levels, 24 views, layout sheet A101) on application startup (desktop and WebAssembly).
+- **Public Download**: Published as [docs/sample_project.arch3d](file:///d:/Arch3D/docs/sample_project.arch3d) for direct file exchange testing.
+- **Test Isolation**: Created Document::create_test_box_building() for unit tests requiring fixed rectangular envelope coordinates, ensuring complete independence from sample model geometry updates.
+
+### I. Landing Page Workspace Interface Gallery & High-Res Showcase
+- **High-Res Studio Screenshots**: Updated landing page gallery in [docs/index.html](file:///d:/Arch3D/docs/index.html) with authentic high-resolution captures from Arch3D:
+  - docs/images/arch3d-ui-main.png: Full Arch3D studio application window showcasing ribbons, project browser hierarchy across all 10 storeys, 3D viewport, and properties inspector.
+  - docs/images/arch3d-viewport-split.png: Focused 3D viewport canvas with interactive 3D ViewCube navigation widget.
+  - docs/images/arch3d-multi-storey.jpg: 10-storey apartment highrise model with faceted balconies and project tree.
+  - docs/images/arch3d-framing.png: Automated structural framing and substructure pipeline.
+- **Refined Showcase Copy**: Updated cards for Unified Architectural & Structural Studio, Hardware-Accelerated 3D Navigation, Multi-Storey Facades, and Automated Framing.
+
+---
+
 ## 3. Verification & Test Suite Summary
 
-All 97 automated unit & integration tests across the 5 workspace crates pass with 100% success rate:
+All 107 automated unit & integration tests across the 5 workspace crates pass with 100% success rate:
 
-```
-running 33 tests (crates/plinth-app)  ... ok (100%)
+`
+running 39 tests (crates/plinth-app)  ... ok (100%)
 running 16 tests (crates/plinth-geom) ... ok (100%)
-running 14 tests (crates/plinth-ifc)  ... ok (100%)
-running 13 tests (crates/plinth-model)... ok (100%)
-running 20 tests (crates/plinth-views)... ok (100%)
-Total: 96 passed; 0 failed; 0 ignored (0 warnings)
-```
+running 15 tests (crates/plinth-ifc)  ... ok (100%)
+running 15 tests (crates/plinth-model)... ok (100%)
+running 22 tests (crates/plinth-views)... ok (100%)
+Total: 107 passed; 0 failed; 0 ignored (0 errors)
+`
+
 
 ### D. Benchmark IFC Suite & MEP Systems Classification
 1. **Schema Verification Audit**:
