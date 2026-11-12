@@ -93,6 +93,235 @@
     });
   }
 
+  // ========================================================================
+  // Onda Interactive Violet Pixel Silk Wave Background Engine
+  // ========================================================================
+  const silkCanvas = document.getElementById('silkCanvas');
+  if (silkCanvas) {
+    const sCtx = silkCanvas.getContext('2d');
+    let sWidth = 0;
+    let sHeight = 0;
+    let sDpr = 1;
+    let animFrameId = null;
+    let isVisible = true;
+    const startTime = performance.now();
+
+    // Mouse interaction tracking
+    const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999, active: false };
+    const heroSection = document.getElementById('heroSection') || silkCanvas.parentElement;
+
+    if (heroSection) {
+      heroSection.addEventListener('mousemove', (e) => {
+        const rect = silkCanvas.getBoundingClientRect();
+        mouse.tx = e.clientX - rect.left;
+        mouse.ty = e.clientY - rect.top;
+        mouse.active = true;
+      }, { passive: true });
+      heroSection.addEventListener('mouseleave', () => {
+        mouse.active = false;
+      }, { passive: true });
+    }
+
+    // Bayer 4x4 Ordered Halftone Dithering Matrix
+    const BAYER_4X4 = [
+       0,  8,  2, 10,
+      12,  4, 14,  6,
+       3, 11,  1,  9,
+      15,  7, 13,  5
+    ];
+
+    // Dot Level Sizes (relative to cell pitch)
+    const DOT_LEVEL_SIZES = [0.18, 0.35, 0.52, 0.68, 0.82, 0.95];
+
+    // Colors matching active visual theme
+    function getDotColors() {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        return [
+          'rgba(124, 58, 237, 0.20)', // Level 1 - subtle violet
+          'rgba(124, 58, 237, 0.42)', // Level 2
+          'rgba(109, 40, 217, 0.68)', // Level 3
+          '#7c3aed',                   // Level 4
+          '#6d28d9',                   // Level 5
+          '#5b21b6'                    // Level 6 - deep royal violet
+        ];
+      } else {
+        return [
+          'rgba(167, 139, 250, 0.22)', // Level 1
+          'rgba(167, 139, 250, 0.48)', // Level 2
+          'rgba(192, 132, 252, 0.72)', // Level 3
+          '#a855f7',                   // Level 4
+          '#9333ea',                   // Level 5
+          '#7c3aed'                    // Level 6 - vibrant electric violet
+        ];
+      }
+    }
+
+    // Deterministic 3D harmonic noise for organic wave turbulence
+    function pseudoNoise3D(x, y, z) {
+      return (
+        Math.sin(x * 1.7 + z * 0.9) * Math.cos(y * 1.5 - z * 0.7) * 0.5 +
+        Math.sin(x * 3.1 - y * 2.3 + z * 1.4) * 0.3 +
+        Math.cos(x * 0.8 + y * 2.9 + z * 0.5) * 0.2
+      );
+    }
+
+    // Onda Silk Wave Field Formulation
+    function evaluateSilkField(normX, normY, time) {
+      // Norm coordinates: centered near (0.45, 0.55)
+      const nx = (normX - 0.48) * 2.2;
+      const ny = (normY - 0.52) * 1.9;
+
+      // Ribbon 1: Main flowing diagonal ribbon (angle ~ -35.5 deg / -0.62 rad)
+      const cos1 = 0.814, sin1 = -0.581;
+      const u1 = nx * cos1 + ny * sin1;
+      const v1 = -nx * sin1 + ny * cos1;
+
+      const wave1 = 0.12 * Math.sin(u1 * 2.6 - time * 0.42) +
+                    0.05 * Math.sin(u1 * 5.8 + time * 0.65);
+      const width1 = 0.22;
+      const dist1 = Math.abs(v1 - wave1);
+      const env1 = Math.exp(-Math.pow(dist1 / width1, 2));
+
+      // Ribbon 2: Secondary harmonic trailing ribbon (angle ~ -27.5 deg)
+      const cos2 = 0.887, sin2 = -0.462;
+      const u2 = nx * cos2 + ny * sin2;
+      const v2 = -nx * sin2 + ny * cos2 - 0.12;
+      const wave2 = 0.10 * Math.sin(u2 * 2.1 + time * 0.35) +
+                    0.04 * Math.cos(u2 * 6.4 - time * 0.50);
+      const width2 = 0.16;
+      const dist2 = Math.abs(v2 - wave2);
+      const env2 = Math.exp(-Math.pow(dist2 / width2, 2)) * 0.75;
+
+      // Top-left subtle pixel spray (matching Onda hero visual)
+      const tlDist = Math.hypot(normX - 0.08, normY - 0.08);
+      const tlEnv = Math.exp(-Math.pow(tlDist / 0.22, 2)) * 0.45;
+
+      // 3D fluid noise modulation
+      const noise = pseudoNoise3D(u1 * 1.8, v1 * 2.2, time * 0.3);
+      const noiseMod = 0.55 + 0.45 * noise;
+
+      let intensity = Math.max(env1, env2) * noiseMod + tlEnv * (0.6 + 0.4 * Math.sin(time * 0.5));
+
+      // Mouse ripple / interactive wave deflection
+      if (mouse.active) {
+        const mxNorm = (mouse.x / sWidth - 0.48) * 2.2;
+        const myNorm = (mouse.y / sHeight - 0.52) * 1.9;
+        const mDist = Math.hypot(nx - mxNorm, ny - myNorm);
+        if (mDist < 0.65) {
+          const ripple = Math.exp(-Math.pow(mDist / 0.30, 2)) * Math.sin(mDist * 16.0 - time * 4.0);
+          intensity += ripple * 0.35;
+        }
+      }
+
+      return Math.max(0, Math.min(1, intensity));
+    }
+
+    // Map continuous intensity [0, 1] to discrete level 0..6 via Bayer 4x4 dithering
+    function toDotLevel(intensity, col, row) {
+      if (intensity <= 0.02) return 0;
+      if (intensity < 0.18) {
+        const dither = (BAYER_4X4[(row & 3) * 4 + (col & 3)] + 0.5) / 16;
+        return (intensity / 0.18 > dither) ? 1 : 0;
+      }
+      const lvl = 2 + Math.floor(((intensity - 0.18) / 0.82) * 4);
+      return Math.min(6, lvl);
+    }
+
+    function resizeSilk() {
+      const parent = silkCanvas.parentElement;
+      sWidth = parent.clientWidth;
+      sHeight = parent.clientHeight;
+      sDpr = Math.min(window.devicePixelRatio || 1, 2);
+      silkCanvas.width = sWidth * sDpr;
+      silkCanvas.height = sHeight * sDpr;
+      sCtx.setTransform(sDpr, 0, 0, sDpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resizeSilk, { passive: true });
+    resizeSilk();
+
+    // Render loop
+    function renderSilkFrame(timestamp) {
+      if (!isVisible) {
+        animFrameId = requestAnimationFrame(renderSilkFrame);
+        return;
+      }
+
+      const elapsed = (timestamp - startTime) * 0.001;
+
+      // Smooth mouse interpolation
+      if (mouse.active) {
+        mouse.x += (mouse.tx - mouse.x) * 0.12;
+        mouse.y += (mouse.ty - mouse.y) * 0.12;
+      }
+
+      sCtx.clearRect(0, 0, sWidth, sHeight);
+
+      // Cell pitch (tight, precise architectural square pixels)
+      const cellSize = sWidth < 768 ? 9 : 11;
+      const cols = Math.ceil(sWidth / cellSize);
+      const rows = Math.ceil(sHeight / cellSize);
+      const totalCells = cols * rows;
+
+      const levels = new Uint8Array(totalCells);
+
+      // Evaluate field across grid
+      for (let r = 0, idx = 0; r < rows; r++) {
+        const ny = r / rows;
+        for (let c = 0; c < cols; c++, idx++) {
+          const nx = c / cols;
+          const val = evaluateSilkField(nx, ny, elapsed);
+          levels[idx] = toDotLevel(val, c, r);
+        }
+      }
+
+      const colors = getDotColors();
+
+      // Batched render by level (exact paintDots algorithm: 6 fill calls total)
+      for (let lvl = 1; lvl <= 6; lvl++) {
+        const size = Math.max(1.2, Math.round(cellSize * DOT_LEVEL_SIZES[lvl - 1]));
+        const offset = Math.floor((cellSize - size) / 2);
+        let hasDots = false;
+
+        sCtx.beginPath();
+        for (let r = 0, idx = 0; r < rows; r++) {
+          const py = r * cellSize + offset;
+          for (let c = 0; c < cols; c++, idx++) {
+            if (levels[idx] === lvl) {
+              sCtx.rect(c * cellSize + offset, py, size, size);
+              hasDots = true;
+            }
+          }
+        }
+
+        if (hasDots) {
+          sCtx.fillStyle = colors[lvl - 1];
+          sCtx.fill();
+        }
+      }
+
+      animFrameId = requestAnimationFrame(renderSilkFrame);
+    }
+
+    // Visibility observer to pause when scrolled away
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          isVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0.05 });
+      observer.observe(silkCanvas);
+    }
+
+    // Respect reduced motion preference
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      animFrameId = requestAnimationFrame(renderSilkFrame);
+    } else {
+      renderSilkFrame(startTime);
+    }
+  }
+
   // --- Interactive 3D BIM Model Viewport Simulation ---
   const canvas = document.getElementById('bimCanvas');
   if (!canvas) return;

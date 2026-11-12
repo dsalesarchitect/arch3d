@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=20261112b">
+  <link rel="stylesheet" href="styles.css?v=20261112c">
 </head>
 <body>
 
@@ -86,8 +86,14 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="container hero-content">
+  <section class="hero" id="heroSection">
+    <!-- Onda Interactive Violet Pixel Silk Wave Background -->
+    <div class="hero-silk-bg" aria-hidden="true">
+      <canvas id="silkCanvas" class="hero-silk-canvas"></canvas>
+      <div class="hero-silk-fade"></div>
+    </div>
+
+    <div class="container hero-content" style="position: relative; z-index: 2;">
       <div class="hero-logo-badge">
         <img src="logo.png" alt="Arch3D Official Logo" class="hero-logo-img">
       </div>
@@ -1110,6 +1116,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261112b"></script>
+  <script src="app.js?v=20261112c"></script>
 </body>
 </html>
