@@ -878,7 +878,7 @@ mod tests {
 
     #[test]
     fn test_export_sample_building() {
-        let doc = Document::create_sample_building();
+        let doc = Document::create_test_box_building();
         let step = export_ifc4(&doc);
         assert!(step.contains("FILE_SCHEMA(('IFC4'));"));
         assert!(step.contains("ReferenceView_V1.2"));

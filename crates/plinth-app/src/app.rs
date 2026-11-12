@@ -3693,7 +3693,7 @@ mod tests {
         use crate::canvas::{get_element_projected_screen_pts, test_element_marquee, SelectionBox};
         use egui::pos2;
 
-        let doc = plinth_model::Document::create_sample_building();
+        let doc = plinth_model::Document::create_test_box_building();
         let center = pos2(600.0, 400.0);
         let pan = egui::Vec2::ZERO;
         let zoom = 0.05f32; // 50px per 1000mm
