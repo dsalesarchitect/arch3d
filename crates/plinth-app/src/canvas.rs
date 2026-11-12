@@ -3058,12 +3058,13 @@ fn render_single_viewport(
     }
 
     if is_active && *active_tool == Tool::Select && !floating_consumed && !canvas_state.picking_surface_workplane {
+        let actual_pointer_screen = pointer_pos.unwrap_or(mouse_screen);
         if is_primary_down && canvas_state.active_annotation_grip.is_none() {
             if let Some(origin) = press_origin {
-                if vp_rect.contains(origin) && origin.distance(mouse_screen) >= 4.0 {
+                if vp_rect.contains(origin) && origin.distance(actual_pointer_screen) >= 6.0 {
                     canvas_state.selection_box = Some(SelectionBox {
                         start: origin,
-                        current: mouse_screen,
+                        current: actual_pointer_screen,
                     });
                 }
             }
@@ -3071,7 +3072,7 @@ fn render_single_viewport(
 
         if is_primary_released {
             if let Some(sel_box) = canvas_state.selection_box.take() {
-                if sel_box.start.distance(sel_box.current) >= 4.0 {
+                if sel_box.start.distance(sel_box.current) >= 6.0 {
                     box_selected_this_frame = true;
                     let is_crossing = sel_box.is_crossing();
                     let sel_rect = sel_box.rect();
@@ -5668,14 +5669,7 @@ pub fn test_element_marquee(
         if geom.vertices.iter().any(|p| sel_rect.contains(*p)) {
             return true;
         }
-        // 2. Selection marquee is completely inside an element polygon
-        let center = sel_rect.center();
-        for poly in &geom.polygons {
-            if point_in_screen_poly(center, poly) {
-                return true;
-            }
-        }
-        // 3. Any element edge intersects any of the 4 borders of sel_rect
+        // 2. Any element edge intersects any of the 4 borders of sel_rect
         let rect_edges = [
             (sel_rect.left_top(), sel_rect.right_top()),
             (sel_rect.right_top(), sel_rect.right_bottom()),
