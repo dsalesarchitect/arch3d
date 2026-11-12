@@ -1063,7 +1063,7 @@ impl eframe::App for PlinthApp {
                         }
                     }
                 } else {
-                    self.status_message = "No sheets available in project to export to PDF. Create a Sheet in the Project Browser first.".into();
+                    self.status_message = "No sheets available in project to export to PDF. Create a Sheet in the Project Tree first.".into();
                 }
             }
 
@@ -1098,7 +1098,7 @@ impl eframe::App for PlinthApp {
                         }
                     }
                 } else {
-                    self.status_message = "No sheets available in project to export to PDF. Create a Sheet in the Project Browser first.".into();
+                    self.status_message = "No sheets available in project to export to PDF. Create a Sheet in the Project Tree first.".into();
                 }
             }
 
@@ -1561,8 +1561,8 @@ impl eframe::App for PlinthApp {
             });
         });
 
-        // 3. Left Side Panel: Project Browser
-        egui::SidePanel::left("project_browser_panel")
+        // 3. Left Side Panel: Project Tree
+        egui::SidePanel::left("project_tree_panel")
             .resizable(true)
             .default_width(220.0)
             .width_range(160.0..=360.0)
@@ -1837,7 +1837,7 @@ mod tests {
                     ui.label(&app.status_message);
                 });
 
-                egui::SidePanel::left("project_browser_panel").show(ctx, |ui| {
+                egui::SidePanel::left("project_tree_panel").show(ctx, |ui| {
                     render_project_browser(ui, &mut app.doc, &theme);
                 });
 

@@ -1,6 +1,6 @@
 //! # plinth-app
 //!
-//! Arch3D BIM application components: Ribbon, Project Browser, Properties Panel,
+//! Arch3D BIM application components: Ribbon, Project Tree, Properties Panel,
 //! Canvas viewport, Tool state machine, and Dark/Light themes.
 
 pub mod app;

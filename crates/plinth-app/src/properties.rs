@@ -253,9 +253,14 @@ pub fn render_properties_panel(
     let mut open_studio_for: Option<ToolCategory> = None;
 
     ui.horizontal(|ui| {
-        ui.label(RichText::new("Properties").strong().size(12.0));
+        let (icon_rect, _) = ui.allocate_exact_size(egui::Vec2::new(16.0, 16.0), egui::Sense::hover());
+        crate::icons::draw_icon(ui.painter(), icon_rect, crate::icons::IconKind::Settings, theme.accent);
+        ui.add_space(2.0);
+        ui.label(RichText::new("Properties").strong().size(13.0).color(theme.text_primary));
     });
+    ui.add_space(4.0);
     ui.separator();
+    ui.add_space(2.0);
 
     // Pre-collect sorted project levels so we can edit elements mutably without borrow conflicts
     let mut sorted_levels: Vec<(LevelId, String, f64)> = doc
@@ -348,7 +353,7 @@ pub fn render_properties_panel(
                     if sheet.viewports.is_empty() {
                         grid.row_full(|ui| {
                             ui.label(
-                                "No viewports placed on this sheet yet. Click '+ Place Viewport' in Project Browser.",
+                                "No viewports placed on this sheet yet. Click '+ Place Viewport' in Project Tree.",
                             );
                         });
                     }

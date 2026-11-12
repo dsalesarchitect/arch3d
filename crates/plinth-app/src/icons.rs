@@ -83,6 +83,9 @@ pub enum IconKind {
     Road,
     Sidewalk,
     Pathwalk,
+    ProjectTree,
+    Blocks,
+    SearchFilter,
 }
 
 pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) {
@@ -1825,6 +1828,67 @@ pub fn draw_icon(painter: &Painter, rect: Rect, kind: IconKind, color: Color32) 
                     painter.line_segment([Pos2::new(x - paver_w, y), Pos2::new(x - paver_w, y + paver_h)], s_joint);
                 }
             }
+        }
+        IconKind::ProjectTree => {
+            // Stylized hierarchical branch tree node structure
+            // Root stem on left
+            let x_stem = c.x - w * 0.28;
+            let y_top = c.y - h * 0.32;
+            let y_mid = c.y;
+            let y_bot = c.y + h * 0.32;
+            let x_leaf = c.x + w * 0.28;
+
+            // Vertical backbone stem
+            painter.line_segment([Pos2::new(x_stem, y_top), Pos2::new(x_stem, y_bot)], stroke);
+
+            // Horizontal branches to tree nodes
+            painter.line_segment([Pos2::new(x_stem, y_top), Pos2::new(x_leaf, y_top)], thin_stroke);
+            painter.line_segment([Pos2::new(x_stem, y_mid), Pos2::new(x_leaf, y_mid)], thin_stroke);
+            painter.line_segment([Pos2::new(x_stem, y_bot), Pos2::new(x_leaf, y_bot)], thin_stroke);
+
+            // Circular node pills at branch ends
+            let node_r = 2.2;
+            let fill_col = color.gamma_multiply(0.3);
+            for y_node in [y_top, y_mid, y_bot] {
+                painter.circle_filled(Pos2::new(x_leaf, y_node), node_r, fill_col);
+                painter.circle_stroke(Pos2::new(x_leaf, y_node), node_r, thin_stroke);
+            }
+            // Root node anchor
+            painter.circle_filled(Pos2::new(x_stem, y_mid), 2.5, color);
+        }
+        IconKind::Blocks => {
+            // Isometric architectural component blocks / family cubes stacked in 3D
+            let cube_size = w * 0.28;
+            // Lower left block
+            let r1 = Rect::from_center_size(Pos2::new(c.x - w * 0.16, c.y + h * 0.14), egui::vec2(cube_size, cube_size));
+            painter.rect_filled(r1, 1.5, color.gamma_multiply(0.22));
+            painter.rect_stroke(r1, 1.5, stroke, egui::StrokeKind::Middle);
+
+            // Lower right block
+            let r2 = Rect::from_center_size(Pos2::new(c.x + w * 0.18, c.y + h * 0.14), egui::vec2(cube_size, cube_size));
+            painter.rect_filled(r2, 1.5, color.gamma_multiply(0.22));
+            painter.rect_stroke(r2, 1.5, stroke, egui::StrokeKind::Middle);
+
+            // Top centered block (creating stepped block assembly)
+            let r3 = Rect::from_center_size(Pos2::new(c.x + w * 0.01, c.y - h * 0.18), egui::vec2(cube_size, cube_size));
+            painter.rect_filled(r3, 1.5, color.gamma_multiply(0.35));
+            painter.rect_stroke(r3, 1.5, stroke, egui::StrokeKind::Middle);
+
+            // Inner cross accents indicating parametric components
+            painter.line_segment([Pos2::new(r3.min.x + 3.0, r3.center().y), Pos2::new(r3.max.x - 3.0, r3.center().y)], thin_stroke);
+            painter.line_segment([Pos2::new(r3.center().x, r3.min.y + 3.0), Pos2::new(r3.center().x, r3.max.y - 3.0)], thin_stroke);
+        }
+        IconKind::SearchFilter => {
+            // Sleek vector magnifying glass search lens with diagonal handle
+            let lens_c = Pos2::new(c.x - w * 0.10, c.y - h * 0.10);
+            let lens_r = w * 0.24;
+            painter.circle_stroke(lens_c, lens_r, stroke);
+            painter.circle_filled(lens_c, lens_r - 0.5, color.gamma_multiply(0.15));
+
+            // 45-degree angled handle
+            let h_start = Pos2::new(lens_c.x + lens_r * 0.707, lens_c.y + lens_r * 0.707);
+            let h_end = Pos2::new(c.x + w * 0.35, c.y + h * 0.35);
+            painter.line_segment([h_start, h_end], Stroke::new(2.4, color));
         }
     }
 }
