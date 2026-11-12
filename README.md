@@ -9,7 +9,7 @@
 [![Schema: IFC4](https://img.shields.io/badge/IFC-4_ISO_10303--21-brightgreen.svg)](https://technical.buildingsmart.org/standards/ifc/)
 [![Web Studio](https://img.shields.io/badge/Web_Studio-Live_on_GitHub_Pages-cyan.svg)](https://dsalesarchitect.github.io/arch3d/)
 [![YouTube](https://img.shields.io/badge/YouTube-%40OpenSourceArchitecture-red.svg?logo=youtube)](https://www.youtube.com/@OpenSourceArchitecture)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c.svg?logo=paypal)](https://www.paypal.com/paypalme/dsalesarchitect)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c.svg?logo=paypal)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66)
 
 <br><br>
 
@@ -188,7 +188,7 @@ Arch3D is developed as open-source software for the global AEC community. Volunt
 - 📺 **Official YouTube Channel**: Watch dev logs, release demos, and architectural BIM tutorials at [@OpenSourceArchitecture](https://www.youtube.com/@OpenSourceArchitecture).
 - ⭐ **YouTube Membership**: Join as a channel member for community perks and direct support at [YouTube Channel Membership](https://www.youtube.com/@OpenSourceArchitecture/join).
 - 💖 **GitHub Sponsors**: Back ongoing development and continuous testing infrastructure via [GitHub Sponsors](https://github.com/sponsors/dsalesarchitect).
-- ☕ **PayPal Donation**: Send an instant one-time contribution directly via [PayPal.me](https://www.paypal.com/paypalme/dsalesarchitect).
+- ☕ **PayPal Donation**: Send an instant contribution directly via [PayPal](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66).
 
 ---
 
