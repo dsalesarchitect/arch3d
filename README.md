@@ -139,6 +139,40 @@ When viewing the model:
 
 ---
 
+## 🏗 BIM Level of Development (LOD) Roadmap & Current State
+
+Arch3D aligns with the international **AIA G202 / BIMForum Level of Development (LOD)** industry specification:
+
+| Level | Definition | Arch3D Implementation & Capabilities | Status |
+| :--- | :--- | :--- | :--- |
+| **LOD 100** | Conceptual Massing | Site boundary lot polygons, building pads, toposolids, massing volumes, gross floor area. | 🟢 **Core Engine** |
+| **LOD 200** | Schematic Assemblies | Parametric elements with live dimensions, datum grids, storeys, generic walls/slabs/doors/windows. | 🟢 **Core Engine** |
+| **LOD 300** | Specific Assemblies & Quantities | True 1:1 mm watertight 6-sided solid B-Reps, compound assemblies with thermal U-values, ISO 10303-21 IFC4 Psets. | 🟢 **ACTIVE BASELINE** |
+| **LOD 350** | System Coordination & Interfaces | Mitered wall corners, beam-to-column analytical ray trimming, bay slab inner-face beam attachments, hosted curtain wall cutouts. | 🟢 **ACTIVE BASELINE** |
+| **LOD 400** | Fabrication & Detailing | Automated 3D rebar cages, bar bending schedules, structural steel connection plates, bolts, CNC fabrication exports. | 🟡 **Planned (Plugins)** |
+| **LOD 500** | As-Built & Facility Management | Scan-to-BIM point cloud comparison, COBie facility management tabular data, IoT telemetry digital twin. | 🔵 **Future Lifecycle** |
+
+### 🔍 Current Feature Readiness (v0.1.0)
+
+- **🟢 Production-Ready & Validated (100% Operational in Core)**:
+  - **3D Solid Geometry**: 18 core architectural/structural primitives with 1:1 mm analytical B-Rep solids and compound multi-layer assemblies.
+  - **Dynamic Multi-View Projections**: Single Source of Truth Floor Plans (1200mm cut plane), RCP, 4 Elevations, arbitrary Section cuts, and 3D Axonometric views.
+  - **GPU Hardware Viewport**: 24-bit depth testing with 4x MSAA, directional sunlight shading, and translucent glazing passes.
+  - **Open Industry Exchange**: buildingSMART IFC4 STEP export/import, AutoCAD DWG/DXF ingestion (`acadrust`), SketchUp SKP mesh ingestion (`openskp`), and glTF 2.0 Binary (`.glb`) export.
+  - **Interoperability & Sheets**: Bidirectional Blender Live Sync socket bridge, WebGPU Path Tracing Studio (`@meimu/mutracer`), multi-sheet layouts, and vector PDF export.
+  - **Snapping & Automation**: Full CAD snapping (Endpoint, Midpoint, Perpendicular, Center, Nearest, Ortho, Polar 15°/30°/45°), multi-storey replication, and automatic bay framing.
+- **🟡 In Active Development (Near-Term Pipeline)**:
+  - Automated cross-compilation pipeline for native macOS (Apple Silicon/Intel) and Linux desktop binaries (Windows x64 and WebAssembly are fully active).
+  - External dynamic `.wasm` runtime plugin sandboxing.
+  - Automated tabular Bill of Quantities (BOQ) CSV/Excel schedule export.
+- **🔴 Not Yet Implemented (LOD 400+ Roadmap)**:
+  - 3D structural rebar reinforcement cages (planned via structural plugin).
+  - Steel connection plates, cleats, and bolt assemblies.
+  - MEP (Mechanical, Electrical, Plumbing) duct and pipe routing.
+  - Multi-user real-time cloud worksharing / central file checkout.
+
+---
+
 ## 💖 Community & Sponsorship
 
 Arch3D is developed as open-source software for the global AEC community. Voluntary contributions, sponsorships, and channel memberships directly support independent CAD/BIM engine development, IFC4 certification testing, and native cross-platform builds.

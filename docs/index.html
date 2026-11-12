@@ -39,6 +39,8 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#gallery" class="nav-link">Interface</a></li>
         <li><a href="#capabilities" class="nav-link">Capabilities</a></li>
+        <li><a href="#lod" class="nav-link">LOD Roadmap</a></li>
+        <li><a href="#status" class="nav-link">Live Status</a></li>
         <li><a href="#plugins" class="nav-link">Plugins</a></li>
         <li><a href="#community" class="nav-link">Community</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
@@ -367,6 +369,378 @@
     </div>
   </section>
 
+  <!-- BIM Industry LOD (Level of Development) Roadmap Section -->
+  <section class="section" id="lod" style="background: linear-gradient(180deg, transparent 0%, rgba(217, 70, 239, 0.03) 50%, transparent 100%);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Industry Standard &amp; Roadmap</div>
+        <h2 class="section-title">BIM Level of Development (LOD) Specification</h2>
+        <p>Aligned with the American Institute of Architects (AIA G202) and BIMForum Level of Development framework, Arch3D bridges conceptual authoring with exact 1:1 millimetre construction coordination.</p>
+      </div>
+
+      <!-- Current State Highlight Box -->
+      <div class="lod-spotlight-card">
+        <div class="lod-spotlight-header">
+          <div class="lod-status-pill active-pill">
+            <span class="dot-live"></span>
+            ACTIVE CORE ENGINE STATE: LOD 300 – LOD 350
+          </div>
+          <span class="lod-subtitle-tag">Production-Ready Solid B-Rep &amp; System Interfaces</span>
+        </div>
+        <div class="lod-spotlight-content">
+          <p>
+            Arch3D operates at <strong>LOD 300 (Specific Assemblies &amp; Precise Quantities)</strong> and <strong>LOD 350 (Inter-System Interface Coordination)</strong>. All architectural and structural elements are generated as true 1:1 millimetre watertight solids with analytical joint miter cuts, automated opening reveals, beam-to-column trimming, and complete IFC4 standard property sets.
+          </p>
+          <div class="lod-highlights-grid">
+            <div class="lod-highlight-item">
+              <span class="highlight-check">✓</span>
+              <div>
+                <strong>LOD 300 Specific Geometry</strong>
+                <p>Watertight 6-sided solid prisms for walls, columns, beams, sloped roofs, stairs, ramps, and footings.</p>
+              </div>
+            </div>
+            <div class="lod-highlight-item">
+              <span class="highlight-check">✓</span>
+              <div>
+                <strong>Compound Assemblies</strong>
+                <p>Multi-layer wall and floor assemblies with customizable layer functions, thicknesses, and live thermal U-values.</p>
+              </div>
+            </div>
+            <div class="lod-highlight-item">
+              <span class="highlight-check">✓</span>
+              <div>
+                <strong>LOD 350 System Interfaces</strong>
+                <p>Mitered wall corner joins, beam-to-column boundary trimming, hosted curtain wall cutouts, and inner-bay slab alignment.</p>
+              </div>
+            </div>
+            <div class="lod-highlight-item">
+              <span class="highlight-check">✓</span>
+              <div>
+                <strong>ISO 10303-21 IFC4 Psets</strong>
+                <p>Complete standard IFC Psets (Pset_WallCommon, Pset_BeamCommon, etc.) and real-time multi-view synchronization.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-Stage Standard LOD Cards Grid -->
+      <div class="lod-grid">
+        <!-- LOD 100 -->
+        <div class="lod-card state-supported">
+          <div class="lod-card-top">
+            <div class="lod-level">LOD 100</div>
+            <span class="lod-status-badge supported">Supported in Core</span>
+          </div>
+          <h3 class="lod-card-title">Conceptual Massing</h3>
+          <p class="lod-card-desc">Model elements represented as generalized mass volumes, overall area boundaries, orientations, and height limits.</p>
+          <ul class="lod-feature-list">
+            <li>Site property lines &amp; lot boundary calculation</li>
+            <li>Building pads &amp; topography surfaces (Toposolids)</li>
+            <li>Conceptual mass volumes &amp; gross floor area tallies</li>
+          </ul>
+        </div>
+
+        <!-- LOD 200 -->
+        <div class="lod-card state-supported">
+          <div class="lod-card-top">
+            <div class="lod-level">LOD 200</div>
+            <span class="lod-status-badge supported">Supported in Core</span>
+          </div>
+          <h3 class="lod-card-title">Schematic Assemblies</h3>
+          <p class="lod-card-desc">Generic model elements with approximate dimensions, locations, unconnected heights, and generic placeholder profiles.</p>
+          <ul class="lod-feature-list">
+            <li>Parametric element placement with live dimensions</li>
+            <li>Storey elevation level manager &amp; custom grid bays</li>
+            <li>Generic architectural walls, slabs, windows, and doors</li>
+          </ul>
+        </div>
+
+        <!-- LOD 300 -->
+        <div class="lod-card state-active">
+          <div class="lod-card-top">
+            <div class="lod-level active-text">LOD 300</div>
+            <span class="lod-status-badge active">CURRENT ENGINE STATE</span>
+          </div>
+          <h3 class="lod-card-title">Specific Assemblies &amp; Quantities</h3>
+          <p class="lod-card-desc">Elements modeled as exact, specific assemblies with accurate 1:1 scale mm geometry, multi-layer compound materials, and IFC classifications.</p>
+          <ul class="lod-feature-list">
+            <li>Compound multi-layer assemblies with thermal U-values</li>
+            <li>Watertight 6-sided solid B-Rep geometry for all 18 element types</li>
+            <li>Real-world opening cutouts with reveals, jambs, sills, and lintels</li>
+            <li>IFC4 ISO 10303-21 standard physical STEP serialization</li>
+          </ul>
+        </div>
+
+        <!-- LOD 350 -->
+        <div class="lod-card state-active">
+          <div class="lod-card-top">
+            <div class="lod-level active-text">LOD 350</div>
+            <span class="lod-status-badge active">CURRENT ENGINE STATE</span>
+          </div>
+          <h3 class="lod-card-title">Interface Coordination Details</h3>
+          <p class="lod-card-desc">Elements modeled with accurate boundary conditions, structural connections, trims, and geometric coordination with adjacent systems.</p>
+          <ul class="lod-feature-list">
+            <li>Analytical beam-to-column trimming against column faces</li>
+            <li>Mitered wall corner footprints &amp; cross-joint cutout spans</li>
+            <li>Inner-surface bay slab alignment with column notches</li>
+            <li>Hosted curtain wall cutouts with mullions &amp; glazing</li>
+          </ul>
+        </div>
+
+        <!-- LOD 400 -->
+        <div class="lod-card state-planned">
+          <div class="lod-card-top">
+            <div class="lod-level planned-text">LOD 400</div>
+            <span class="lod-status-badge planned">Roadmap • Modular Plugins</span>
+          </div>
+          <h3 class="lod-card-title">Fabrication &amp; Assembly</h3>
+          <p class="lod-card-desc">Detailed shop geometry, rebar reinforcement cages, fabrication tolerances, steel connection plates, and CNC export.</p>
+          <ul class="lod-feature-list">
+            <li>Automated structural rebar cages &amp; bar bending schedules</li>
+            <li>Steel connection plates, gussets, and anchor bolt patterns</li>
+            <li>Automated Bill of Quantities (BOQ) &amp; BOM fabrication exports</li>
+          </ul>
+        </div>
+
+        <!-- LOD 500 -->
+        <div class="lod-card state-future">
+          <div class="lod-card-top">
+            <div class="lod-level future-text">LOD 500</div>
+            <span class="lod-status-badge future">Roadmap • Future Lifecycle</span>
+          </div>
+          <h3 class="lod-card-title">As-Built &amp; Facility Operations</h3>
+          <p class="lod-card-desc">Field-verified as-built conditions with operational asset telemetry, maintenance lifecycle data, and facility management exchange.</p>
+          <ul class="lod-feature-list">
+            <li>Point cloud scan-to-BIM comparison &amp; overlay alignment</li>
+            <li>COBie (Construction Operations Building Information Exchange)</li>
+            <li>IoT sensor telemetry &amp; digital twin asset maintenance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Application State Matrix Section (Working vs. In Development) -->
+  <section class="section" id="status">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Transparency &amp; Readiness</div>
+        <h2 class="section-title">Current Application State</h2>
+        <p>A transparent breakdown of production-ready features currently running in Arch3D v0.1.0 alongside features under active development and upcoming roadmap milestones.</p>
+      </div>
+
+      <div class="status-matrix-container">
+        <!-- Column 1: Fully Working & Validated -->
+        <div class="status-column col-working">
+          <div class="status-column-header">
+            <div class="status-column-title" style="color: #34d399;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Fully Working &amp; Validated</span>
+            </div>
+            <span class="status-count-badge count-working">100% Operational in Core</span>
+          </div>
+
+          <!-- Group A: 3D Kernel & Modeling -->
+          <div class="status-group">
+            <div class="status-group-title">1. Analytical Solid Geometry &amp; Modeling</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">18 Core Architectural &amp; Structural Primitives</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Walls, Columns, Beams, Slabs, Roofs (Hip, Gable, Shed, Flat), Stairs, Ramps, Railings, Curtain Walls, Doors, Windows, Ceilings, Footings, Site Toposolids, Property Lines, Building Pads, and Freeform Solids.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Automated Joint Coordination (LOD 350)</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Mitered wall corner footprints, beam-to-column analytical ray trimming, bay slab inner-face beam attachments, and hosted curtain wall hole cutouts.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Multi-Layer Compound Assembly Stacks</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Configurable compound layers with individual functions (Structure, Substrate, Thermal/Air, Finish 1, Finish 2), live thickness tracking, and automatic thermal U-value computation.</p>
+            </div>
+          </div>
+
+          <!-- Group B: Multi-View Projections -->
+          <div class="status-group">
+            <div class="status-group-title">2. Projection Engine &amp; Hardware Viewport</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Single Source of Truth Multi-View Projections</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Floor Plans (1200mm cut plane with door swings &amp; window reveals), Reflected Ceiling Plans (RCP 600x600 grid), Elevations (N, S, E, W), Arbitrary Building Section cuts, and Axonometric 3D.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">24-bit OpenGL Hardware Z-Buffered Viewport</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Pure OpenGL hardware depth testing with 4x MSAA, directional sunlight shading, polygon offset silhouettes, and translucent glazing passes.</p>
+            </div>
+          </div>
+
+          <!-- Group C: Formats & Interoperability -->
+          <div class="status-group">
+            <div class="status-group-title">3. Standards &amp; Interoperability</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">ISO 10303-21 IFC4 STEP File Export &amp; Import</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Compliant buildingSMART IFC4 data model with standard Psets (Pset_*Common) and spatial structure containment.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">AutoCAD (.dwg / .dxf) &amp; SketchUp (.skp) Ingestion</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Direct binary CAD and SketchUp mesh import with automatic conversion to native BIM walls, slabs, and freeform solids without third-party proprietary SDKs.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Blender Live Sync &amp; WebGPU Path Tracer</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Real-time socket bridge streaming to Blender Cycles/EEVEE and browser-based WebGPU path tracing studio with glTF 2.0 Binary (.glb) export.</p>
+            </div>
+          </div>
+
+          <!-- Group D: Sheets & Drafting -->
+          <div class="status-group">
+            <div class="status-group-title">4. Documentation, Snapping &amp; Sheets</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Sheet Layouts &amp; Multi-Page Vector PDF Export</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Free viewport positioning, 4-corner resizing, standard scale viewports (1:50, 1:100, 1:200), and crisp vector PDF production.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Universal CAD Snapping &amp; Storey Replication</span>
+                <span class="status-badge working">Working</span>
+              </div>
+              <p class="status-item-desc">Endpoint, Midpoint, Perpendicular, Center, Nearest, Ortho, Polar tracking (15°/30°/45°), Multi-Storey copy/paste, and automated structural bay framing.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: In Progress & Upcoming Roadmap -->
+        <div class="status-column col-pipeline">
+          <div class="status-column-header">
+            <div class="status-column-title" style="color: #f0abfc;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>In Progress &amp; Planned Milestones</span>
+            </div>
+            <span class="status-count-badge count-pipeline">Active Pipeline</span>
+          </div>
+
+          <!-- Group A: In Active Development -->
+          <div class="status-group">
+            <div class="status-group-title">1. Under Active Development (Near-Term)</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Native macOS &amp; Linux Desktop Builds</span>
+                <span class="status-badge progress">In Progress</span>
+              </div>
+              <p class="status-item-desc">Windows x64 and WebAssembly (in-browser) are fully operational. Automated cross-compilation pipeline for native macOS (Apple Silicon/Intel) and Linux (.deb / AppImage) is currently undergoing CI verification.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Dynamic External Wasm Plugin Sandboxing</span>
+                <span class="status-badge progress">In Progress</span>
+              </div>
+              <p class="status-item-desc">Plugin UI manager and bundled extension bridges are complete. Dynamic runtime execution of external third-party compiled .wasm modules is actively being finalized.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Automated Bill of Quantities (BOQ) Tabular Export</span>
+                <span class="status-badge progress">In Progress</span>
+              </div>
+              <p class="status-item-desc">Live material volume, surface area, and linear takeoffs exist in the property grid; automated tabular CSV and Excel schedule report generation is in development.</p>
+            </div>
+          </div>
+
+          <!-- Group B: Not Yet Working / LOD 400 Roadmap -->
+          <div class="status-group">
+            <div class="status-group-title">2. Not Yet Implemented (LOD 400 &amp; Advanced Plugins)</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Structural Rebar Reinforcement 3D Modeling</span>
+                <span class="status-badge planned">Planned (LOD 400)</span>
+              </div>
+              <p class="status-item-desc">Detailed 3D rebar cages, stirrups, column ties, and bar bending schedule tables will be introduced via specialized structural extension modules.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Steel Connection Plates, Cleats &amp; Bolt Patterns</span>
+                <span class="status-badge planned">Planned (LOD 400)</span>
+              </div>
+              <p class="status-item-desc">Parametric fabrication detailing for steel beam-to-column connections, baseplates, anchor bolts, and gussets.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">MEP (Mechanical, Electrical, Plumbing) Systems</span>
+                <span class="status-badge planned">Planned</span>
+              </div>
+              <p class="status-item-desc">Parametric ductwork, pipe routing, electrical trays, and HVAC equipment families are not yet present in core v0.1.0.</p>
+            </div>
+          </div>
+
+          <!-- Group C: Future Enterprise Roadmap (LOD 500) -->
+          <div class="status-group">
+            <div class="status-group-title">3. Future Vision &amp; Lifecycle (LOD 500)</div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Multi-User Real-Time Cloud Worksharing</span>
+                <span class="status-badge planned">Future</span>
+              </div>
+              <p class="status-item-desc">Arch3D currently operates as a fast, autonomous standalone desktop/web app with local file persistence. Central model multi-user server checkout is planned for future collaborative tiers.</p>
+            </div>
+
+            <div class="status-item-card">
+              <div class="status-item-header">
+                <span class="status-item-name">Laser Scan Point Cloud (.e57 / .las) Ingestion</span>
+                <span class="status-badge planned">Future (LOD 500)</span>
+              </div>
+              <p class="status-item-desc">GPU out-of-core point cloud streaming for as-built renovation modeling and field verification.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Plugins Section -->
   <section class="section" id="plugins">
     <div class="container">
@@ -661,6 +1035,8 @@
           <ul class="footer-links">
             <li><a href="#gallery" class="footer-link">Interface Gallery</a></li>
             <li><a href="#capabilities" class="footer-link">Capabilities</a></li>
+            <li><a href="#lod" class="footer-link">LOD Roadmap</a></li>
+            <li><a href="#status" class="footer-link">Live Status</a></li>
             <li><a href="#plugins" class="footer-link">Plugins</a></li>
             <li><a href="#community" class="footer-link">Community</a></li>
             <li><a href="#about" class="footer-link">About</a></li>

@@ -974,6 +974,409 @@ code {
   color: var(--text-muted);
 }
 
+/* ==========================================================================
+   BIM Industry Level of Development (LOD) Roadmap Styles
+   ========================================================================== */
+.lod-spotlight-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(217, 70, 239, 0.45);
+  border-radius: var(--radius-lg);
+  padding: 34px 36px;
+  margin-bottom: 40px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(217, 70, 239, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.lod-spotlight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.lod-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.active-pill {
+  background: rgba(217, 70, 239, 0.15);
+  border: 1px solid rgba(217, 70, 239, 0.5);
+  color: #f0abfc;
+}
+
+[data-theme="light"] .active-pill {
+  background: rgba(162, 28, 175, 0.12);
+  border-color: rgba(162, 28, 175, 0.4);
+  color: #a21caf;
+}
+
+.dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  display: inline-block;
+}
+
+.lod-subtitle-tag {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lod-spotlight-content p {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.lod-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.lod-highlight-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.highlight-check {
+  color: var(--accent-cyan);
+  font-weight: 900;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.lod-highlight-item strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.lod-highlight-item p {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.lod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.lod-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(12px);
+}
+
+.lod-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.lod-card.state-supported {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.lod-card.state-active {
+  border: 1px solid rgba(217, 70, 239, 0.6);
+  background: rgba(217, 70, 239, 0.05);
+  box-shadow: 0 0 24px rgba(217, 70, 239, 0.12);
+}
+
+.lod-card.state-planned {
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.lod-card.state-future {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.lod-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.lod-level {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.lod-level.active-text {
+  color: #f0abfc;
+}
+
+[data-theme="light"] .lod-level.active-text {
+  color: #a21caf;
+}
+
+.lod-level.planned-text {
+  color: #c084fc;
+}
+
+.lod-level.future-text {
+  color: #fbbf24;
+}
+
+.lod-status-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lod-status-badge.supported {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.lod-status-badge.active {
+  background: rgba(217, 70, 239, 0.22);
+  color: #f0abfc;
+  border: 1px solid rgba(217, 70, 239, 0.65);
+}
+
+[data-theme="light"] .lod-status-badge.active {
+  background: rgba(162, 28, 175, 0.14);
+  color: #86198f;
+  border-color: rgba(162, 28, 175, 0.5);
+}
+
+.lod-status-badge.planned {
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.lod-status-badge.future {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.lod-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.lod-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+.lod-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.lod-feature-list li {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lod-feature-list li::before {
+  content: "•";
+  color: var(--accent-cyan);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Current Application State Matrix (Working vs. In Development)
+   ========================================================================== */
+.status-matrix-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 40px;
+}
+
+@media (max-width: 900px) {
+  .status-matrix-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-column {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  backdrop-filter: blur(12px);
+}
+
+.status-column.col-working {
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(16, 185, 129, 0.08);
+}
+
+.status-column.col-pipeline {
+  border: 1px solid rgba(217, 70, 239, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(217, 70, 239, 0.08);
+}
+
+.status-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+}
+
+.status-column-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.status-count-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.count-working {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.count-pipeline {
+  background: rgba(217, 70, 239, 0.15);
+  color: #f0abfc;
+  border: 1px solid rgba(217, 70, 239, 0.4);
+}
+
+.status-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-group-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-item-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: all var(--transition-fast);
+}
+
+.status-item-card:hover {
+  border-color: var(--border-medium);
+  transform: translateX(2px);
+}
+
+.status-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.status-item-name {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.status-badge.working {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.status-badge.progress {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.status-badge.planned {
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.status-item-desc {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
 /* Sponsorship / Donation Section */
 .sponsor-grid {
   display: grid;
