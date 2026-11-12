@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=20261112g">
+  <link rel="stylesheet" href="styles.css?v=20261112h">
 </head>
 <body>
 
@@ -413,152 +413,56 @@
   </section>
 
   <!-- BIM Industry LOD (Level of Development) Roadmap Section -->
-  <section class="section" id="lod" style="background: linear-gradient(180deg, transparent 0%, rgba(37, 99, 235, 0.02) 50%, transparent 100%);">
+  <section class="section" id="lod">
     <div class="container">
       <div class="section-header">
         <div class="section-tag">Industry Standard &amp; Roadmap</div>
         <h2 class="section-title">BIM Level of Development (LOD) Specification</h2>
-        <p>Aligned with the American Institute of Architects (AIA G202) and BIMForum Level of Development framework, Arch3D bridges conceptual authoring with exact 1:1 millimetre construction coordination.</p>
+        <p>Aligned with the American Institute of Architects (AIA G202) and BIMForum Level of Development framework.</p>
       </div>
 
-      <!-- Current State Highlight Box -->
-      <div class="lod-spotlight-card">
-        <div class="lod-spotlight-header">
-          <div class="lod-status-pill active-pill">
-            <span class="dot-live"></span>
-            ACTIVE CORE ENGINE STATE: LOD 300 – LOD 350
-          </div>
-          <span class="lod-subtitle-tag">Production-Ready Solid B-Rep &amp; System Interfaces</span>
-        </div>
-        <div class="lod-spotlight-content">
-          <p>
-            Arch3D operates at <strong>LOD 300 (Specific Assemblies &amp; Precise Quantities)</strong> and <strong>LOD 350 (Inter-System Interface Coordination)</strong>. All architectural and structural elements are generated as true 1:1 millimetre watertight solids with analytical joint miter cuts, automated opening reveals, beam-to-column trimming, and complete IFC4 standard property sets.
-          </p>
-          <div class="lod-highlights-grid">
-            <div class="lod-highlight-item">
-              <span class="highlight-check">✓</span>
-              <div>
-                <strong>LOD 300 Specific Geometry</strong>
-                <p>Watertight 6-sided solid prisms for walls, columns, beams, sloped roofs, stairs, ramps, and footings.</p>
-              </div>
-            </div>
-            <div class="lod-highlight-item">
-              <span class="highlight-check">✓</span>
-              <div>
-                <strong>Compound Assemblies</strong>
-                <p>Multi-layer wall and floor assemblies with customizable layer functions, thicknesses, and live thermal U-values.</p>
-              </div>
-            </div>
-            <div class="lod-highlight-item">
-              <span class="highlight-check">✓</span>
-              <div>
-                <strong>LOD 350 System Interfaces</strong>
-                <p>Mitered wall corner joins, beam-to-column boundary trimming, hosted curtain wall cutouts, and inner-bay slab alignment.</p>
-              </div>
-            </div>
-            <div class="lod-highlight-item">
-              <span class="highlight-check">✓</span>
-              <div>
-                <strong>ISO 10303-21 IFC4 Psets</strong>
-                <p>Complete standard IFC Psets (Pset_WallCommon, Pset_BeamCommon, etc.) and real-time multi-view synchronization.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 6-Stage Standard LOD Cards Grid -->
-      <div class="lod-grid">
+      <!-- Simplified LOD Numbers Grid -->
+      <div class="lod-numbers-grid">
         <!-- LOD 100 -->
-        <div class="lod-card state-supported">
-          <div class="lod-card-top">
-            <div class="lod-level">LOD 100</div>
-            <span class="lod-status-badge supported">Supported in Core</span>
-          </div>
-          <h3 class="lod-card-title">Conceptual Massing</h3>
-          <p class="lod-card-desc">Model elements represented as generalized mass volumes, overall area boundaries, orientations, and height limits.</p>
-          <ul class="lod-feature-list">
-            <li>Site property lines &amp; lot boundary calculation</li>
-            <li>Building pads &amp; topography surfaces (Toposolids)</li>
-            <li>Conceptual mass volumes &amp; gross floor area tallies</li>
-          </ul>
+        <div class="lod-num-card">
+          <div class="lod-num-val">100</div>
+          <div class="lod-num-title">Conceptual Massing</div>
+          <span class="lod-num-badge">Core</span>
         </div>
 
         <!-- LOD 200 -->
-        <div class="lod-card state-supported">
-          <div class="lod-card-top">
-            <div class="lod-level">LOD 200</div>
-            <span class="lod-status-badge supported">Supported in Core</span>
-          </div>
-          <h3 class="lod-card-title">Schematic Assemblies</h3>
-          <p class="lod-card-desc">Generic model elements with approximate dimensions, locations, unconnected heights, and generic placeholder profiles.</p>
-          <ul class="lod-feature-list">
-            <li>Parametric element placement with live dimensions</li>
-            <li>Storey elevation level manager &amp; custom grid bays</li>
-            <li>Generic architectural walls, slabs, windows, and doors</li>
-          </ul>
+        <div class="lod-num-card">
+          <div class="lod-num-val">200</div>
+          <div class="lod-num-title">Schematic Assemblies</div>
+          <span class="lod-num-badge">Core</span>
         </div>
 
         <!-- LOD 300 -->
-        <div class="lod-card state-active">
-          <div class="lod-card-top">
-            <div class="lod-level active-text">LOD 300</div>
-            <span class="lod-status-badge active">CURRENT ENGINE STATE</span>
-          </div>
-          <h3 class="lod-card-title">Specific Assemblies &amp; Quantities</h3>
-          <p class="lod-card-desc">Elements modeled as exact, specific assemblies with accurate 1:1 scale mm geometry, multi-layer compound materials, and IFC classifications.</p>
-          <ul class="lod-feature-list">
-            <li>Compound multi-layer assemblies with thermal U-values</li>
-            <li>Watertight 6-sided solid B-Rep geometry for all 18 element types</li>
-            <li>Real-world opening cutouts with reveals, jambs, sills, and lintels</li>
-            <li>IFC4 ISO 10303-21 standard physical STEP serialization</li>
-          </ul>
+        <div class="lod-num-card active">
+          <div class="lod-num-val">300</div>
+          <div class="lod-num-title">Specific Assemblies</div>
+          <span class="lod-num-badge active">Active Engine</span>
         </div>
 
         <!-- LOD 350 -->
-        <div class="lod-card state-active">
-          <div class="lod-card-top">
-            <div class="lod-level active-text">LOD 350</div>
-            <span class="lod-status-badge active">CURRENT ENGINE STATE</span>
-          </div>
-          <h3 class="lod-card-title">Interface Coordination Details</h3>
-          <p class="lod-card-desc">Elements modeled with accurate boundary conditions, structural connections, trims, and geometric coordination with adjacent systems.</p>
-          <ul class="lod-feature-list">
-            <li>Analytical beam-to-column trimming against column faces</li>
-            <li>Mitered wall corner footprints &amp; cross-joint cutout spans</li>
-            <li>Inner-surface bay slab alignment with column notches</li>
-            <li>Hosted curtain wall cutouts with mullions &amp; glazing</li>
-          </ul>
+        <div class="lod-num-card active">
+          <div class="lod-num-val">350</div>
+          <div class="lod-num-title">System Interfaces</div>
+          <span class="lod-num-badge active">Active Engine</span>
         </div>
 
         <!-- LOD 400 -->
-        <div class="lod-card state-planned">
-          <div class="lod-card-top">
-            <div class="lod-level planned-text">LOD 400</div>
-            <span class="lod-status-badge planned">Roadmap • Modular Plugins</span>
-          </div>
-          <h3 class="lod-card-title">Fabrication &amp; Assembly</h3>
-          <p class="lod-card-desc">Detailed shop geometry, rebar reinforcement cages, fabrication tolerances, steel connection plates, and CNC export.</p>
-          <ul class="lod-feature-list">
-            <li>Automated structural rebar cages &amp; bar bending schedules</li>
-            <li>Steel connection plates, gussets, and anchor bolt patterns</li>
-            <li>Automated Bill of Quantities (BOQ) &amp; BOM fabrication exports</li>
-          </ul>
+        <div class="lod-num-card">
+          <div class="lod-num-val">400</div>
+          <div class="lod-num-title">Fabrication &amp; Detailing</div>
+          <span class="lod-num-badge">Planned</span>
         </div>
 
         <!-- LOD 500 -->
-        <div class="lod-card state-future">
-          <div class="lod-card-top">
-            <div class="lod-level future-text">LOD 500</div>
-            <span class="lod-status-badge future">Roadmap • Future Lifecycle</span>
-          </div>
-          <h3 class="lod-card-title">As-Built &amp; Facility Operations</h3>
-          <p class="lod-card-desc">Field-verified as-built conditions with operational asset telemetry, maintenance lifecycle data, and facility management exchange.</p>
-          <ul class="lod-feature-list">
-            <li>Point cloud scan-to-BIM comparison &amp; overlay alignment</li>
-            <li>COBie (Construction Operations Building Information Exchange)</li>
-            <li>IoT sensor telemetry &amp; digital twin asset maintenance</li>
-          </ul>
+        <div class="lod-num-card">
+          <div class="lod-num-val">500</div>
+          <div class="lod-num-title">Operations &amp; As-Built</div>
+          <span class="lod-num-badge">Roadmap</span>
         </div>
       </div>
     </div>
@@ -577,7 +481,7 @@
         <!-- Column 1: Fully Working & Validated -->
         <div class="status-column col-working">
           <div class="status-column-header">
-            <div class="status-column-title" style="color: #34d399;">
+            <div class="status-column-title">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -691,7 +595,7 @@
         <!-- Column 2: In Progress & Upcoming Roadmap -->
         <div class="status-column col-pipeline">
           <div class="status-column-header">
-            <div class="status-column-title" style="color: #60a5fa;">
+            <div class="status-column-title">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
@@ -1141,6 +1045,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261112g"></script>
+  <script src="app.js?v=20261112h"></script>
 </body>
 </html>
