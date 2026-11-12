@@ -278,3 +278,25 @@ See [d:\Arch3D\AGENTS.md](file:///d:/Arch3D/AGENTS.md) for full architecture and
         - **Embedded Gzip Model**: Document::create_sample_building() embeds and decompresses sample_project.arch3d.gz (~24.9 KB) containing the authentic 10-storey apartment highrise model (450 elements, 10 levels, 24 views, layout sheet) for instant review on desktop and web app launch (pp.html).
         - **Unit Test Isolation**: Regression unit tests that verify specific coordinates, opening offsets, and ray intersections must use Document::create_test_box_building() or Document::new_empty() to avoid dependencies on sample building scale or layout changes.
         - **Public Download**: Published as [docs/sample_project.arch3d](file:///d:/Arch3D/docs/sample_project.arch3d) for direct import/export exchange testing.
+
+     58. **Automatic Fit Zoom Extents Standard (`CanvasState::zoom_extents_viewport`)**:
+         - **Bounding Box Calculation**: Model space viewports calculate the exact 3D/2D bounding box across all 18 element categories and site elements.
+         - **First-Frame Auto-Fit**: On first frame load and view activation, automatically positions camera at the model's centroid with a 12% safety margin (`0.76` fill factor), guaranteeing models open centered and fitted on both desktop and Web Studio.
+     59. **Refined Project Tree Procedural Vector Icons Standard (`IconKind::FloorPlanView` & `IconKind::SectionView`)**:
+         - **Floor Plan View Icon**: Procedurally renders an authentic architectural floor plan in `icons.rs` with partitioned rooms, door leaf, and 90° swing arc.
+         - **Section View Icon**: Procedurally renders an authentic building section cut in `icons.rs` with stepped building envelope, floor slabs, dashed vertical cutting plane line, and directional viewing arrow.
+     60. **Professional 3-Color Architectural Brand System & Zero Neon Glow Standard (`docs/styles.css`, `web_app.css`)**:
+         - **Zero Neon Glow**: Eliminates all wide 30–35px glowing box-shadow halos, neon pink/magenta gradients, and glowing radial backgrounds.
+         - **3-Color Architectural Identity**:
+           1. *Precision CAD Blueprint Blue* (`#2563eb` / `#1d4ed8` primary)
+           2. *Steel Slate / Cyan* (`#0ea5e9` / `#38bdf8` secondary)
+           3. *Architectural Obsidian / Slate Neutrals* (`#0b0f19`, `#111827`, `#1f2937` dark surfaces, crisp `#f8fafc` text; Light mode: `#ffffff` canvas with `#0f172a` slate text).
+     61. **Strict Cleanroom Architecture & Anti-Proprietary Screenshot Policy Standard (`.github/ISSUE_TEMPLATE`, `CONTRIBUTING.md`)**:
+         - **Zero Decompiled Code**: Never inspect, reference, or decompile proprietary CAD/BIM binary assemblies, DLLs, or source code.
+         - **Strict Anti-Proprietary Screenshot Rule**: Absolutely no screenshots or video captures of commercial proprietary software (Revit, ArchiCAD, AutoCAD, MicroStation, etc.) in GitHub Issues, PRs, or Discussions.
+         - **Approved References**: Only Arch3D screenshots, hand-drawn blueprints, or official buildingSMART IFC4 schema docs. Any issue containing proprietary software captures is immediately scrubbed and closed.
+         - **Mandatory Gated Forms**: GitHub Issue Forms (`bug_report.yml`, `feature_request.yml`) require explicit cleanroom checkboxes; unformatted blank issues are disabled (`config.yml`). PR template enforces contributor cleanroom sign-off.
+     62. **Sponsorship, Funding & Windows SmartScreen Setup**:
+         - **Active PayPal Donation Checkout**: Custom payment link `https://www.paypal.com/ncp/payment/PXBTVNQLUWF66` integrated across `.github/FUNDING.yml`, `README.md`, and `docs/index.html`.
+         - **GitHub Sponsors Onboarding**: `https://github.com/sponsors/dsalesarchitect` configured and pending GitHub approval.
+         - **Windows Defender SmartScreen Notice**: Documented standard unsigned open-source notice and 2-step click-through (*"More info"* -> *"Run anyway"*) in `README.md` and `docs/index.html`.

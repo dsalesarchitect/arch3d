@@ -315,3 +315,52 @@ Total: 107 passed; 0 failed; 0 ignored (0 errors)
 11. **Frustum & Marquee Selection Screen-Bounds Safety**: 3D selection highlights cull offscreen projected vertices outside `vp_rect.expand(200.0)`, and `draw_polygon_safe` only strokes borders if ear-clipping fails, eliminating infinite rays and screen-splitting wedges.
 12. **Universal Annotation & Architectural Snapping Engine**: Ribbon Annotation tab provides Linear Dim, Circular Dim, Angular Dim, Text Note, and Leader Callout with customizable tick marks, typography, and live magnetic snapping to all architecture and structure vertices, cut opening jamb corners, centerlines, and edges.
 13. **Landing Page, GitHub Pages & Cloudflare Deployment**: Zero-dependency landing page in `docs/` with interactive 3D HTML5 model canvas, ready for GitHub Pages (via `docs/.nojekyll` and `.github/workflows/deploy-pages.yml`) and Cloudflare Pages (via `docs/_headers`, `docs/_redirects`, and `wrangler.toml`). Fully documented in `DEPLOYMENT.md`.
+
+
+---
+
+## 5. Latest Implementations & Brand System (Session: November 12, 2026)
+
+### J. Automatic Fit Zoom Extents on Startup & View Activation
+- **Viewport Extents Calculation**: Added `CanvasState::zoom_extents_viewport()` in `crates/plinth-app/src/canvas.rs`. Computes the true 3D/2D bounding box across all 18 element categories and site elements.
+- **Safety Margin & Centroid Centering**: Centers the camera at the model's centroid with a 12% safety margin (`0.76` fill factor).
+- **Multi-Platform Consistency**: Automatically triggers on frame 1 and upon switching views/loading sample models, ensuring both desktop launcher and WebAssembly Web Studio open perfectly centered and fitted.
+
+### K. Authentic Architectural Procedural Vector Icons
+- **Floor Plan View Icon (`IconKind::FloorPlanView`)**: Renders an authentic floor plan diagram directly with mathematical strokes in `egui::Painter`: 3 partitioned rooms, door leaf, and 90° swing arc.
+- **Section View Icon (`IconKind::SectionView`)**: Renders an authentic building section cut with stepped building envelope, floor slabs, dashed vertical cutting plane line, and directional viewing arrow.
+- **Zero Raster Artifacts**: Maintains Arch3D's strict cleanroom procedural vector standard across all UI scales.
+
+### L. Professional 3-Color Architectural Brand Identity & Zero Neon Glow
+- **Neon Glow Removal**: Eliminated all wide 30–35px glowing box-shadow halos, neon pink/magenta gradients, and glowing radial background bursts across `docs/styles.css`, `docs/web_app.css`, and `docs/index.html`.
+- **Architectural 3-Color Palette**:
+  1. *Precision CAD Blueprint Blue* (`#2563eb` / `#1d4ed8` primary brand accent).
+  2. *Steel Slate / Cyan* (`#0ea5e9` / `#38bdf8` secondary accent).
+  3. *Architectural Obsidian & Slate Neutrals* (`#0b0f19`, `#111827`, `#1f2937` dark surfaces, crisp `#f8fafc` text; Light mode: `#ffffff` canvas with `#0f172a` slate text).
+- **Subtle Architectural Elevation**: Replaced neon shadows with crisp CAD drop shadows (`0 1px 3px rgba(0,0,0,0.2)` and `0 10px 25px -5px rgba(0,0,0,0.4)`).
+
+### M. Professional Typography & Official Brand Badges in GitHub Documentation
+- **Clean Section Headers**: Removed cartoon emojis from headings in `README.md` and `CONTRIBUTING.md`, adopting clean architectural typography.
+- **Flat-Square SVG Badges**: Integrated official vector logos for Rust, GPLv3, IFC4, WebAssembly, GitHub Sponsors, PayPal, and YouTube.
+- **Typographic Readiness Matrix**: Transformed emoji bullet lists into structured, technical readiness tiers (`Active Baseline`, `Core Engine`, `Planned (Plugin)`, `Future Lifecycle`).
+
+### N. Strict Cleanroom Architecture & Anti-Proprietary Screenshot Framework
+- **Gated Issue Forms**: Configured `.github/ISSUE_TEMPLATE/` (`bug_report.yml`, `feature_request.yml`) with required cleanroom sign-off checkboxes.
+- **Blank Issues Disabled**: `.github/ISSUE_TEMPLATE/config.yml` prevents unformatted issues that bypass compliance.
+- **Anti-Proprietary Screenshot Rule**: Explicitly prohibits uploading screenshots, videos, or UI captures of commercial proprietary software (Revit, ArchiCAD, AutoCAD, MicroStation, etc.).
+- **Immediate Scrubbing Policy**: Documented in `CONTRIBUTING.md` that any issue or PR containing proprietary commercial software captures will be closed and deleted on sight.
+- **Pull Request Certification**: `.github/PULL_REQUEST_TEMPLATE.md` mandates contributor certification of 100% original, non-decompiled code and zero proprietary assets.
+
+### O. Funding, Sponsorship & Windows SmartScreen Setup
+- **Active PayPal Donation Checkout**: Custom donation checkout link `https://www.paypal.com/ncp/payment/PXBTVNQLUWF66` integrated across `.github/FUNDING.yml`, `README.md`, and `docs/index.html`.
+- **GitHub Sponsors Onboarding**: `https://github.com/sponsors/dsalesarchitect` configured and pending GitHub review.
+- **Microsoft Defender SmartScreen Notice**: Added standard unsigned open-source notice and 2-step click-through (*"More info"* -> *"Run anyway"*) in `README.md` and `docs/index.html`.
+
+### P. Workspace Test Suite Status
+All **109 tests** across all 5 workspace crates pass with 100% success rate:
+- `plinth-app`: 41 passed
+- `plinth-geom`: 16 passed
+- `plinth-ifc`: 15 passed
+- `plinth-model`: 15 passed
+- `plinth-views`: 22 passed
+- Total: 109 passed; 0 failed; 0 ignored (0 errors)
