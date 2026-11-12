@@ -214,6 +214,10 @@
         }
       }
 
+      // Soft bottom taper so pixels smoothly dissolve before and around the interface window
+      const bottomTaper = normY > 0.65 ? Math.max(0, 1.0 - (normY - 0.65) / 0.30) : 1.0;
+      intensity *= bottomTaper;
+
       return Math.max(0, Math.min(1, intensity));
     }
 

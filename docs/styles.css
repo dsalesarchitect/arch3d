@@ -313,11 +313,10 @@ code {
 .hero, .hero-onda-section {
   position: relative;
   overflow: hidden;
-  padding: 100px 0 60px;
-  min-height: calc(100vh - 68px);
+  padding: 96px 0 90px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  border-bottom: none !important;
 }
 
 .hero-silk-bg {
@@ -337,14 +336,40 @@ code {
   display: block;
 }
 
+/* Soft feathered transition — absolutely zero sharp partition lines */
 .hero-silk-fade {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 38%;
-  background: linear-gradient(to top, var(--bg-primary) 15%, transparent 100%);
+  height: 480px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.0) 25%,
+    rgba(255, 255, 255, 0.40) 60%,
+    rgba(255, 255, 255, 0.85) 85%,
+    var(--bg-primary) 100%
+  );
   pointer-events: none;
+}
+
+[data-theme="dark"] .hero-silk-fade {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 13, 20, 0.0) 25%,
+    rgba(10, 13, 20, 0.40) 60%,
+    rgba(10, 13, 20, 0.85) 85%,
+    var(--bg-primary) 100%
+  );
+}
+
+.hero-viewport-wrap {
+  width: 100%;
+  max-width: 1360px;
+  margin: 56px auto 0 auto;
+  padding: 0 24px;
 }
 
 /* Onda Split Hero Container */
@@ -632,14 +657,19 @@ code {
 
 /* Real Live Arch3D Studio App UI Frame */
 .app-ui-frame {
-  margin-top: 40px;
+  margin-top: 0;
   background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.20);
   display: flex;
   flex-direction: column;
+}
+
+[data-theme="dark"] .app-ui-frame {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.65);
 }
 
 .app-window-bar {
