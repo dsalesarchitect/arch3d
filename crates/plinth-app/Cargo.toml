@@ -29,7 +29,7 @@ plinth-ifc.workspace = true
 
 eframe.workspace = true
 egui.workspace = true
-egui_glow = "0.31"
+egui_glow = "0.37"
 glow = "0.16"
 rfd.workspace = true
 serde.workspace = true
