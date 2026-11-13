@@ -1,0 +1,12 @@
+# Arch3D Code Ownership — Require maintainer approval for all changes
+* @dsalesarchitect
+
+# High-security surfaces (CI, dependencies, auto-updater, launcher, web deployment)
+/.github/ @dsalesarchitect
+/Cargo.toml @dsalesarchitect
+/Cargo.lock @dsalesarchitect
+/deny.toml @dsalesarchitect
+/SECURITY.md @dsalesarchitect
+/crates/plinth-app/src/home_screen.rs @dsalesarchitect
+/crates/plinth-app/src/app.rs @dsalesarchitect
+/docs/ @dsalesarchitect

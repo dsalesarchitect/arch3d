@@ -1,0 +1,58 @@
+# Arch3D Supply-Chain & Crate Firewall (cargo-deny)
+# Blocks known CVEs, banned telemetry/HTTP crates, and untrusted registries.
+
+[graph]
+targets = [
+    "x86_64-pc-windows-gnu",
+    "x86_64-unknown-linux-gnu",
+]
+all-features = false
+
+[advisories]
+version = 2
+yanked = "warn"
+ignore = []
+
+[licenses]
+version = 2
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "Zlib",
+    "GPL-3.0-or-later",
+    "MPL-2.0",
+    "CC0-1.0",
+    "BSL-1.0",
+]
+confidence-threshold = 0.8
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+highlight = "all"
+
+# Ban HTTP client, telemetry, and analytics crates from being added silently
+deny = [
+    { name = "reqwest", reason = "Unauthorized HTTP client crate — Arch3D is local-first with zero telemetry." },
+    { name = "ureq", reason = "Unauthorized HTTP client crate — Arch3D is local-first with zero telemetry." },
+    { name = "hyper", reason = "Unauthorized HTTP stack — Arch3D is local-first with zero telemetry." },
+    { name = "surf", reason = "Unauthorized HTTP client crate." },
+    { name = "isahc", reason = "Unauthorized HTTP client crate." },
+    { name = "attohttpc", reason = "Unauthorized HTTP client crate." },
+    { name = "curl", reason = "Unauthorized libcurl binding." },
+    { name = "sentry", reason = "Telemetry/crash-reporting crate is strictly prohibited." },
+    { name = "opentelemetry", reason = "Telemetry crate is strictly prohibited." },
+    { name = "posthog-rs", reason = "Analytics/tracking crate is strictly prohibited." },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
