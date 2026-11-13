@@ -1,0 +1,177 @@
+name: Arch3D Security Gate & Contributor Audit
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - ui-refresh
+  push:
+    branches:
+      - main
+      - master
+      - ui-refresh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  malware-and-tracker-scan:
+    name: Malware, Virus & Data-Tracker Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Scan for Hidden Trackers, Malware, Build Scripts & Trojan Unicode
+        shell: python3 {0}
+        run: |
+          import os, re, sys
+
+          findings = []
+
+          # 1. Disallow binary executables and suspicious scripts anywhere in repo
+          banned_exts = {'.exe', '.dll', '.msi', '.so', '.dylib', '.vbs', '.scr', '.ps1', '.com', '.pif'}
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in {'.git', 'target'}]
+              for fn in files:
+                  path = os.path.join(root, fn).replace('\\', '/')
+                  ext = os.path.splitext(fn)[1].lower()
+                  if ext in banned_exts:
+                      findings.append(f"BINARY/SCRIPT DROP: `{path}` (executables/binaries must never be committed to source)")
+                  # 2. Disallow build.rs (Rust build scripts execute arbitrary code at compile time)
+                  if fn == 'build.rs':
+                      findings.append(f"BUILD SCRIPT: `{path}` (`build.rs` executes arbitrary code during compilation — requires explicit maintainer review)")
+
+          # 3. Trojan Source (CVE-2021-42574) invisible bidirectional Unicode characters
+          bidi_chars = set(range(0x202A, 0x202F)) | set(range(0x2066, 0x206A)) | {0x200E, 0x200F}
+
+          # Allowed network URLs & local IPC files
+          allowed_url_prefixes = (
+              'https://github.com/dsalesarchitect/arch3d',
+              'https://api.github.com/repos/dsalesarchitect/arch3d',
+              'https://objects.githubusercontent.com/',
+              'https://dsalesarchitect.github.io/arch3d',
+              'https://www.youtube.com/@OpenSourceArchitecture',
+              'https://mutracer-dev.meimu-studio.com',
+              'https://github.com/pissang/mutracer',
+              'https://github.com/rsms/inter',
+              'https://www.paypal.com/ncp/payment/PXBTVNQLUWF66',
+              'https://github.com/sponsors/dsalesarchitect',
+              'https://fonts.googleapis.com',
+              'https://fonts.gstatic.com',
+              'https://crates.io',
+              'https://docs.rs',
+              'https://rust-lang.org',
+              'https://www.buildingsmart.org',
+              'https://example.com/', # unit test fixture only
+          )
+
+          allowed_command_files = {
+              './crates/plinth-app/src/home_screen.rs',
+              './crates/plinth-app/src/app.rs',
+          }
+          allowed_unsafe_files = {
+              './crates/plinth-app/src/gpu_viewport.rs',
+          }
+
+          scan_exts = {'.rs', '.toml', '.js', '.html', '.css', '.yml', '.yaml'}
+
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in {'.git', 'target'}]
+              for fn in files:
+                  path = os.path.join(root, fn).replace('\\', '/')
+                  ext = os.path.splitext(fn)[1].lower()
+                  if ext not in scan_exts:
+                      continue
+                  try:
+                      with open(path, 'r', encoding='utf-8', errors='replace') as f:
+                          lines = f.readlines()
+                  except Exception as e:
+                      findings.append(f"READ ERROR: `{path}` ({e})")
+                      continue
+
+                  for idx, line in enumerate(lines, 1):
+                      # Check Trojan Source invisible bidi characters
+                      if any(ord(ch) in bidi_chars for ch in line):
+                          findings.append(f"TROJAN UNICODE: `{path}:{idx}` contains hidden bidirectional control characters")
+
+                      # Only inspect code files (crates/ and docs/) for runtime trackers/exec
+                      is_code = path.startswith('./crates/') or path.startswith('./docs/')
+                      if not is_code:
+                          continue
+
+                      # Check unauthorized HTTP/HTTPS URLs in code
+                      for m in re.finditer(r'https?://[^\s"\'\)\]>`,;]+', line):
+                          url = m.group(0)
+                          if not any(url.startswith(p) for p in allowed_url_prefixes):
+                              findings.append(f"UNAUTHORIZED URL: `{path}:{idx}` -> `{url}`")
+
+                      # Check web trackers in docs/
+                      if path.startswith('./docs/'):
+                          if re.search(r'\b(fetch\s*\(|XMLHttpRequest|sendBeacon|new\s+WebSocket|eval\s*\(|new\s+Function\s*\()\b', line):
+                              findings.append(f"WEB TRACKER / EVAL: `{path}:{idx}` -> `{line.strip()[:80]}`")
+
+                      # Check Rust network / process / unsafe outside allowlist
+                      if ext == '.rs':
+                          if re.search(r'\b(reqwest|ureq|surf|isahc|attohttpc|UdpSocket|sentry|posthog)\b', line):
+                              findings.append(f"SUSPICIOUS CRATE/NET: `{path}:{idx}` -> `{line.strip()[:80]}`")
+                          if 'TcpStream' in line and path != './crates/plinth-app/src/app.rs':
+                              findings.append(f"UNAUTHORIZED SOCKET: `{path}:{idx}` -> `{line.strip()[:80]}`")
+                          if 'std::process::Command' in line and path not in allowed_command_files:
+                              findings.append(f"UNAUTHORIZED SHELL EXEC: `{path}:{idx}` -> `{line.strip()[:80]}`")
+                          if re.search(r'\bunsafe\s*(\{|fn\b)', line) and path not in allowed_unsafe_files:
+                              findings.append(f"NEW UNSAFE BLOCK: `{path}:{idx}` -> `{line.strip()[:80]}`")
+
+          summary_path = os.environ.get('GITHUB_STEP_SUMMARY')
+          if findings:
+              msg = "## ❌ Arch3D Security Gate BLOCKED Potential Threat\n\n" + "\n".join(f"- {x}" for x in findings)
+              print(msg, file=sys.stderr)
+              if summary_path:
+                  with open(summary_path, 'a', encoding='utf-8') as s:
+                      s.write(msg + "\n")
+              sys.exit(1)
+          else:
+              msg = "## ✅ Arch3D Security Gate Passed\n- Zero unauthorized URLs or data trackers\n- Zero binary drops or `build.rs` scripts\n- Zero Trojan Source Unicode characters\n- Zero unauthorized `unsafe` or shell execution blocks\n"
+              print(msg)
+              if summary_path:
+                  with open(summary_path, 'a', encoding='utf-8') as s:
+                      s.write(msg + "\n")
+
+  rustsec-audit:
+    name: Vulnerability Scan (cargo-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Run RustSec Advisory Audit
+        uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  supply-chain-deny:
+    name: Supply-Chain Firewall (cargo-deny)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Run cargo-deny (Licenses, Bans, Sources)
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check bans licenses sources
+
+  workspace-tests:
+    name: Build & Test Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Workspace Tests
+        run: cargo test --workspace
