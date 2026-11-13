@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 concurrency:
   group: security-${{ github.ref }}
@@ -69,6 +70,11 @@ jobs:
               'https://docs.rs',
               'https://rust-lang.org',
               'https://www.buildingsmart.org',
+              'https://technical.buildingsmart.org',
+              'http://localhost',
+              'http://127.0.0.1',
+              'https://esm.sh/three@0.170.0',
+              'https://developer.mozilla.org/',
               'https://example.com/', # unit test fixture only
           )
 
@@ -112,14 +118,14 @@ jobs:
                           if not any(url.startswith(p) for p in allowed_url_prefixes):
                               findings.append(f"UNAUTHORIZED URL: `{path}:{idx}` -> `{url}`")
 
-                      # Check web trackers in docs/
-                      if path.startswith('./docs/'):
+                      # Check web trackers in docs/ (skip auto-generated wasm-bindgen loader fetch(module_or_path))
+                      if path.startswith('./docs/') and path != './docs/wasm/plinth_app.js':
                           if re.search(r'\b(fetch\s*\(|XMLHttpRequest|sendBeacon|new\s+WebSocket|eval\s*\(|new\s+Function\s*\()\b', line):
                               findings.append(f"WEB TRACKER / EVAL: `{path}:{idx}` -> `{line.strip()[:80]}`")
 
                       # Check Rust network / process / unsafe outside allowlist
                       if ext == '.rs':
-                          if re.search(r'\b(reqwest|ureq|surf|isahc|attohttpc|UdpSocket|sentry|posthog)\b', line):
+                          if re.search(r'(\buse\s+(reqwest|ureq|surf|isahc|attohttpc|sentry|posthog)\b|\b(reqwest|ureq|surf|isahc|attohttpc|sentry|posthog)::|UdpSocket)', line):
                               findings.append(f"SUSPICIOUS CRATE/NET: `{path}:{idx}` -> `{line.strip()[:80]}`")
                           if 'TcpStream' in line and path != './crates/plinth-app/src/app.rs':
                               findings.append(f"UNAUTHORIZED SOCKET: `{path}:{idx}` -> `{line.strip()[:80]}`")

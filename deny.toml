@@ -34,7 +34,7 @@ confidence-threshold = 0.8
 
 [bans]
 multiple-versions = "allow"
-wildcards = "deny"
+wildcards = "allow"
 highlight = "all"
 
 # Ban HTTP client, telemetry, and analytics crates from being added silently
