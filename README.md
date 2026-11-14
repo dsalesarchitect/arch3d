@@ -126,9 +126,6 @@ cargo test --workspace
 cargo run --bin arch3d
 ```
 
-### Windows One-Click Launcher
-Double-click `Launch-Arch3D.bat` in the repository root.
-
 ### Windows Installer & Microsoft Defender SmartScreen Notice
 
 > [!NOTE]
