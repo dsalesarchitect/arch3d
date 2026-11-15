@@ -15,7 +15,7 @@ edition = "2021"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/dsalesarchitect/arch3d"
 rust-version = "1.81"
-authors = ["David Sales <dsalesarchitect@gmail.com>", "Arch3D Contributors"]
+authors = ["David Sales <dsalesarchitect@gmail.com>"]
 
 [workspace.dependencies]
 # Internal crates

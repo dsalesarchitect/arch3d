@@ -1,6 +1,8 @@
 ## Pull Request — Cleanroom & Code Compliance
 
-### ⚠️ Cleanroom Contributor Certification (Mandatory)
+> **Notice**: **Arch3D is not accepting external Pull Requests at this time.** Unsolicited external Pull Requests will be closed without review. Please use GitHub Issues for bug reports and feature proposals.
+
+### ⚠️ Cleanroom Certification (Mandatory)
 Please read and verify all checkboxes before requesting review. Any PR failing cleanroom certification will be immediately rejected and closed.
 
 - [ ] **Cleanroom Verification**: I certify that this code is 100% original work authored by me, or provided under compatible open-source terms (GPL-3.0-or-later).

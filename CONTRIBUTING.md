@@ -1,6 +1,7 @@
-# Contributing to Arch3D
+# Issue Reporting & Cleanroom Policy — Arch3D
 
-Thank you for your interest in contributing to **Arch3D**! Arch3D is an open-source, cleanroom BIM (Building Information Modeling) engine and authoring application powered by a high-performance pure Rust engine.
+> [!NOTE]
+> **External Code Contributions Closed**: **Arch3D** is currently developed and maintained solely by the author (`@dsalesarchitect`). **We are not accepting external code contributions or Pull Requests at this time** (this policy may be revisited in the future). Bug reports and feature proposals via GitHub Issues remain welcome under the cleanroom policy below.
 
 ---
 

@@ -23,9 +23,9 @@ If you discover a security vulnerability in Arch3D or a suspicious dependency:
 
 ---
 
-## Contributor Security Requirements
+## Pull Request & Security Requirements
 
-All Pull Requests must pass:
+> **Note**: Arch3D is not accepting external Pull Requests at this time. All maintainer or future Pull Requests must pass:
 1. **Code Owner Approval** (`@dsalesarchitect`).
 2. **Arch3D Security Gate (`security-audit.yml`)**: Automated scan for unauthorized network trackers, shell commands, `build.rs` scripts, Trojan Source Unicode characters, new `unsafe` blocks, and binary drops.
 3. **RustSec & Supply-Chain Audit**: `cargo-audit` and `cargo-deny` (`deny.toml`).
