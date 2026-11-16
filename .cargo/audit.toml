@@ -1,0 +1,8 @@
+# Arch3D cargo-audit configuration
+# Ignore only Linux-only transitive advisories in `accesskit_unix -> zbus_xml 4.0.0 -> quick-xml 0.30.0`
+# (not compiled into Windows `arch3d.exe`, pinned by `eframe 0.31.1`).
+[advisories]
+ignore = [
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+]
