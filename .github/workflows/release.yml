@@ -1,9 +1,6 @@
 name: Build & Publish Arch3D Release (with SHA-256)
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
