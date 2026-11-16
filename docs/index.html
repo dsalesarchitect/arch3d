@@ -140,7 +140,7 @@
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </a>
-            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="pill-btn pill-btn-outline">
+            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="msi" class="pill-btn pill-btn-outline">
               <span>Windows (.msi)</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -148,7 +148,7 @@
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
             </a>
-            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="pill-btn pill-btn-outline">
+            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="deb" class="pill-btn pill-btn-outline">
               <span>Linux (.deb)</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -156,7 +156,7 @@
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
             </a>
-            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="pill-btn pill-btn-outline">
+            <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="dmg" class="pill-btn pill-btn-outline">
               <span>macOS (.dmg)</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -770,7 +770,7 @@
       <div class="section-header">
         <div class="section-tag">Community</div>
         <h2 class="section-title">Open Collaboration</h2>
-        <p>Connect with architects, engineers, and designers following an open, unencumbered BIM ecosystem.</p>
+        <p>Connect with architects, engineers, and contributors building an open, unencumbered BIM ecosystem.</p>
       </div>
 
       <div class="grid-3 reveal-stagger" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
@@ -960,7 +960,7 @@
         </p>
 
         <div class="hero-actions" style="margin-bottom: 24px;">
-          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
+          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="msi" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -968,10 +968,10 @@
             </svg>
             Windows (.msi / .zip)
           </a>
-          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="btn btn-secondary" style="padding: 12px 22px;">
+          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="deb" class="btn btn-secondary" style="padding: 12px 22px;">
             Linux (.deb / .tar.gz)
           </a>
-          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" class="btn btn-secondary" style="padding: 12px 22px;">
+          <a href="https://github.com/dsalesarchitect/arch3d/releases/latest" data-installer="dmg" class="btn btn-secondary" style="padding: 12px 22px;">
             macOS (.dmg)
           </a>
           <a href="https://github.com/dsalesarchitect/arch3d" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 12px 22px;">
@@ -1068,5 +1068,34 @@
   </footer>
 
   <script src="app.js?v=20261112h"></script>
+  <script>
+    (function () {
+      fetch('https://api.github.com/repos/dsalesarchitect/arch3d/releases/latest')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (rel) {
+          if (!rel || !Array.isArray(rel.assets)) return;
+          var findAsset = function (ext) {
+            return rel.assets.find(function (a) {
+              return a.name && a.name.toLowerCase().endsWith(ext) && a.browser_download_url;
+            });
+          };
+          var map = {
+            msi: findAsset('.msi') || findAsset('-x64.zip'),
+            deb: findAsset('.deb') || findAsset('linux-x64.tar.gz'),
+            dmg: findAsset('.dmg')
+          };
+          document.querySelectorAll('a[data-installer]').forEach(function (el) {
+            var kind = el.getAttribute('data-installer');
+            var asset = map[kind];
+            if (asset) {
+              el.href = asset.browser_download_url;
+              el.setAttribute('download', asset.name);
+              el.title = 'Direct download ' + asset.name + ' (' + (rel.tag_name || 'latest') + ')';
+            }
+          });
+        })
+        .catch(function () {});
+    })();
+  </script>
 </body>
 </html>
