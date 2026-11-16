@@ -40,33 +40,6 @@ Arch3D offers a streamlined, developer-friendly architectural and structural mod
 
 ---
 
-## Workspace Architecture
-
-```text
-arch3d/
-├── crates/
-│   ├── plinth-geom/     # Geometry kernel: 2D/3D vectors, AABBs, affine transforms,
-│   │                    # ear-clipping polygon triangulation, prism solids, clipping.
-│   │
-│   ├── plinth-model/    # Central Single Source of Truth BIM model:
-│   │                    # Elements (Wall, Column, Beam, Slab, Ceiling, Door, Window,
-│   │                    # Dimension, DetailLine), Levels, Grids, Materials, Undo/Redo.
-│   │
-│   ├── plinth-views/    # Multi-view projection engine:
-│   │                    # Floor Plan (cut plane at 1200mm, door swing arcs, glazing),
-│   │                    # Reflected Ceiling Plan (RCP tile grid), Elevations (N/S/E/W),
-│   │                    # Section cuts (solid slicing & hatching), 3D shaded view, Details.
-│   │
-│   ├── plinth-ifc/      # Standards-compliant IFC4 STEP physical file exporter and parser
-│   │                    # (ISO 10303-21) with buildingSMART 22-char GUID compression.
-│   │
-│   └── plinth-app/      # Interactive desktop application (egui / eframe):
-│                        # Ribbon bar, Project Browser tree, Properties inspector,
-│                        # interactive viewport canvas with grid snapping and tool state machine.
-```
-
----
-
 ## Ribbon Tools & Modeling Suite
 
 ### 1. Architecture
@@ -109,50 +82,21 @@ arch3d/
 
 ## Quick Start
 
-### Build and Run
-
-```bash
-# Clone the repository
-git clone https://github.com/dsalesarchitect/arch3d.git
-cd arch3d
-
-# Check workspace
-cargo check --workspace
-
-# Run all unit and projection tests
-cargo test --workspace
-
-# Run Arch3D Desktop
-cargo run --bin arch3d
-```
+### Download Desktop App
+Download the latest Windows installer (`.msi`) or portable archive (`.zip`) from the [GitHub Releases](https://github.com/dsalesarchitect/arch3d/releases/latest) page.
 
 ### Windows Installer & Microsoft Defender SmartScreen Notice
 
 > [!NOTE]
 > **Windows Defender SmartScreen Notice**:
-> Arch3D Windows installer and executable binaries are not yet digitally signed with an expensive commercial Microsoft code-signing certificate (which is standard and normal for independent, newly released open-source software under active development).
+> Arch3D Windows installer and executable binaries are not yet digitally signed with a commercial Microsoft code-signing certificate.
 >
 > When installing or launching for the first time, Windows Defender SmartScreen may display:
 > *"Windows protected your PC — Microsoft Defender SmartScreen prevented an unrecognized app from starting"*.
 > - **To install/run:** Click **"More info"**, then click **"Run anyway"**.
-> - Arch3D is 100% free and open-source (GPL-3.0-or-later), pure clean-room Rust, completely malware-free, and all source code is publicly auditable right here on GitHub. You can also build directly from source using `cargo run --bin arch3d`.
 
 ### Web Studio (GitHub Pages)
 Test live in your browser without installation: [https://dsalesarchitect.github.io/arch3d/](https://dsalesarchitect.github.io/arch3d/)
-
----
-
-## Analytical Projection Engine
-
-In Arch3D, every building element is stored once in 3D world space at standard 1:1 scale (mm):
-$$\mathbf{X}_{world} = (x, y, z) \in \mathbb{R}^3$$
-
-When viewing the model:
-1. **Floor Plan**: Slices the model at $Z_{cut} = Z_{level} + 1200\,\text{mm}$. Cutting solids are filled with cut hatch and outlined with heavy cut line weights. Door swing arcs and window sill geometry are generated.
-2. **Reflected Ceiling Plan (RCP)**: Looks upwards from $Z_{cut} = Z_{level} + 2300\,\text{mm}$, rendering ceiling boundary perimeters and tile module grid lines (e.g. $600 \times 600\,\text{mm}$).
-3. **Elevations**: Orthographically projects exterior faces onto North, South, East, and West planes with level datum markers and heavy ground lines.
-4. **Sections**: Slices model prisms against arbitrary vertical cutting lines $(S_1, S_2)$, computing mathematically exact cut polygons and background projection lines.
-5. **3D View**: Directional sunlight shading ($I = 0.45 + 0.55 \max(0, \mathbf{n} \cdot \mathbf{l})$), back-face culling, depth sorting, and crisp architectural edge linework.
 
 ---
 
