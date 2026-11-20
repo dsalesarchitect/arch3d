@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Scan for Hidden Trackers, Malware, Build Scripts & Trojan Unicode
         shell: python3 {0}
@@ -154,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Run RustSec Advisory Audit
         uses: rustsec/audit-check@v2
         with:
@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Run cargo-deny (Licenses, Bans, Sources)
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
@@ -176,7 +176,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Run Workspace Tests
