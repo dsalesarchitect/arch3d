@@ -17,6 +17,25 @@
 
 <img src="docs/images/arch3d-multi-view-light.png" alt="Arch3D Multi-Viewport Studio UI" width="100%">
 
+<br><br>
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/images/arch3d-multi-view-dark.png" alt="Sheet Layout Desk" width="100%"><br>
+      <sub><b>Sheet Layout Desk &amp; Titleblock</b></sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/images/arch3d-roof-framing.png" alt="Parametric Roofs, PBR Materials & 3D Blocks" width="100%"><br>
+      <sub><b>Parametric Roofs, PBR Materials &amp; 3D Blocks</b></sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/images/arch3d-facade-detail.png" alt="Free Modeling Fillet & Push/Pull" width="100%"><br>
+      <sub><b>Free Modeling Fillet, Push/Pull &amp; Libraries</b></sub>
+    </td>
+  </tr>
+</table>
+
 </div>
 
 > [!WARNING]
