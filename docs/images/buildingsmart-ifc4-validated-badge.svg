@@ -4,10 +4,6 @@
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#111c33"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10b981"/>
-      <stop offset="100%" stop-color="#059669"/>
-    </linearGradient>
     <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#10b981" stop-opacity="0.7"/>
       <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.5"/>
@@ -18,10 +14,28 @@
   <!-- Outer card -->
   <rect x="1" y="1" width="618" height="82" rx="12" fill="url(#bg)" stroke="url(#borderGrad)" stroke-width="1.5"/>
 
-  <!-- Left shield emblem -->
-  <g transform="translate(18, 16)">
-    <path d="M26 2 L48 10 V26 C48 39 38.5 48.5 26 52 C13.5 48.5 4 39 4 26 V10 Z" fill="url(#accent)" fill-opacity="0.16" stroke="#10b981" stroke-width="2"/>
-    <path d="M16.5 26.5 L23 33 L36.5 19.5" fill="none" stroke="#34d399" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- White emblem tile for crisp buildingSMART knot mark -->
+  <rect x="14" y="15" width="54" height="54" rx="10" fill="#ffffff"/>
+
+  <!-- buildingSMART interlocking diamond knot mark -->
+  <g transform="translate(41, 42)">
+    <!-- Top-left teal loop -->
+    <rect x="-13.5" y="-13.5" width="14" height="14" rx="3" transform="rotate(45)" fill="none" stroke="#009ca6" stroke-width="3.4"/>
+    <!-- Top-right crimson loop -->
+    <rect x="-0.5" y="-13.5" width="14" height="14" rx="3" transform="rotate(45)" fill="none" stroke="#c8102e" stroke-width="3.4"/>
+    <!-- Bottom-left navy loop -->
+    <rect x="-13.5" y="-0.5" width="14" height="14" rx="3" transform="rotate(45)" fill="none" stroke="#1d3c6a" stroke-width="3.4"/>
+    <!-- Bottom-right teal loop -->
+    <rect x="-0.5" y="-0.5" width="14" height="14" rx="3" transform="rotate(45)" fill="none" stroke="#009ca6" stroke-width="3.4"/>
+    <!-- Interlocking weave highlights -->
+    <line x1="-4" y1="-4" x2="4" y2="4" stroke="#ffffff" stroke-width="1.2" opacity="0.7"/>
+    <line x1="4" y1="-4" x2="-4" y2="4" stroke="#1d3c6a" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Verified green checkmark seal on corner of tile -->
+  <g transform="translate(59, 60)">
+    <circle cx="0" cy="0" r="8.5" fill="#10b981" stroke="#0f172a" stroke-width="2"/>
+    <path d="M-3.5 0.2 L-1 2.7 L3.8 -2.3" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <!-- Main text -->
