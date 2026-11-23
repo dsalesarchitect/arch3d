@@ -13,6 +13,12 @@
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c?style=flat-square&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66)
 [![YouTube](https://img.shields.io/badge/YouTube-%40OpenSourceArchitecture-ff0000?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/@OpenSourceArchitecture)
 
+<br>
+
+<a href="docs/reports/buildingsmart-ifc4-validation-report.pdf">
+  <img src="docs/images/buildingsmart-ifc4-validated-badge.svg" alt="buildingSMART IFC4 ReferenceView V1.2 Validated — 0 Errors, 0 Warnings" width="540">
+</a>
+
 <br><br>
 
 <img src="docs/images/arch3d-multi-view-light.png" alt="Arch3D Multi-Viewport Studio UI" width="100%">
