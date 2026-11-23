@@ -7,6 +7,7 @@
 [![Rust 1.81+](https://img.shields.io/badge/Rust-1.81%2B-black?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-2563eb?style=flat-square)](LICENSE)
 [![Schema: IFC4](https://img.shields.io/badge/Schema-IFC4_ISO_10303--21-0ea5e9?style=flat-square)](https://technical.buildingsmart.org/standards/ifc/)
+[![buildingSMART Validation](https://img.shields.io/badge/buildingSMART_Validation-IFC4_RV1.2_Passed-16a34a?style=flat-square)](https://validate.buildingsmart.org/)
 [![Web Studio](https://img.shields.io/badge/Web_Studio-Live_Preview-10b981?style=flat-square&logo=webassembly&logoColor=white)](https://dsalesarchitect.github.io/arch3d/)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/dsalesarchitect)
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-00457c?style=flat-square&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PXBTVNQLUWF66)
@@ -14,7 +15,7 @@
 
 <br><br>
 
-<img src="docs/images/arch3d-multi-view-dark.png" alt="Arch3D Multi-Viewport Studio UI" width="100%">
+<img src="docs/images/arch3d-multi-view-light.png" alt="Arch3D Multi-Viewport Studio UI" width="100%">
 
 </div>
 
@@ -32,7 +33,8 @@ Arch3D offers a streamlined, developer-friendly architectural and structural mod
 - **Modern Ribbon Interface**: Intuitive top ribbon organized into **Architecture**, **Structure**, **Site**, **Free Modeling**, **Annotation**, **Modify**, **Manage**, and **Insert** panels.
 - **Single Source of Truth**: All views—**Floor Plans**, **Reflected Ceiling Plans (RCP)**, **Building Elevations (N, S, E, W)**, **Building Sections**, **3D Axonometric/Perspective**, and **Detail Callouts**—are dynamically projected in real-time from a single central 3D building model.
 - **Standard 1:1 Scale**: Every element is modeled at real-world scale in millimetres (`mm`), with customizable view scale representation (1:1 up to 1:1000).
-- **ISO 10303-21 IFC4 Standard File Format**: Full export and import support for buildingSMART IFC4 schema (`IfcProject`, `IfcSite`, `IfcBuilding`, `IfcBuildingStorey`, `IfcWall`, `IfcColumn`, `IfcBeam`, `IfcSlab`, `IfcCovering`, `IfcDoor`, `IfcWindow`, `IfcCurtainWall`, `IfcRoof`, `IfcStair`, `IfcRamp`, `IfcRailing`, `IfcFooting`, `IfcExtrudedAreaSolid`, `IfcRelAggregates`, and `IfcRelContainedInSpatialStructure`).
+- **ISO 10303-21 IFC4 Standard File Format**: Full export and import support for buildingSMART IFC4 (`ReferenceView_V1.2`) schema (`IfcProject`, `IfcSite`, `IfcBuilding`, `IfcBuildingStorey`, `IfcWall`, `IfcColumn`, `IfcBeam`, `IfcSlab`, `IfcCovering`, `IfcDoor`, `IfcWindow`, `IfcCurtainWall`, `IfcRoof`, `IfcStair`, `IfcRamp`, `IfcRailing`, `IfcFooting`, `IfcPipeSegment`, `IfcExtrudedAreaSolid`, `IfcFacetedBrep`, `IfcProjectedCRS`, `IfcMapConversion`, `IfcRelAggregates`, and `IfcRelContainedInSpatialStructure`).
+- **buildingSMART Validation Service Verified**: Exported IFC4 models pass all 4 active checks on [`validate.buildingsmart.org`](https://validate.buildingsmart.org/) (**STEP Syntax**, **IFC Schema**, **Normative IFC Rules**, and **Industry Practices**) with **0 errors and 0 warnings**—including pure-ASCII STEP encoding, manifold planar B-Reps, standard `Pset_*Common` property sets, and `IfcProjectedCRS` georeferencing.
 - **CAD & Mesh Ingestion**: Reads `.dwg`/`.dxf` via `acadrust` and SketchUp `.skp` via `openskp` without proprietary SDKs.
 - **Hardware GPU Viewport**: Direct OpenGL hardware depth-buffered rendering (`glow`) with 24-bit Z-buffer and 4x MSAA.
 - **Live Sync & Interoperability**: glTF 2.0 Binary (`.glb`) export, WebGPU path tracing studio (`@meimu/mutracer`), and Blender Live Sync bidirectional socket bridge.
